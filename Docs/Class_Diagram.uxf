@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1.0">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>8</x>
+      <y>56</y>
+      <w>248</w>
+      <h>952</h>
+    </coordinates>
+    <panel_attributes>Book
+--
+-Book_Id: int
+-Author: string
+-ISBN: string
+-Title: string
+-Copies: Copy[*]
+-Loans: Loan[*]
+
+{innerclass
++Copy
+&lt;&lt;static&gt;&gt;
+--
+-Copy_Id: int
+-Book_Id: int
+-Book_Ref: Book [1]
+-Loan_Ref: Loan [0..1]
+--
+- Copy(): void
++ Copy(book: Book): void
++ Copy(Book_Id: int, Copy_Id: int): void
++ Copy(book: Book, Copy_Id: int): void
+
+innerclass}
+
+{innerclass
++Loan
+&lt;&lt;static&gt;&gt;
+--
+-Loan_Id: int
+-Copy_Id: int
+-User_Id: int
+-Date_Out: Date
+-Date_Due: Date
+-Active: Boolean = True
+-Copy_Ref: Copy [1]
+-User_Ref: User [1]
+-Book_Ref: Book [1]
+--
+-Loan(): void
++Loan(Copy_Id: int, User_Id: int,
+  Date_Out: Date, Date_Due: Date)
++Loan(Loan_Id: int): void {Query
+  Loan info from DB}
++Loan(Loan_ID: int, Copy_Id: int,
+  User_Id: int, Date_Out: Date,
+  Date_Due: Date)  
++Renew(): void
++Renew(Renew_Date: Date): void
++Return(): void
++Return(Return_Date: Date): void
+innerclass}
+--
++Book():void {Default Constructor}
++Book(Book_Id: int, Author: string,
+  ISBN: string, Title: string): void
++toString(): string
++addCopy(Id: int): void
++addCopy(): int {returns Copy_Id}
++remCopy(Id: int): void
++Count(): int
+-loadCopies(): int
++getCopies(): Copy[*]
++getID(): int
++getAuthor(): String
++getISBN(): String
++getTitle(): String
++getLoans(): Loan[*]
++setAuthor(Author: String): void
++setISBN(ISBN: String): void
++setTitle(Title: String): void
++addLoan(Copy_Id: int, User_Id: int,
+  Date_Out: Date, Date_Due: Date): void
++returnLoan(Loan_Id: int,
+  Return_Date: Date): void
++ renewLoan(Loan_Id: int, 
+  Renew_Date: Date): void
+- loadLoans(): int
+
+ 
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>472</x>
+      <y>0</y>
+      <w>272</w>
+      <h>632</h>
+    </coordinates>
+    <panel_attributes>/User/
+--
+-User_Id: int
+-Name_First: string
+-Name_Last: string
+-Addresses: User_Address[*]
+-Phone_Nos: string[*] {10 digit numeric}
+-Type: string = "User" {User type}
+
+
+{innerclass
++User_Address
+&lt;&lt;static&gt;&gt;
+--
+-User_Id:int
+-Address_Id: int
+-Street1: string
+-Street2: string
+-City: string
+-Zip: string {5 digit numeric}
+-State: string {2 char abbv}
+--
++User_Address():void
++User_Address(Street1: string, Street2: string,
+  City: string, Zip: string, State: string): void
++setStreet1(Street1: string): void
++setStreet2(Street2: string): void
++setCity(City: string): void
++setZip(Zip: string): void
++setState(State: string): void
++toString(): string
+innerclass}
+
+
+--
++User():void
++User(Name_First: string, Name_Last: string):void
++getAddresses(): User_Address[*]
++getPhoneNos(): string[*]
++getName(): string[1]
++getFirstName(): string[1]
++getLastName(): string[1]
++addAddress(Address: User_Address): void
++remAddress(Address_Id: int): void
++addPhone(Phone_No: string): void
++remPhone(Phone_Id: int): void
++toString(): string
++getType(): string</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>864</x>
+      <y>16</y>
+      <w>272</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Patron
+--
+-Type: string = "Patron" {Patron type}
+-Loans: Book.Loan[*]
+--
++Patron(): void
++Patron(Name_First: string, Name_Last: string):void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>872</x>
+      <y>144</y>
+      <w>296</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Librarian
+--
+-Type: string = "Librarian" {Librarian type}
+--
++Librarian(): void
++Librarian(Name_First: string, Name_Last: string):void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>736</x>
+      <y>16</y>
+      <w>144</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;160.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>736</x>
+      <y>112</y>
+      <w>152</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;170.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>840</x>
+      <y>272</y>
+      <w>240</w>
+      <h>328</h>
+    </coordinates>
+    <panel_attributes>DB_Access
+--
+- dbURL: string = "jdbc:sqlite:mydb.db"
+- connection: java.sql.Connection 
+
+--
++ connect(): void throws SQLException
++ disconnect(): void throws SQLException
++ getConnection(): java.sql.Connection
++ existsDB(): boolean
++ createDB(): void throws SQLException
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>808</x>
+      <y>640</y>
+      <w>296</w>
+      <h>264</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;abstract&gt;&gt;
+/Table_Access&lt;T&gt;/
+-
+/# table_name: string/
+# connection:java.sql.Connection
+/# primary_key: string/
+-
++ Table_Access(connection:
+   java.sql.Connection):
+- Table_Access(): 
+/+ add(Record: T): void/
+/+ get(Record_Id: int): T/
+/+ get(): T[*] /
+/+ get(Parameters: HashMap&lt;String, String&gt;):/
+/  T[*] {Query DB for specified params}/
++ del(Record_Id: int): void
+/+ del(Record: T): void/
+/- initialize(): void throws SQLException/
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>336</x>
+      <y>920</y>
+      <w>288</w>
+      <h>184</h>
+    </coordinates>
+    <panel_attributes>Book_Access
+{extends Table_Access&lt;Book&gt;}
+-
+-Table_Name: string = "Book" {DB Table Name}
+-
++ Book_Access(connection:
+   java.sql.Connection): void
+- Book_Access(): void
++ add(Record: T): void
++ get(Record_Id: int): T
++ get(): T[*] 
++ get(Parameters: HashMap&lt;String, String&gt;):
+   T[*] {Query DB for specified params}
++ del(Record_Id: int): void
++ del(Record: T): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>616</x>
+      <y>896</y>
+      <w>208</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>240.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>664</x>
+      <y>976</y>
+      <w>288</w>
+      <h>184</h>
+    </coordinates>
+    <panel_attributes>Copy_Access
+{extends Table_Access&lt;Copy&gt;}
+-
+-Table_Name: string = "Copy" {DB Table Name}
+-
++ Copy_Access(connection:
+   java.sql.Connection): void
+- Copy_Access(): void
++ add(Record: T): void
++ get(Record_Id: int): T
++ get(): T[*] 
++ get(Parameters: HashMap&lt;String, String&gt;):
+   T[*] {Query DB for specified params}
++ del(Record_Id: int): void
++ del(Record: T): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1256</x>
+      <y>528</y>
+      <w>288</w>
+      <h>184</h>
+    </coordinates>
+    <panel_attributes>User_Address_Access
+{extends Table_Access&lt;User.User_Address&gt;}
+-
+-Table_Name: string = "User_Address" {DB Table Name}
+-
++ User_Address_Access(connection: 
+  java.sql.Connection): void
+- User_Address_Access(): void
++ add(Record: T): void
++ get(Record_Id: int): T
++ get(): T[*] 
++ get(Parameters: HashMap&lt;String, String&gt;):
+   T[*] {Query DB for specified params}
++ del(Record_Id: int): void
++ del(Record: T): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1000</x>
+      <y>992</y>
+      <w>288</w>
+      <h>184</h>
+    </coordinates>
+    <panel_attributes>Loan_Access
+{extends Table_Access&lt;Loan&gt;}
+-
+-Table_Name: string = "Copy" {DB Table Name}
+-
++ Loan_Access(connection:
+   java.sql.Connection): void
+- Loan_Access(): void
++ add(Record: T): void
++ get(Record_Id: int): T
++ get(): T[*] 
++ get(Parameters: HashMap&lt;String, String&gt;):
+   T[*] {Query DB for specified params}
++ del(Record_Id: int): void
++ del(Record: T): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1256</x>
+      <y>768</y>
+      <w>288</w>
+      <h>184</h>
+    </coordinates>
+    <panel_attributes>User_Access
+{extends Table_Access&lt;User&gt;}
+-
+-Table_Name: string = "Copy" {DB Table Name}
+-
++ User_Access(connection:
+   java.sql.Connection): void
+- User_Access(): void
++ add(Record: T): void
++ get(Record_Id: int): T
++ get(): T[*] 
++ get(Parameters: HashMap&lt;String, String&gt;):
+   T[*] {Query DB for specified params}
++ del(Record_Id: int): void
++ del(Record: T): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>768</x>
+      <y>896</y>
+      <w>72</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>70.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1000</x>
+      <y>896</y>
+      <w>40</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;30.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1096</x>
+      <y>880</y>
+      <w>176</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;30.0;200.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1096</x>
+      <y>704</y>
+      <w>176</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;100.0;200.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>920</x>
+      <y>592</y>
+      <w>80</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;60.0</additional_attributes>
+  </element>
+</diagram>
