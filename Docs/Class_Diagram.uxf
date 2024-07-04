@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.1.0">
-  <zoom_level>8</zoom_level>
+  <zoom_level>6</zoom_level>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>8</x>
-      <y>56</y>
-      <w>248</w>
-      <h>952</h>
+      <x>6</x>
+      <y>54</y>
+      <w>186</w>
+      <h>378</h>
     </coordinates>
     <panel_attributes>Book
 --
@@ -15,63 +15,13 @@
 -Author: string
 -ISBN: string
 -Title: string
--Copies: Copy[*]
--Loans: Loan[*]
 
-{innerclass
-+Copy
-&lt;&lt;static&gt;&gt;
---
--Copy_Id: int
--Book_Id: int
--Book_Ref: Book [1]
--Loan_Ref: Loan [0..1]
---
-- Copy(): void
-+ Copy(book: Book): void
-+ Copy(Book_Id: int, Copy_Id: int): void
-+ Copy(book: Book, Copy_Id: int): void
-
-innerclass}
-
-{innerclass
-+Loan
-&lt;&lt;static&gt;&gt;
---
--Loan_Id: int
--Copy_Id: int
--User_Id: int
--Date_Out: Date
--Date_Due: Date
--Active: Boolean = True
--Copy_Ref: Copy [1]
--User_Ref: User [1]
--Book_Ref: Book [1]
---
--Loan(): void
-+Loan(Copy_Id: int, User_Id: int,
-  Date_Out: Date, Date_Due: Date)
-+Loan(Loan_Id: int): void {Query
-  Loan info from DB}
-+Loan(Loan_ID: int, Copy_Id: int,
-  User_Id: int, Date_Out: Date,
-  Date_Due: Date)  
-+Renew(): void
-+Renew(Renew_Date: Date): void
-+Return(): void
-+Return(Return_Date: Date): void
-innerclass}
 --
 +Book():void {Default Constructor}
 +Book(Book_Id: int, Author: string,
   ISBN: string, Title: string): void
 +toString(): string
-+addCopy(Id: int): void
-+addCopy(): int {returns Copy_Id}
-+remCopy(Id: int): void
-+Count(): int
--loadCopies(): int
-+getCopies(): Copy[*]
+
 +getID(): int
 +getAuthor(): String
 +getISBN(): String
@@ -80,13 +30,16 @@ innerclass}
 +setAuthor(Author: String): void
 +setISBN(ISBN: String): void
 +setTitle(Title: String): void
+
 +addLoan(Copy_Id: int, User_Id: int,
   Date_Out: Date, Date_Due: Date): void
 +returnLoan(Loan_Id: int,
   Return_Date: Date): void
 + renewLoan(Loan_Id: int, 
   Renew_Date: Date): void
-- loadLoans(): int
+_
+
+
 
  
 </panel_attributes>
@@ -95,10 +48,10 @@ innerclass}
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>472</x>
+      <x>666</x>
       <y>0</y>
-      <w>272</w>
-      <h>632</h>
+      <w>204</w>
+      <h>474</h>
     </coordinates>
     <panel_attributes>/User/
 --
@@ -153,10 +106,10 @@ innerclass}
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>864</x>
-      <y>16</y>
-      <w>272</w>
-      <h>80</h>
+      <x>936</x>
+      <y>6</y>
+      <w>204</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Patron
 --
@@ -171,10 +124,10 @@ innerclass}
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>872</x>
+      <x>936</x>
       <y>144</y>
-      <w>296</w>
-      <h>80</h>
+      <w>222</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Librarian
 --
@@ -188,32 +141,32 @@ innerclass}
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>736</x>
-      <y>16</y>
-      <w>144</w>
-      <h>48</h>
+      <x>864</x>
+      <y>12</y>
+      <w>84</w>
+      <h>30</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;160.0;40.0</additional_attributes>
+    <additional_attributes>10.0;10.0;120.0;30.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>736</x>
-      <y>112</y>
-      <w>152</w>
-      <h>64</h>
+      <x>864</x>
+      <y>84</y>
+      <w>84</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;170.0;60.0</additional_attributes>
+    <additional_attributes>10.0;10.0;120.0;120.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>840</x>
-      <y>272</y>
-      <w>240</w>
-      <h>328</h>
+      <x>378</x>
+      <y>540</y>
+      <w>180</w>
+      <h>246</h>
     </coordinates>
     <panel_attributes>DB_Access
 --
@@ -234,21 +187,21 @@ innerclass}
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>808</x>
-      <y>640</y>
-      <w>296</w>
-      <h>264</h>
+      <x>342</x>
+      <y>906</y>
+      <w>288</w>
+      <h>198</h>
     </coordinates>
     <panel_attributes>&lt;&lt;abstract&gt;&gt;
 /Table_Access&lt;T&gt;/
 -
-/# table_name: string/
+# table_name: string
 # connection:java.sql.Connection
-/# primary_key: string/
+# primary_key: string
+_- ins: Map&lt;Class&lt;? extends Table_Access&lt;?&gt;&gt;,_
+_   Table_Access&lt;?&gt;= new HashMap&lt;&gt;();_
 -
-+ Table_Access(connection:
-   java.sql.Connection):
-- Table_Access(): 
+# Table_Access(): void
 /+ add(Record: T): void/
 /+ get(Record_Id: int): T/
 /+ get(): T[*] /
@@ -257,52 +210,58 @@ innerclass}
 + del(Record_Id: int): void
 /+ del(Record: T): void/
 /- initialize(): void throws SQLException/
+
+_# getInstance(class: Class&lt;T&gt;,_
+_  variable: Object): &lt;T extends Table_Access&lt;?&gt;&gt; T_
 </panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>336</x>
-      <y>920</y>
-      <w>288</w>
-      <h>184</h>
+      <x>36</x>
+      <y>1062</y>
+      <w>216</w>
+      <h>204</h>
     </coordinates>
     <panel_attributes>Book_Access
 {extends Table_Access&lt;Book&gt;}
 -
 -Table_Name: string = "Book" {DB Table Name}
 -
-+ Book_Access(connection:
+- Book_Access(connection:
    java.sql.Connection): void
 - Book_Access(): void
-+ add(Record: T): void
-+ get(Record_Id: int): T
-+ get(): T[*] 
++ add(record: Book): void
++ get(Record_Id: int): Book
++ get(): Book[*] 
 + get(Parameters: HashMap&lt;String, String&gt;):
-   T[*] {Query DB for specified params}
+   Book[*] {Query DB for specified params}
 + del(Record_Id: int): void
-+ del(Record: T): void</panel_attributes>
++ del(record: Book): void
++ update(record: Book): void
+_+ getInstance(connection: java.sql.Connection)_
+_   : Book_Access_</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>616</x>
-      <y>896</y>
-      <w>208</w>
-      <h>40</h>
+      <x>246</x>
+      <y>1056</y>
+      <w>108</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>240.0;10.0;10.0;30.0</additional_attributes>
+    <additional_attributes>160.0;80.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>664</x>
-      <y>976</y>
-      <w>288</w>
-      <h>184</h>
+      <x>282</x>
+      <y>1200</y>
+      <w>216</w>
+      <h>138</h>
     </coordinates>
     <panel_attributes>Copy_Access
 {extends Table_Access&lt;Copy&gt;}
@@ -324,10 +283,10 @@ innerclass}
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1256</x>
-      <y>528</y>
-      <w>288</w>
-      <h>184</h>
+      <x>978</x>
+      <y>672</y>
+      <w>216</w>
+      <h>138</h>
     </coordinates>
     <panel_attributes>User_Address_Access
 {extends Table_Access&lt;User.User_Address&gt;}
@@ -349,10 +308,10 @@ innerclass}
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1000</x>
-      <y>992</y>
-      <w>288</w>
-      <h>184</h>
+      <x>648</x>
+      <y>1152</y>
+      <w>216</w>
+      <h>186</h>
     </coordinates>
     <panel_attributes>Loan_Access
 {extends Table_Access&lt;Loan&gt;}
@@ -362,22 +321,27 @@ innerclass}
 + Loan_Access(connection:
    java.sql.Connection): void
 - Loan_Access(): void
-+ add(Record: T): void
-+ get(Record_Id: int): T
-+ get(): T[*] 
++ add(Record: Loan): void
++ get(Record_Id: int): Loan
++ get(): Loan[*] 
 + get(Parameters: HashMap&lt;String, String&gt;):
-   T[*] {Query DB for specified params}
+   Loan[*] {Query DB for specified params}
 + del(Record_Id: int): void
-+ del(Record: T): void</panel_attributes>
++ del(Record: Loan): void
+
++ return(Loan_Id: int,
+  Return_Date: Date): void
++ renew(Loan_Id: int, 
+  Renew_Date: Date): void</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1256</x>
-      <y>768</y>
-      <w>288</w>
-      <h>184</h>
+      <x>870</x>
+      <y>912</y>
+      <w>216</w>
+      <h>138</h>
     </coordinates>
     <panel_attributes>User_Access
 {extends Table_Access&lt;User&gt;}
@@ -399,57 +363,108 @@ innerclass}
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>768</x>
-      <y>896</y>
-      <w>72</w>
-      <h>96</h>
+      <x>348</x>
+      <y>1098</y>
+      <w>30</w>
+      <h>114</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>70.0;10.0;10.0;100.0</additional_attributes>
+    <additional_attributes>10.0;10.0;30.0;170.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1000</x>
-      <y>896</y>
-      <w>40</w>
-      <h>112</h>
+      <x>486</x>
+      <y>1098</y>
+      <w>192</w>
+      <h>66</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;30.0;120.0</additional_attributes>
+    <additional_attributes>10.0;10.0;300.0;90.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1096</x>
-      <y>880</y>
-      <w>176</w>
-      <h>40</h>
+      <x>624</x>
+      <y>996</y>
+      <w>258</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;30.0;200.0;10.0</additional_attributes>
+    <additional_attributes>10.0;180.0;410.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1096</x>
-      <y>704</y>
-      <w>176</w>
-      <h>96</h>
+      <x>624</x>
+      <y>804</y>
+      <w>366</w>
+      <h>222</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;100.0;200.0;10.0</additional_attributes>
+    <additional_attributes>10.0;350.0;590.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>920</x>
-      <y>592</y>
-      <w>80</w>
-      <h>64</h>
+      <x>438</x>
+      <y>780</y>
+      <w>48</w>
+      <h>138</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;40.0;60.0</additional_attributes>
+    <additional_attributes>10.0;10.0;20.0;210.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>324</x>
+      <y>372</y>
+      <w>198</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>Copy
+--
+-Copy_Id: int
+-Book_Id: int
+--
+- Copy(): void
++ Copy(book: Book): void
++ Copy(Book_Id: int, Copy_Id: int): void
++ Copy(book: Book, Copy_Id: int): void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>330</x>
+      <y>30</y>
+      <w>186</w>
+      <h>246</h>
+    </coordinates>
+    <panel_attributes>Loan
+--
+-Loan_Id: int
+-Copy_Id: int
+-User_Id: int
+-Date_Out: Date
+-Date_Due: Date
+-Active: Boolean = True
+--
+-Loan(): void
++Loan(Copy_Id: int, User_Id: int,
+  Date_Out: Date, Date_Due: Date)
++Loan(Loan_Id: int): void {Query
+  Loan info from DB}
++Loan(Loan_ID: int, Copy_Id: int,
+  User_Id: int, Date_Out: Date,
+  Date_Due: Date)  
++Renew(): void
++Renew(Renew_Date: Date): void
++Return(): void
++Return(Return_Date: Date): void</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>
