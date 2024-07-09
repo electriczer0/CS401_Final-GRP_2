@@ -7,7 +7,7 @@ import library.model.*;
 
 
 public class Book {
-	private int Book_Id;
+	private int Book_Id = -1; //-1 will be the null value for this field
 	private String Author;
 	private String ISBN;
 	private String Title;
@@ -158,6 +158,9 @@ public class Book {
 	}
 	public void setTitle(String Title) {
 		this.Title = Title;
+	}
+	public void setID(int Book_Id) {
+		this.Book_Id = Book_Id;
 	}
 	public void addLoan(int Copy_Id, int User_Id, Date Date_Out, Date Date_Due) {
 		
