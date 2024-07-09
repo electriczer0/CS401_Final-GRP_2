@@ -4,9 +4,6 @@ import library.db.*;
 import library.model.*;
 
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,9 +30,8 @@ public class Book_Access extends Table_Access<Book> {
 	
 	
 	
-	@SuppressWarnings("unused")
 	private Book_Access() {
-		super();
+		super(Book.class);
 	}
 	
 	//initialize column getter/setter maps so that generic methods from 
@@ -57,43 +53,5 @@ public class Book_Access extends Table_Access<Book> {
         }
     
 	}
-	
-
-	
-
-	@Override
-	public Book get(int Record_Id) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Vector<Book> get() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Vector<Book> get(HashMap<String, String> args) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void del(Book record) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void initialize() throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	protected List<String> getTableSchema(){
-		return this.schema;
-	}
-	
 
 }
