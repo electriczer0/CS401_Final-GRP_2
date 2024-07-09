@@ -4,12 +4,11 @@ import library.db.*;
 import library.model.*;
 
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+
 import java.lang.reflect.Method;
 
 public class Book_Access extends Table_Access<Book> {
@@ -27,31 +26,31 @@ public class Book_Access extends Table_Access<Book> {
     private final Map<String, Method> columnSetterMap = new HashMap<>();
 	
    	
-	
+    //initialize column getter/setter maps so that generic methods from 
+  	//abstract super class can be used. 
+  	{
+  		
+          try {
+              columnGetterMap.put(primary_key, Book.class.getMethod("getID"));
+              columnGetterMap.put("Author", Book.class.getMethod("getAuthor"));
+              columnGetterMap.put("ISBN", Book.class.getMethod("getISBN"));
+              columnGetterMap.put("Title", Book.class.getMethod("getTitle"));
+
+              columnSetterMap.put(primary_key, Book.class.getMethod("setID", Integer.class));
+              columnSetterMap.put("Author", Book.class.getMethod("setAuthor", String.class));
+              columnSetterMap.put("ISBN", Book.class.getMethod("setISBN", String.class));
+              columnSetterMap.put("Title", Book.class.getMethod("setTitle", String.class));
+          } catch (NoSuchMethodException e) {
+              throw new RuntimeException("Failed to initialize column getter/setter maps", e);
+          }
+      
+  	}
 	
 	
 	private Book_Access() {
 		super(Book.class);
 	}
 	
-	//initialize column getter/setter maps so that generic methods from 
-	//abstract super class can be used. 
-	{
-		
-        try {
-            columnGetterMap.put(primary_key, Book.class.getMethod("getID"));
-            columnGetterMap.put("Author", Book.class.getMethod("getAuthor"));
-            columnGetterMap.put("ISBN", Book.class.getMethod("getISBN"));
-            columnGetterMap.put("Title", Book.class.getMethod("getTitle"));
-
-            columnSetterMap.put(primary_key, Book.class.getMethod("setID", Integer.class));
-            columnSetterMap.put("Author", Book.class.getMethod("setAuthor", String.class));
-            columnSetterMap.put("ISBN", Book.class.getMethod("setISBN", String.class));
-            columnSetterMap.put("Title", Book.class.getMethod("setTitle", String.class));
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Failed to initialize column getter/setter maps", e);
-        }
-    
-	}
+	
 
 }

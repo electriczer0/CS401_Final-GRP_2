@@ -1,6 +1,5 @@
 package library.model;
 import java.util.Date;
-import java.util.Vector;
 
 import library.db.*;
 import library.model.*;

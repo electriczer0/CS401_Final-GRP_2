@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.1.0">
-  <zoom_level>8</zoom_level>
+  <zoom_level>4</zoom_level>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>96</x>
-      <y>128</y>
-      <w>248</w>
-      <h>304</h>
+      <x>52</x>
+      <y>24</y>
+      <w>124</w>
+      <h>152</h>
     </coordinates>
     <panel_attributes>Book
 --
@@ -46,10 +46,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1104</x>
-      <y>280</y>
-      <w>272</w>
-      <h>504</h>
+      <x>532</x>
+      <y>104</y>
+      <w>136</w>
+      <h>252</h>
     </coordinates>
     <panel_attributes>/User/
 --
@@ -90,10 +90,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1464</x>
-      <y>96</y>
-      <w>272</w>
-      <h>80</h>
+      <x>712</x>
+      <y>12</y>
+      <w>136</w>
+      <h>40</h>
     </coordinates>
     <panel_attributes>Patron
 --
@@ -108,10 +108,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1448</x>
-      <y>280</y>
-      <w>296</w>
-      <h>80</h>
+      <x>704</x>
+      <y>104</y>
+      <w>148</w>
+      <h>40</h>
     </coordinates>
     <panel_attributes>Librarian
 --
@@ -125,10 +125,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1368</x>
-      <y>120</y>
-      <w>112</w>
-      <h>200</h>
+      <x>664</x>
+      <y>24</y>
+      <w>56</w>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;230.0;120.0;10.0</additional_attributes>
@@ -136,10 +136,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1368</x>
-      <y>288</y>
-      <w>96</w>
-      <h>128</h>
+      <x>664</x>
+      <y>108</y>
+      <w>48</w>
+      <h>64</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;140.0;100.0;10.0</additional_attributes>
@@ -147,10 +147,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>704</x>
-      <y>880</y>
-      <w>240</w>
-      <h>328</h>
+      <x>384</x>
+      <y>376</y>
+      <w>120</w>
+      <h>164</h>
     </coordinates>
     <panel_attributes>DB_Access
 --
@@ -171,10 +171,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>640</x>
-      <y>1360</y>
-      <w>384</w>
-      <h>504</h>
+      <x>300</x>
+      <y>644</y>
+      <w>192</w>
+      <h>252</h>
     </coordinates>
     <panel_attributes>&lt;&lt;abstract&gt;&gt;
 /Table_Access&lt;T extends Has_ID&gt;/
@@ -218,10 +218,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>144</x>
-      <y>1880</y>
-      <w>288</w>
-      <h>152</h>
+      <x>52</x>
+      <y>904</y>
+      <w>144</w>
+      <h>76</h>
     </coordinates>
     <panel_attributes>Book_Access
 {extends Table_Access&lt;Book&gt;}
@@ -239,10 +239,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>424</x>
-      <y>1856</y>
-      <w>232</w>
-      <h>40</h>
+      <x>192</x>
+      <y>892</y>
+      <w>116</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>270.0;10.0;10.0;30.0</additional_attributes>
@@ -250,10 +250,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>536</x>
-      <y>2000</y>
-      <w>288</w>
-      <h>184</h>
+      <x>248</x>
+      <y>964</y>
+      <w>144</w>
+      <h>92</h>
     </coordinates>
     <panel_attributes>Copy_Access
 {extends Table_Access&lt;Copy&gt;}
@@ -270,10 +270,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1280</x>
-      <y>1496</y>
-      <w>288</w>
-      <h>184</h>
+      <x>620</x>
+      <y>712</y>
+      <w>144</w>
+      <h>92</h>
     </coordinates>
     <panel_attributes>User_Address_Access
 {extends Table_Access&lt;User.User_Address&gt;}
@@ -290,10 +290,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>952</x>
-      <y>1976</y>
-      <w>288</w>
-      <h>248</h>
+      <x>456</x>
+      <y>952</y>
+      <w>144</w>
+      <h>124</h>
     </coordinates>
     <panel_attributes>Loan_Access
 {extends Table_Access&lt;Loan&gt;}
@@ -310,10 +310,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1264</x>
-      <y>1752</y>
-      <w>288</w>
-      <h>184</h>
+      <x>612</x>
+      <y>840</y>
+      <w>144</w>
+      <h>92</h>
     </coordinates>
     <panel_attributes>User_Access
 {extends Table_Access&lt;User&gt;}
@@ -330,10 +330,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>640</x>
-      <y>1856</y>
-      <w>32</w>
-      <h>160</h>
+      <x>300</x>
+      <y>892</y>
+      <w>16</w>
+      <h>80</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>20.0;10.0;10.0;180.0</additional_attributes>
@@ -341,10 +341,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>832</x>
-      <y>1856</y>
-      <w>160</w>
-      <h>136</h>
+      <x>396</x>
+      <y>892</y>
+      <w>80</w>
+      <h>68</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;180.0;150.0</additional_attributes>
@@ -352,10 +352,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1016</x>
-      <y>1616</y>
-      <w>264</w>
-      <h>272</h>
+      <x>488</x>
+      <y>772</y>
+      <w>132</w>
+      <h>136</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;310.0;320.0</additional_attributes>
@@ -363,10 +363,10 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1016</x>
-      <y>1496</y>
-      <w>280</w>
-      <h>200</h>
+      <x>488</x>
+      <y>712</y>
+      <w>140</w>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;330.0;230.0</additional_attributes>
@@ -374,22 +374,22 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>776</x>
-      <y>1200</y>
-      <w>64</w>
-      <h>176</h>
+      <x>368</x>
+      <y>536</y>
+      <w>68</w>
+      <h>116</h>
     </coordinates>
     <panel_attributes>lt=&lt;.
 m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
-    <additional_attributes>20.0;10.0;10.0;200.0</additional_attributes>
+    <additional_attributes>150.0;10.0;10.0;270.0</additional_attributes>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>40</x>
-      <y>616</y>
-      <w>264</w>
-      <h>192</h>
+      <x>0</x>
+      <y>272</y>
+      <w>132</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>Copy
 --
@@ -398,7 +398,6 @@ m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
 --
 + Copy(): void
 + Copy(book: Book): void
-+ Copy(Book_Id: int, Copy_Id: int): void
 
 + getID(): int
 + getBookID(): int
@@ -412,10 +411,10 @@ m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>416</x>
-      <y>72</y>
-      <w>248</w>
-      <h>400</h>
+      <x>188</x>
+      <y>0</y>
+      <w>124</w>
+      <h>200</h>
     </coordinates>
     <panel_attributes>Loan
 --
@@ -454,10 +453,10 @@ m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>736</x>
-      <y>112</y>
-      <w>272</w>
-      <h>392</h>
+      <x>348</x>
+      <y>20</y>
+      <w>136</w>
+      <h>196</h>
     </coordinates>
     <panel_attributes>User_Address
 --
@@ -494,10 +493,10 @@ m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>496</x>
-      <y>600</y>
-      <w>168</w>
-      <h>152</h>
+      <x>228</x>
+      <y>264</y>
+      <w>84</w>
+      <h>76</h>
     </coordinates>
     <panel_attributes>&lt;&lt;interface&gt;&gt;
 Has_ID
@@ -509,10 +508,10 @@ Has_ID
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>640</x>
-      <y>496</y>
-      <w>232</w>
-      <h>120</h>
+      <x>300</x>
+      <y>212</y>
+      <w>116</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
     <additional_attributes>10.0;130.0;270.0;10.0</additional_attributes>
@@ -520,10 +519,10 @@ Has_ID
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>568</x>
-      <y>464</y>
-      <w>48</w>
-      <h>152</h>
+      <x>264</x>
+      <y>196</y>
+      <w>24</w>
+      <h>76</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
     <additional_attributes>40.0;170.0;10.0;10.0</additional_attributes>
@@ -531,21 +530,21 @@ Has_ID
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>192</x>
-      <y>424</y>
-      <w>320</w>
-      <h>192</h>
+      <x>100</x>
+      <y>172</y>
+      <w>136</w>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
-    <additional_attributes>380.0;220.0;10.0;10.0</additional_attributes>
+    <additional_attributes>320.0;230.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>296</x>
-      <y>608</y>
-      <w>216</w>
-      <h>40</h>
+      <x>128</x>
+      <y>268</y>
+      <w>108</w>
+      <h>20</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
     <additional_attributes>250.0;10.0;10.0;30.0</additional_attributes>
@@ -553,12 +552,24 @@ Has_ID
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>656</x>
-      <y>520</y>
-      <w>464</w>
-      <h>112</h>
+      <x>308</x>
+      <y>224</y>
+      <w>232</w>
+      <h>56</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
     <additional_attributes>10.0;120.0;560.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>276</x>
+      <y>336</y>
+      <w>100</w>
+      <h>316</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;190.0;770.0</additional_attributes>
   </element>
 </diagram>
