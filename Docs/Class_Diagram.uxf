@@ -4,7 +4,7 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>96</x>
+      <x>0</x>
       <y>42</y>
       <w>186</w>
       <h>228</h>
@@ -45,7 +45,7 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>852</x>
+      <x>756</x>
       <y>156</y>
       <w>204</w>
       <h>312</h>
@@ -86,7 +86,7 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1122</x>
+      <x>1026</x>
       <y>162</y>
       <w>204</w>
       <h>60</h>
@@ -104,7 +104,7 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1122</x>
+      <x>1026</x>
       <y>300</y>
       <w>222</w>
       <h>60</h>
@@ -121,7 +121,7 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1050</x>
+      <x>954</x>
       <y>168</y>
       <w>84</w>
       <h>30</h>
@@ -132,7 +132,7 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1050</x>
+      <x>954</x>
       <y>240</y>
       <w>84</w>
       <h>84</h>
@@ -143,7 +143,7 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>552</x>
+      <x>456</x>
       <y>606</y>
       <w>180</w>
       <h>246</h>
@@ -167,7 +167,7 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>504</x>
+      <x>408</x>
       <y>966</y>
       <w>288</w>
       <h>378</h>
@@ -213,7 +213,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>132</x>
+      <x>36</x>
       <y>1356</y>
       <w>216</w>
       <h>114</h>
@@ -234,7 +234,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>342</x>
+      <x>246</x>
       <y>1338</y>
       <w>174</w>
       <h>30</h>
@@ -245,7 +245,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>426</x>
+      <x>330</x>
       <y>1446</y>
       <w>216</w>
       <h>138</h>
@@ -265,7 +265,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>984</x>
+      <x>888</x>
       <y>1068</y>
       <w>216</w>
       <h>138</h>
@@ -285,7 +285,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>738</x>
+      <x>642</x>
       <y>1428</y>
       <w>216</w>
       <h>186</h>
@@ -305,7 +305,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>972</x>
+      <x>876</x>
       <y>1260</y>
       <w>216</w>
       <h>138</h>
@@ -325,7 +325,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>504</x>
+      <x>408</x>
       <y>1338</y>
       <w>24</w>
       <h>120</h>
@@ -336,7 +336,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>648</x>
+      <x>552</x>
       <y>1338</y>
       <w>120</w>
       <h>102</h>
@@ -347,7 +347,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>786</x>
+      <x>690</x>
       <y>1158</y>
       <w>198</w>
       <h>204</h>
@@ -358,7 +358,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>786</x>
+      <x>690</x>
       <y>1068</y>
       <w>210</w>
       <h>150</h>
@@ -369,7 +369,7 @@ _+ getInstance(): &lt;&lt;T extends Table_Access&lt;?&gt;&gt;_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>606</x>
+      <x>510</x>
       <y>846</y>
       <w>48</w>
       <h>132</h>
@@ -381,7 +381,7 @@ m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>174</x>
+      <x>78</x>
       <y>438</y>
       <w>198</w>
       <h>144</h>
@@ -407,7 +407,7 @@ m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>336</x>
+      <x>240</x>
       <y>0</y>
       <w>186</w>
       <h>300</h>
@@ -449,7 +449,7 @@ m2=&lt;&lt;Uses&gt;&gt;</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>582</x>
+      <x>486</x>
       <y>66</y>
       <w>204</w>
       <h>252</h>
