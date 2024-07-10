@@ -16,15 +16,18 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Table_Access<T extends Has_ID> {
-	protected String table_name; 
-	protected Connection connection; 
-	protected String primary_key; 
+
 	private static final Map<Class<? extends Table_Access<?>>, Table_Access<?>> instances = new HashMap<>();
-	private Map<String, Method> columnGetterMap;
-    private Map<String, Method> columnSetterMap;
-    private List<String> schema; 
-    private Class<T> type;
+	private Class<T> type;
 	
+    protected abstract List<String> getTableSchema();
+    protected abstract Map<String, Method> getColumnGetterMap();
+    protected abstract Map<String, Method> getColumnSetterMap();
+    protected abstract Connection getConnection();
+    protected abstract void setConnection(Connection connection);
+    protected abstract String getTableName();
+    protected abstract String getPrimaryKey();
+
 	
 	
 	@SuppressWarnings("unused")
@@ -32,15 +35,15 @@ public abstract class Table_Access<T extends Has_ID> {
 	}
 	
 	protected Table_Access(Class<T> type) {
-		this.type = type;
+		this.type = type; 
 	}
 	
 	
 
 	//Generic method to get or create a singleton instance for a given class with the requisite connection variable
 	//This method acts is a helper function which acts as the primary constructor for all subclasses. 
-	public static <T extends Table_Access<?>> T getInstance( Connection connection) throws SQLException {
-		Class<T> callerClass = (Class<T>) getCallerClass();
+	public static <T extends Table_Access<?>> T getInstance( Connection connection, Class<T> callerClass) throws SQLException {
+		//Class<T> callerClass = (Class<T>) getCallerClass();
 		
 		T instance = null; 
 		synchronized (instances) {
@@ -48,7 +51,7 @@ public abstract class Table_Access<T extends Has_ID> {
 				try {
 					// Use reflection to create new instance of the class through the subclass
 					instance = callerClass.getDeclaredConstructor().newInstance();
-					instance.connection = connection; 
+					instance.setConnection(connection); 
 					instances.put(callerClass, instance);
 					
 				} catch (Exception e) {
@@ -95,8 +98,8 @@ public abstract class Table_Access<T extends Has_ID> {
     }
 	//Checks if this table already exists in the database
 	protected boolean tableExists() throws SQLException{
-		DatabaseMetaData dbMeta = connection.getMetaData();
-		try (var rs = dbMeta.getTables(null,  null,  this.table_name, null)){
+		DatabaseMetaData dbMeta = getConnection().getMetaData();
+		try (var rs = dbMeta.getTables(null,  null,  this.getTableName(), null)){
 			return rs.next();
 		}
 	}
@@ -104,7 +107,7 @@ public abstract class Table_Access<T extends Has_ID> {
 	//creates the table within the database if it does not already exist. 
 	protected void createTable() throws SQLException {
 		List<String> schema = getTableSchema();
-		StringBuilder createTableSQL = new StringBuilder("CREATE TABLE IF NOT EXISTS " + table_name + " (");
+		StringBuilder createTableSQL = new StringBuilder("CREATE TABLE IF NOT EXISTS " + getTableName() + " (");
         for (int i = 0; i < schema.size(); i++) {
             createTableSQL.append(schema.get(i));
             if (i < schema.size() - 1) {
@@ -113,8 +116,10 @@ public abstract class Table_Access<T extends Has_ID> {
         }
         createTableSQL.append(")");
 
-        try (Statement stmt = connection.createStatement()) {
+        try (Statement stmt = getConnection().createStatement()) {
             stmt.execute(createTableSQL.toString());
+        }catch (SQLException e) {
+            throw new SQLException("Failed to create table with statement: " + createTableSQL.toString(), e);
         }
     }
 	
@@ -124,30 +129,15 @@ public abstract class Table_Access<T extends Has_ID> {
     	
     }
 	
-	protected Map<String, Method> getColumnGetterMap(){
-		return columnGetterMap;
-	}
-	
-    protected Map<String, Method> getColumnSetterMap(){
-    	return columnSetterMap;
-    }
     
-    protected List<String> getTableSchema(){
-    	return schema;
-    }
-    
-	public String getTableName() {
-		return this.table_name;
-	}
 	
-	public String getPrimaryKey() {
-		return this.primary_key;
-	}
+	
+	
 	
 	public void delete(int Record_Id) throws SQLException{
-		//delete record where the column this.primary_key matches Record_Id
+		//delete record where the column this.getPrimaryKey() matches Record_Id
 		String sql = String.format("DELETE FROM %s WHERE %s = ?", this.getTableName(), this.getPrimaryKey()); 
-		try(PreparedStatement stmt = connection.prepareStatement(sql)){
+		try(PreparedStatement stmt = getConnection().prepareStatement(sql)){
 			stmt.setInt(1,  Record_Id);
 			stmt.executeUpdate();
 		}catch (SQLException e) {
@@ -173,8 +163,8 @@ public abstract class Table_Access<T extends Has_ID> {
         String columns = String.join(", ", getters.keySet());
         String values = String.join(", ", getters.keySet().stream().map(col -> "?").toArray(String[]::new));
 
-        String sql = "INSERT INTO " + table_name + " (" + columns + ") VALUES (" + values + ")";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        String sql = "INSERT INTO " + getTableName() + " (" + columns + ") VALUES (" + values + ")";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             int index = 1;
             for (String column : getters.keySet()) {
                 Method getter = getters.get(column);
@@ -189,10 +179,10 @@ public abstract class Table_Access<T extends Has_ID> {
             
             Map<String, Method> setters = getColumnSetterMap();
 
-            if (primary_key != null && setters.containsKey(primary_key)) { //if the primary key field is known, and available in the getters map
+            if (getPrimaryKey() != null && setters.containsKey(getPrimaryKey())) { //if the primary key field is known, and available in the getters map
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {  //get the results from the insert operation
                     if (generatedKeys.next()) { 
-                        Method setter = setters.get(primary_key); 
+                        Method setter = setters.get(getPrimaryKey()); 
                         if (setter != null) {
                             setter.invoke(entity, generatedKeys.getInt(1));
                         }
@@ -205,8 +195,8 @@ public abstract class Table_Access<T extends Has_ID> {
     }
 	
 	public T read(int recordId) throws SQLException {
-        String sql = "SELECT * FROM " + table_name + " WHERE " + primary_key + " = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        String sql = "SELECT * FROM " + getTableName() + " WHERE " + getPrimaryKey() + " = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setInt(1, recordId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -230,10 +220,10 @@ public abstract class Table_Access<T extends Has_ID> {
     }
 	
 	public List<T> readAll() throws SQLException {
-        String sql = "SELECT * FROM " + table_name;
+        String sql = "SELECT * FROM " + getTableName();
         Map<String, Method> setters = getColumnSetterMap();
         List<T> resultList = new ArrayList<>();
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 T entity = createEntityInstance();
@@ -256,24 +246,24 @@ public abstract class Table_Access<T extends Has_ID> {
 	
 	public void update(T record) throws SQLException {
         int recordId = record.getID();
-        String sql = "UPDATE " + table_name + " SET ";
+        String sql = "UPDATE " + getTableName() + " SET ";
 
         Map<String, Method> getters = getColumnGetterMap();
         StringBuilder setClause = new StringBuilder();
         for (String column : getters.keySet()) {
-            if (!column.equals(primary_key)) {
+            if (!column.equals(getPrimaryKey())) {
                 if (setClause.length() > 0) {
                     setClause.append(", ");
                 }
                 setClause.append(column).append(" = ?");
             }
         }
-        sql += setClause.toString() + " WHERE " + primary_key + " = ?";
+        sql += setClause.toString() + " WHERE " + getPrimaryKey() + " = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             int index = 1;
             for (String column : getters.keySet()) {
-                if (!column.equals(primary_key)) {
+                if (!column.equals(getPrimaryKey())) {
                     Method getter = getters.get(column);
                     try {
                         Object value = getter.invoke(record);
@@ -305,7 +295,7 @@ public abstract class Table_Access<T extends Has_ID> {
             }
         }
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM ").append(table_name).append(" WHERE ");
+        StringBuilder sql = new StringBuilder("SELECT * FROM ").append(getTableName()).append(" WHERE ");
         List<String> values = new ArrayList<>();
 
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
@@ -317,7 +307,7 @@ public abstract class Table_Access<T extends Has_ID> {
         sql.setLength(sql.length() - 4);
 
         List<T> resultList = new ArrayList<>();
-        try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql.toString())) {
             for (int i = 0; i < values.size(); i++) {
                 stmt.setString(i + 1, values.get(i));
             }

@@ -26,7 +26,7 @@ public class User_Address implements Has_ID {
         return User_Id;
     }
 
-    public void setUserID(Integer User_Id) {
+    public void setUserID(int User_Id) {
         this.User_Id = User_Id;
     }
 

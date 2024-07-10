@@ -15,6 +15,7 @@ public class Loan_Access extends Table_Access<Loan> {
 
     protected final String primary_key = "LoanID"; // Set the primary key field for the Loan table
     protected final String table_name = "Loans"; // Set the table name for the Loan table
+    protected Connection connection;
     private final List<String> schema =
 			Arrays.asList(
 					primary_key + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -24,7 +25,7 @@ public class Loan_Access extends Table_Access<Loan> {
 			                + "DateDue DATE, "
 			                + "IsActive BOOLEAN, "
 			                + "FOREIGN KEY (CopyID) REFERENCES Copy(CopyID) ON DELETE CASCADE, " // DB will delete related Loan records on deletion of related Copy or User
-			                + "FOREIGN KEY (UserID) REFERENCES User(UserID) ON DELETE CASCADE)" // However, User table schema should prevent deletion of user when a loan is outstanding
+			                + "FOREIGN KEY (UserID) REFERENCES User(UserID) ON DELETE CASCADE" // However, User table schema should prevent deletion of user when a loan is outstanding
 					);
  
     // Maps for getter and setter methods
@@ -43,9 +44,9 @@ public class Loan_Access extends Table_Access<Loan> {
             columnGetterMap.put("DateDue", Loan.class.getMethod("getDateDue"));
             columnGetterMap.put("IsActive", Loan.class.getMethod("isActive"));
 
-            columnSetterMap.put("LoanID", Loan.class.getMethod("setID", Integer.class));
-            columnSetterMap.put("CopyID", Loan.class.getMethod("setCopyID", Integer.class));
-            columnSetterMap.put("UserID", Loan.class.getMethod("setUserID", Integer.class));
+            columnSetterMap.put("LoanID", Loan.class.getMethod("setID", int.class));
+            columnSetterMap.put("CopyID", Loan.class.getMethod("setCopyID", int.class));
+            columnSetterMap.put("UserID", Loan.class.getMethod("setUserID", int.class));
             columnSetterMap.put("DateOut", Loan.class.getMethod("setDateOut", Date.class));
             columnSetterMap.put("DateDue", Loan.class.getMethod("setDateDue", Date.class));
             columnSetterMap.put("IsActive", Loan.class.getMethod("setActive", Boolean.class));
@@ -55,8 +56,29 @@ public class Loan_Access extends Table_Access<Loan> {
     }
 
     // Private constructor to enforce singleton pattern
-    private Loan_Access() {
+    protected Loan_Access() {
         super(Loan.class);
+    }
+    protected  List<String> getTableSchema(){
+		return this.schema;
+	}
+    protected  Map<String, Method> getColumnGetterMap(){
+    	return this.columnGetterMap; 
+    }
+    protected  Map<String, Method> getColumnSetterMap(){
+    	return this.columnSetterMap;
+    }
+    protected Connection getConnection() {
+    	return this.connection;
+    }
+    protected void setConnection(Connection connection) {
+    	this.connection = connection;
+    }
+    protected String getTableName() {
+    	return this.table_name;
+    }
+    protected String getPrimaryKey() {
+    	return this.primary_key;
     }
 
 }

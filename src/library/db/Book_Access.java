@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 import java.lang.reflect.Method;
+import java.sql.Connection;
 
 public class Book_Access extends Table_Access<Book> {
 	protected final String table_name = "Book";
 	protected final String primary_key = "BookID";
+	protected Connection connection; 
 	private final List<String> schema =
 			Arrays.asList(
 					primary_key + " INTEGER PRIMARY KEY AUTOINCREMENT",
@@ -36,7 +38,7 @@ public class Book_Access extends Table_Access<Book> {
               columnGetterMap.put("ISBN", Book.class.getMethod("getISBN"));
               columnGetterMap.put("Title", Book.class.getMethod("getTitle"));
 
-              columnSetterMap.put(primary_key, Book.class.getMethod("setID", Integer.class));
+              columnSetterMap.put(primary_key, Book.class.getMethod("setID", int.class));
               columnSetterMap.put("Author", Book.class.getMethod("setAuthor", String.class));
               columnSetterMap.put("ISBN", Book.class.getMethod("setISBN", String.class));
               columnSetterMap.put("Title", Book.class.getMethod("setTitle", String.class));
@@ -47,10 +49,29 @@ public class Book_Access extends Table_Access<Book> {
   	}
 	
 	
-	private Book_Access() {
+	protected Book_Access() {
 		super(Book.class);
 	}
 	
-	
-
+	protected  List<String> getTableSchema(){
+		return this.schema;
+	}
+    protected  Map<String, Method> getColumnGetterMap(){
+    	return this.columnGetterMap; 
+    }
+    protected  Map<String, Method> getColumnSetterMap(){
+    	return this.columnSetterMap;
+    }
+    protected Connection getConnection() {
+    	return this.connection;
+    }
+    protected void setConnection(Connection connection) {
+    	this.connection = connection;
+    }
+    protected String getTableName() {
+    	return this.table_name;
+    }
+    protected String getPrimaryKey() {
+    	return this.primary_key;
+    }
 }
