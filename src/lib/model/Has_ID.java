@@ -1,4 +1,4 @@
-package library.model;
+package lib.model;
 
 public interface Has_ID {
 	public abstract int getID();

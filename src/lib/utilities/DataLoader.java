@@ -1,15 +1,16 @@
-package library.utilities;
+package lib.utilities;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+import lib.db.*;
+import lib.model.*;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.sql.SQLException;
-import library.model.*;
-import library.db.*;
 
 public class DataLoader {
 

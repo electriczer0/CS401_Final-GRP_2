@@ -1,8 +1,8 @@
-package library.model;
+package lib.model;
 import java.util.Date;
 
-import library.db.*;
-import library.model.*;
+import lib.db.*;
+import lib.model.*;
 
 
 public class Book implements Has_ID{

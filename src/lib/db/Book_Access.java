@@ -1,13 +1,12 @@
-package library.db;
-
-import library.db.*;
-import library.model.*;
-
+package lib.db;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lib.db.*;
+import lib.model.*;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;

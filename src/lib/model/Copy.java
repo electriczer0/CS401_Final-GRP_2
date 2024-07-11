@@ -1,4 +1,4 @@
-package library.model;
+package lib.model;
 
 public class Copy implements Has_ID {
     private Integer Copy_Id;

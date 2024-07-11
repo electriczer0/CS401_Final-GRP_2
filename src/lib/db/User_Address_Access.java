@@ -1,4 +1,4 @@
-package library.db;
+package lib.db;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import library.model.*;
+import lib.model.*;
 
 public class User_Address_Access extends Table_Access<User_Address> {
 

@@ -1,4 +1,4 @@
-package library.model;
+package lib.model;
 
 public class User_Address implements Has_ID {
     private Integer Address_Id;

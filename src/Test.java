@@ -1,8 +1,9 @@
-import library.db.*;
-import library.model.*;
-import library.utilities.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import lib.db.*;
+import lib.model.*;
+import lib.utilities.*;
 
 
 

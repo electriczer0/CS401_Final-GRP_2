@@ -1,4 +1,4 @@
-package library.model;
+package lib.model;
 
 public class User implements Has_ID {
     private int UserID;

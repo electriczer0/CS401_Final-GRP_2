@@ -1,4 +1,4 @@
-package library.db;
+package lib.db;
 
 public class DB_PARAMS {
 	public static final String dbLocation = "Library.db";

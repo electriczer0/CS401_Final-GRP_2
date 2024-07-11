@@ -1,7 +1,4 @@
-package library.db;
-
-import library.db.*;
-import library.model.*;
+package lib.db;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -14,6 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lib.db.*;
+import lib.model.*;
 
 public abstract class Table_Access<T extends Has_ID> {
 
