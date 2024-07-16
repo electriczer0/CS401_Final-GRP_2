@@ -129,7 +129,8 @@ class TableAccessTest {
 				//int User_Id, String FirstName, String LastName, String Type
 
 				new Object[] {-1, "Keringham & Ritchie", "1234567890", "The C Programming Language"},
-				new Object [] {245, "Michael Chricton", "2345678901", "Jurassic Park"}
+				new Object[] {245, "Michael Chricton", "2345678901", "Jurassic Park"},
+				new Object[] {20, "laksdf", "3456789012", "jfjei"}
 		);
 		
 	}
@@ -178,6 +179,63 @@ class TableAccessTest {
 		assertEquals(book1, book2);
 		assertEquals(book2, book3);
 		assertEquals(book3, book4);
+		
+	
+		}
+	
+	public static Stream<Object[]> copyData(){
+		return Stream.of(
+				//int User_Id, String FirstName, String LastName, String Type
+
+				new Object[] {-1, 245},
+				new Object [] {1515, 20}
+		);
+		
+	}
+	
+	//tests that constructor and setter methods are equivalent
+	//tests that insert method works 
+	//tests that insert method updates record ID
+	//tests that database read method works correctly
+	//tests that record is written and read correctly from DB
+	
+	@ParameterizedTest
+	@MethodSource("copyData")
+	public void testCopyDB(int Copy_Id, int Book_Id) {
+		Copy copy1 = new Copy(Copy_Id, Book_Id); //we use this as our input
+		Copy copy2 = new Copy(); //we use this to test setters
+		Copy copy4 = null;
+		copy2.setID(Copy_Id);
+		copy2.setBookID(Book_Id);
+		
+		Copy copy3 = new Copy(Copy_Id, Book_Id); //we use this to test the Table_Access class
+		//copy3 is different from copy1 because Table_Access class may change User_Id
+		
+		try{
+			copyTable.insert(copy3);
+		}catch (SQLException e) {
+            e.printStackTrace();
+        }
+		
+		//confirm that the userID is now set if it was not previously. 
+		assertNotEquals(-1, copy3.getID(), "UserID not correctly set by table object");
+		
+		//if User_Id was not set by input, it should have been set by the insert action
+		if(copy1.getID() == -1) {
+			copy1.setID(copy3.getID());
+			copy2.setID(copy3.getID());
+		}
+		
+		//Test the read function to ensure the record was properly inserted. 
+		try{
+			copy4 = copyTable.read(copy3.getID());
+		}catch (SQLException e) {
+            e.printStackTrace();
+        }
+		
+		assertEquals(copy1, copy2);
+		assertEquals(copy2, copy3);
+		assertEquals(copy3, copy4);
 		
 	
 		}

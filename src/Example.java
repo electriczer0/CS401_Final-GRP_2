@@ -41,7 +41,7 @@ public class Example { //<--Refactor
         }
 		try {
 			//Let's load books and create some users here. Need to at a minimum create the 'Librarian' user.
-			DataLoader.loadBooksFromCSV(bookTable, "Data/books.csv");
+			///DataLoader.loadBooksFromCSV(bookTable, "Data/books.csv");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

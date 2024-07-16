@@ -22,7 +22,7 @@ public class Copy implements Has_ID {
         this.Copy_Id = Copy_Id;
     }
 
-    public Integer getBookID() {
+    public int getBookID() {
         return Book_Id;
     }
 
