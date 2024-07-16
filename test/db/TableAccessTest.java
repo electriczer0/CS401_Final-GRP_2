@@ -87,14 +87,14 @@ class TableAccessTest {
 	@ParameterizedTest
 	@MethodSource("userData")
 	public void testUserDB(int User_Id, String FirstName, String LastName, String Type) {
-		User user1 = new User(User_Id, FirstName, LastName, Type); //we use this as our input
+		User user1 = UserFactory.create(User_Id, FirstName, LastName, Type); //we use this as our input
 		User user2 = new User(); //we use this to test setters
 		User user4 = null;
 		user2.setID(User_Id);
 		user2.setFirstName(FirstName);
 		user2.setLastName(LastName);
 		user2.setType(Type);
-		User user3 = new User(User_Id, FirstName, LastName, Type); //we use this to test the Table_Access class
+		User user3 = UserFactory.create(User_Id, FirstName, LastName, Type); //we use this to test the Table_Access class
 		//user3 is different from user1 because Table_Access class may change User_Id
 		
 		try{
@@ -147,14 +147,14 @@ class TableAccessTest {
 	@ParameterizedTest
 	@MethodSource("bookData")
 	public void testBookDB(int Book_Id, String author, String isbn, String title) {
-		Book book1 = new Book(Book_Id, author, isbn, title); //we use this as our input
+		Book book1 = BookFactory.create(Book_Id, author, isbn, title); //we use this as our input
 		Book book2 = new Book(); //we use this to test setters
 		Book book4 = null;
 		book2.setID(Book_Id);
 		book2.setAuthor(author);
 		book2.setISBN(isbn);
 		book2.setTitle(title);
-		Book book3 = new Book(Book_Id, author, isbn, title); //we use this to test the Table_Access class
+		Book book3 = BookFactory.create(Book_Id, author, isbn, title); //we use this to test the Table_Access class
 		//user3 is different from user1 because Table_Access class may change User_Id
 		
 		try{
@@ -206,13 +206,13 @@ class TableAccessTest {
 	@ParameterizedTest
 	@MethodSource("copyData")
 	public void testCopyDB(int Copy_Id, int Book_Id) {
-		Copy copy1 = new Copy(Copy_Id, Book_Id); //we use this as our input
+		Copy copy1 = CopyFactory.create(Copy_Id, Book_Id); //we use this as our input
 		Copy copy2 = new Copy(); //we use this to test setters
 		Copy copy4 = null;
 		copy2.setID(Copy_Id);
 		copy2.setBookID(Book_Id);
 		
-		Copy copy3 = new Copy(Copy_Id, Book_Id); //we use this to test the Table_Access class
+		Copy copy3 = CopyFactory.create(Copy_Id, Book_Id); //we use this to test the Table_Access class
 		//copy3 is different from copy1 because Table_Access class may change User_Id
 		
 		try{
@@ -342,5 +342,100 @@ class TableAccessTest {
 		
 	
 		}
+
+
+
+
+public static Stream<Object[]> addressData(){
+		
+		/**
+		 * Parameterized data function for User_Address object testing. 
+		 * int Address_Id, int User_Id, String Street1, String Street2, String City, String State, String Zip
+		 */
+		
+		return Stream.of(
+			//TODO Overwrite foreign Keys
+				new Object[] {-1, 9999, "123 Main St", "Appt 2", "Labanon", "KY", "12345"},
+				new Object[] {15, 9999, "888 Main St", "", "Labanon", "KY", "12345"},
+				new Object[] {18, 9999, "999 Main St", "Unit z", "San Francisco", "CA", "12345"},
+				new Object[] {22, 9999, "1001 Main St", "", "New York", "NY", "12345"}
+		);
+		
+	}
+	
+	
+
+	
+	//tests that constructor and setter methods are equivalent
+	//tests that insert method works 
+	//tests that insert method updates record ID
+	//tests that database read method works correctly
+	//tests that record is written and read correctly from DB
+	
+	@ParameterizedTest
+	@MethodSource("addressData")
+	public void testAddressDB(int Address_Id, int User_Id, String Street1, String Street2, String City, String State, String Zip) {
+		/**
+		 * Unit test for User_Address objects and the User_Address_Access controller. 
+		 * @param Address_Id the primary key for the User_Address object may be set to -1 as a null value
+		 * @param User_Id foreign key of the User whose address is represented, foreign key must exist in User table
+		 * @param Street1 String representation of Street 1
+		 * @param Street2 String representation of street 2
+		 * @param City String representation of City
+		 * @param State String 2 alpha digits for state abbreviation code
+		 * @param Zip string representation 5 numeric digits representing zip code 
+		 */
+		
+		User_Address address1 = UserAddressFactory.create(Address_Id, User_Id, Street1, Street2, City, State, Zip); //we use this as our input
+		User_Address address2 = new User_Address();
+		address2.setID(Address_Id);
+		address2.setUserID(User_Id);
+		address2.setStreet1(Street1);
+		address2.setStreet2(Street2);
+		address2.setCity(City);
+		address2.setState(State);
+		address2.setZip(Zip);
+		
+	
+		
+		User_Address address3 = UserAddressFactory.create(Address_Id, User_Id, Street1, Street2, City, State, Zip); //we use this to test the Table_Access class
+		//address3 is needed because the Loan passed to the read operation is mutable; its primary key may change.
+		
+		User_Address address4 = null; // used for read operation
+		
+		
+		
+		
+		
+		try{
+			userAddressTable.insert(address3);
+		}catch (SQLException e) {
+            e.printStackTrace();
+        }
+		
+		//confirm that the userID is now set if it was not previously. 
+		assertNotEquals(-1, address3.getID(), "LoanID not correctly set by table object");
+		
+		//if User_Id was not set by input, it should have been set by the insert action
+		if(address1.getID() == -1) {
+			address1.setID(address3.getID());
+			address2.setID(address3.getID());
+		}
+		
+		//Test the read function to ensure the record was properly inserted. 
+		try{
+			address4 = userAddressTable.read(address3.getID());
+		}catch (SQLException e) {
+            e.printStackTrace();
+        }
+		
+		assertEquals(address1, address2);
+		assertEquals(address2, address3);
+		assertEquals(address3, address4);
+		
+	
+		}
+
+
 
 }

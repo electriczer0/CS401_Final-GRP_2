@@ -9,13 +9,6 @@ public class User implements Has_ID {
     public User() {
     }
 
-    public User(Integer UserID, String NameFirst, String NameLast, String Type) {
-        this.UserID = UserID;
-        this.Name_First = NameFirst;
-        this.Name_Last = NameLast;
-        this.Type = Type;
-    }
-
     @Override
     public int getID() {
         return UserID;

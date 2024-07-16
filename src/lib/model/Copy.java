@@ -7,10 +7,7 @@ public class Copy implements Has_ID {
     public Copy() {
     }
 
-    public Copy(Integer Copy_Id, Integer Book_Id) {
-        this.Copy_Id = Copy_Id;
-        this.Book_Id = Book_Id;
-    }
+  
 
     @Override
     public int getID() {
