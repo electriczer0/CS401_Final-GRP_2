@@ -13,13 +13,13 @@ public class Loan implements Has_ID {
 
     public Loan() {
     }
+  
 
-    
     @Override
     public int getID() {
         return Loan_Id;
     }
-
+    
     @Override
     public void setID(int Loan_Id) {
         this.Loan_Id = Loan_Id;

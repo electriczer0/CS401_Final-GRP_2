@@ -18,6 +18,8 @@ import java.util.stream.Stream;
 
 
 import java.io.File;
+import java.util.Date;
+import java.util.Calendar;
 
 import lib.db.*;
 import lib.model.*;
@@ -76,7 +78,8 @@ class TableAccessTest {
 				//int User_Id, String FirstName, String LastName, String Type
 
 				new Object[] {-1, "Joe", "Simms", "Patron"},
-				new Object [] {100, "Jess", "King", "Patron"}
+				new Object [] {100, "Jess", "King", "Patron"},
+				new Object[] {101, "jim", "simms", "Patron"}
 		);
 		
 	}
@@ -126,7 +129,7 @@ class TableAccessTest {
 
 	public static Stream<Object[]> bookData(){
 		return Stream.of(
-				//int User_Id, String FirstName, String LastName, String Type
+				//int Book_Id, String Author, String ISBN, String Title
 
 				new Object[] {-1, "Keringham & Ritchie", "1234567890", "The C Programming Language"},
 				new Object[] {245, "Michael Chricton", "2345678901", "Jurassic Park"},
@@ -185,10 +188,11 @@ class TableAccessTest {
 	
 	public static Stream<Object[]> copyData(){
 		return Stream.of(
-				//int User_Id, String FirstName, String LastName, String Type
+				//int Copy_Id, int Book_Id
 
 				new Object[] {-1, 245},
-				new Object [] {1515, 20}
+				new Object [] {1515, 20},
+				new Object[] {111, 245}
 		);
 		
 	}
@@ -239,4 +243,104 @@ class TableAccessTest {
 		
 	
 		}
+
+	public static Stream<Object[]> loanData(){
+		
+		/**
+		 * Parameterized data function for loan object testing. 
+		 * int Loan_Id, int Copy_Id, int User_Id, Date Date_Out, Date Date_Due, boolean Active
+		 */
+		
+		return Stream.of(
+			
+				new Object[] {-1, 1515, 100, createDate(2024, 5, 1), createDate(2024, 6, 1), true},
+				new Object[] {20, 1515, 101, createDate(2023, 1, 1), createDate(2023, 2, 1), false},
+				new Object[] {21, 111, 101, createDate(2024, 6, 1), createDate(2024, 7, 1), true},
+				new Object[] {22, 111, 100, createDate(2024,7,1), createDate(2024,8,1), false}
+		);
+		
+	}
+	
+	
+	private static Date createDate(int year, int month, int day) {
+		/**
+		 * Helper function to generate Date objects for use with various unit tests
+		 * @param year - the year
+		 * @param month - the month
+		 * @param day - the day
+		 * @return A Date object of the specified day at time 00:00:00
+		 */
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(year,  month, day, 0,0,0);
+		calendar.set(Calendar.MILLISECOND,  0);
+		return calendar.getTime();
+		
+	}
+	
+	//tests that constructor and setter methods are equivalent
+	//tests that insert method works 
+	//tests that insert method updates record ID
+	//tests that database read method works correctly
+	//tests that record is written and read correctly from DB
+	
+	@ParameterizedTest
+	@MethodSource("loanData")
+	public void testLoanDB(int Loan_Id, int Copy_Id, int User_Id, Date Date_Out, Date Date_Due, boolean Active) {
+		/**
+		 * Unit test for loan objects and the loanTable controller. 
+		 * @param Loan_Id the primary key for the loan object may be set to -1 as a null value
+		 * @param Copy_Id foreign key of the copy loaned out, foreign key must exist in Copy table
+		 * @param User_Id foreign key to user table representing user to whom loan was issued, must exist in user table
+		 * @param Date_Out Date object representing the date the loan was issued
+		 * @param Date_Due Date object representing the date the loan is due
+		 * @param Active boolean representing whether the loan is still outstanding 
+		 */
+		
+		Loan loan1 = LoanFactory.create(Loan_Id, Copy_Id, User_Id, Date_Out, Date_Due, Active); //we use this as our input
+		Loan loan2 = new Loan();
+		loan2.setID(Loan_Id);
+		loan2.setCopyID(Copy_Id);
+		loan2.setUserID(User_Id);
+		loan2.setDateOut(Date_Out);
+		loan2.setDateDue(Date_Due);
+		loan2.setActive(Active);
+		
+		Loan loan3 = LoanFactory.create(Loan_Id, Copy_Id, User_Id, Date_Out, Date_Due, Active); //we use this to test the Table_Access class
+		//loan3 is needed because the Loan passed to the read operation is mutable; its primary key may change.
+		
+		Loan loan4 = null; // used for read operation
+		
+		
+		
+		
+		
+		try{
+			loanTable.insert(loan3);
+		}catch (SQLException e) {
+            e.printStackTrace();
+        }
+		
+		//confirm that the userID is now set if it was not previously. 
+		assertNotEquals(-1, loan3.getID(), "LoanID not correctly set by table object");
+		
+		//if User_Id was not set by input, it should have been set by the insert action
+		if(loan1.getID() == -1) {
+			loan1.setID(loan3.getID());
+			loan2.setID(loan3.getID());
+		}
+		
+		//Test the read function to ensure the record was properly inserted. 
+		try{
+			loan4 = loanTable.read(loan3.getID());
+		}catch (SQLException e) {
+            e.printStackTrace();
+        }
+		
+		assertEquals(loan1, loan2);
+		assertEquals(loan2, loan3);
+		assertEquals(loan3, loan4);
+		
+	
+		}
+
 }
