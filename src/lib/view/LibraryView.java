@@ -3,6 +3,7 @@ package lib.view;
 import lib.controller.UserController;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * This static class manages the user-facing library interactions CLI.
@@ -32,8 +33,9 @@ public class LibraryView {
      * Initial intake. Returning a '1' indicates the user wants to switch modes, and returning a '0' indicates
      * that the user wants to quit.
      */
-    public static int basePrompt(){
+    public static int basePrompt(Scanner sc){
         if (UserController.getCurrentUser() == null){ return 0; } //Should never happen
+
 
 
         System.out.println("Welcome to the Library Manager, " + UserController.getCurrentUser().getFirstName() + ".");
@@ -62,7 +64,7 @@ public class LibraryView {
             }
 
         }
-
+        return 0;
 
     }
 
