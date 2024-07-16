@@ -55,10 +55,10 @@ public class Example { //<--Refactor
 			int rtn = -1;
 			switch(state) {
 				case LIBRARY_MANAGEMENT:
-					rtn = LibraryView.basePrompt();
+					rtn = LibraryView.basePrompt(sc);
 					break;
 				case SOCIAL_MEDIA_PLATFORM:
-					//rtn = SocialManager.basePrompt();
+					//rtn = SocialManager.basePrompt(sc);
 					break;
 			}
 			if (rtn == 1){
