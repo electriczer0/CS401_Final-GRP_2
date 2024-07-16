@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * A user who is a patron can check books out, return books, and see what books they've borrowed and when they're due.
  */
 
-enum LibraryActions {
+enum LibraryAction {
     ADD_USER,
     REMOVE_USER,
     LIST_USERS,
@@ -26,23 +26,57 @@ enum LibraryActions {
 }
 public class LibraryView {
 
+    private static boolean exiting = false;
 
     /**
      * Initial intake. Returning a '1' indicates the user wants to switch modes, and returning a '0' indicates
      * that the user wants to quit.
      */
     public static int basePrompt(){
+        if (UserController.getCurrentUser() == null){ return 0; } //Should never happen
 
-        System.out.println("Welcome to the Library Manager.");
-        ArrayList<LibraryActions> actions = new ArrayList<LibraryActions>();
+
+        System.out.println("Welcome to the Library Manager, " + UserController.getCurrentUser().getFirstName() + ".");
+        //We re-initialize this list each time we return to the base Prompt, as the user might have changed 
+        // between calls.
+        ArrayList<LibraryAction> actions = new ArrayList<LibraryAction>();
+        actions.add(LibraryAction.LIST_BOOKS);
+        actions.add(LibraryAction.CHECK_BOOK_AVAILABLE);
+        actions.add(LibraryAction.GENERATE_USER_CHECKOUT_REPORT);
         if (UserController.getCurrentUser().getType() == "Librarian"){
-            actions.add(LibraryActions.ADD_USER);
+            actions.add(LibraryAction.ADD_USER);
+            actions.add(LibraryAction.REMOVE_USER);
+            actions.add(LibraryAction.LIST_USERS);
+            actions.add(LibraryAction.ADD_BOOK);
+            actions.add(LibraryAction.REMOVE_BOOK);
+            actions.add(LibraryAction.GENERATE_LIBRARY_CHECKOUT_REPORT);
         }
         if (UserController.getCurrentUser().getType() == "Patron"){
+            actions.add(LibraryAction.CHECKOUT_BOOK);
+            actions.add(LibraryAction.DEPOSIT_BOOK);
+        }
+        while (!exiting){
+            System.out.println("Here are the actions available.");
+            for (int i = 0; i < actions.size(); i++){
+                System.out.println((i + 1) + ". " + printAction(actions.get(i)));
+            }
 
         }
 
 
+    }
+
+    private static String printAction(LibraryAction action){
+        switch (action){
+            case ADD_USER -> {return "Add a new user to the list of library patrons.";}
+            case REMOVE_USER -> {return "Remove a user from the list of library patrons.";}
+            case LIST_USERS -> {return "List all users.";}
+            case ADD_BOOK -> {return "Add a book to the collection.";}
+            case REMOVE_BOOK -> {return "Remove a book from the collection.";}
+            case LIST_BOOKS -> {return "List all books in the collection.";}
+            default -> {return "";}
+
+        }
     }
 
 }
