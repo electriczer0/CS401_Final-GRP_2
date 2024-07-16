@@ -1,4 +1,4 @@
-package lib.test.db;
+package db;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
