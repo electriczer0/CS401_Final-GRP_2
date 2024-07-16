@@ -49,4 +49,31 @@ public class User implements Has_ID {
     public void setType(String Type) {
         this.Type = Type;
     }
+    
+ // Overriding equals method
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;  // Check if the objects are the same
+        if (o == null || getClass() != o.getClass()) return false;  // Check if the classes are the same
+
+        User user = (User) o;
+
+        if (UserID != user.getID()) return false;  // Compare the ids
+        if (!Name_First.equals(user.getFirstName())) return false;
+        if (!Name_Last.equals(user.getLastName())) return false;
+        
+        
+        return Type.equals(user.getType());  // Compare the authors
+    }
+
+    // Overriding hashCode method
+    @Override
+    public int hashCode() {
+        int result = UserID;
+        result = 31 * result + Name_First.hashCode();
+        result = 31 * result + Name_Last.hashCode();
+        result = 31 * result + Type.hashCode();
+        
+        return result;
+    }
 }

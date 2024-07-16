@@ -69,5 +69,37 @@ public class User_Address implements Has_ID {
     public void setState(String State) {
         this.State = State;
     }
+    
+ // Overriding equals method
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;  // Check if the objects are the same
+        if (o == null || getClass() != o.getClass()) return false;  // Check if the classes are the same
+
+        User_Address address = (User_Address) o;
+
+        if (Address_Id != address.getID()) return false;  // Compare the ids
+        if (User_Id != address.getUserID()) return false;
+        if (!City.equals(address.getCity())) return false;
+        if (!State.equals(address.getState())) return false;
+        if (!Street1.equals(address.getStreet1())) return false;
+        if (!Street2.equals(address.getStreet2())) return false;
+        
+        return Zip.equals(address.getZip());  // Compare the authors
+    }
+
+    // Overriding hashCode method
+    @Override
+    public int hashCode() {
+        int result = Address_Id;
+        result = 31 * result + User_Id;
+        result = 31 * result + City.hashCode();
+        result = 31 * result + State.hashCode();
+        result = 31 * result + Street1.hashCode();
+        result = 31 * result + Street2.hashCode();
+        result = 31 * result + Zip.hashCode();
+      
+        return result;
+    }
 }
 

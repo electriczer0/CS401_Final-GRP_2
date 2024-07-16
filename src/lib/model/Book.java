@@ -69,6 +69,28 @@ public class Book implements Has_ID{
 		this.Book_Id = Book_Id;
 	}
 	
-	
+	// Overriding equals method
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;  // Check if the objects are the same
+        if (o == null || getClass() != o.getClass()) return false;  // Check if the classes are the same
+
+        Book book = (Book) o;
+
+        if (Book_Id != book.getID()) return false;  // Compare the ids
+        if (!ISBN.equals(book.getISBN())) return false;  // Compare the ISBNs
+        if (!Author.equals(book.getAuthor())) return false;  // Compare the titles
+        return Title.equals(book.getTitle());  // Compare the authors
+    }
+
+    // Overriding hashCode method
+    @Override
+    public int hashCode() {
+        int result = Book_Id;
+        result = 31 * result + Author.hashCode();
+        result = 31 * result + ISBN.hashCode();
+        result = 31 * result + Title.hashCode();
+        return result;
+    }
 
 }

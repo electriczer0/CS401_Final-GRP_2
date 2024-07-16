@@ -39,4 +39,25 @@ public class Copy implements Has_ID {
 			.append("\n");
 		return output.toString();
     }
+    
+ // Overriding equals method
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;  // Check if the objects are the same
+        if (o == null || getClass() != o.getClass()) return false;  // Check if the classes are the same
+
+        Copy copy = (Copy) o;
+
+        if (Copy_Id != copy.getID()) return false;  // Compare the ids
+        
+        return Book_Id == copy.getBookID();  // Compare the authors
+    }
+
+    // Overriding hashCode method
+    @Override
+    public int hashCode() {
+        int result = Copy_Id;
+        result = 31 * result + Book_Id;
+        return result;
+    }
 }
