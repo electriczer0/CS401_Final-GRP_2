@@ -17,10 +17,6 @@ public class Book implements Has_ID{
 		
 	}
 	public Book(int Book_Id, String Author, String ISBN, String title) {
-		this.Book_Id = Book_Id; 
-		this.Author = Author;
-		this.ISBN = ISBN;
-		this.Title = title; 
 		
 	}
 	
