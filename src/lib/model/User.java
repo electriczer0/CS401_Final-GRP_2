@@ -69,4 +69,20 @@ public class User implements Has_ID {
         
         return result;
     }
+    
+    @Override
+    public String toString() {
+    	StringBuilder output = new StringBuilder();
+		output.append("User ID:\t")
+			.append(this.UserID)
+			.append("\nFirst Name:\t")
+			.append(this.Name_First)
+			.append("\nLast Name:\t")
+			.append(this.Name_Last)
+			.append("\nType:\t")
+			.append(this.Type)
+			.append("\n");
+		return output.toString();
+    	
+    }
 }

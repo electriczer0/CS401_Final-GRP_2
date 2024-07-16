@@ -25,7 +25,7 @@ public class Loan_Access extends Table_Access<Loan> {
 			                + "DateDue DATE, "
 			                + "IsActive BOOLEAN, "
 			                + "FOREIGN KEY (CopyID) REFERENCES Copy(CopyID) ON DELETE CASCADE, " // DB will delete related Loan records on deletion of related Copy or User
-			                + "FOREIGN KEY (UserID) REFERENCES User(UserID) ON DELETE CASCADE" // However, User table schema should prevent deletion of user when a loan is outstanding
+			                + "FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE" // However, User table schema should prevent deletion of user when a loan is outstanding
 					);
  
     // Maps for getter and setter methods

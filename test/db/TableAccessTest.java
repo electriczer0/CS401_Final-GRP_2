@@ -18,6 +18,11 @@ import java.util.stream.Stream;
 
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path; 
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Calendar;
 
@@ -30,13 +35,32 @@ class TableAccessTest {
 	private static Loan_Access loanTable = null;
 	private static User_Access userTable = null;
 	private static User_Address_Access userAddressTable = null;
-	private static final String testDBLocation = "test.db";
-	private static final String testDBURL= "jdbc:sqlite:" + testDBLocation;
+	private static final String testDBLocation = "Data/Test.db";
+	private static final String activeDBLocation = "ActiveTest.db"; 
+	private static final String testDBURL= "jdbc:sqlite:" + activeDBLocation;
 	private static Connection libraryConnection;
 	
 
 	@BeforeAll
 	static void setUpAll() throws Exception {
+		/**
+		 * Sets up database environment for tests
+		 * Uses the file defined at testDBLocation 
+		 * Code assumes that it can safely insert records with
+		 * primary keys between 10,000 and 100,000
+		 * The tables' primary key sequence should be set to 100,000 or more
+		 * And there should be no existing keys in the range of 10,000 to 100,000
+		 */
+		
+		//Copy the test database so that we maintain a clean test source
+		Path sourcePath = Paths.get(testDBLocation);
+		Path destinationPath = Paths.get(activeDBLocation);	
+		try {
+			Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		try {
 			libraryConnection = Connection_Factory.getConnection(testDBURL,
 				DB_PARAMS.dbInitSchema);
@@ -57,7 +81,7 @@ class TableAccessTest {
 		libraryConnection.close(); //close out the DB connection
 		
 		//Delete test db file if it exists
-		File dbFile = new File(testDBLocation);
+		File dbFile = new File(activeDBLocation);
 		if (dbFile.exists()) {
 			dbFile.delete();
 		}
@@ -78,8 +102,8 @@ class TableAccessTest {
 				//int User_Id, String FirstName, String LastName, String Type
 
 				new Object[] {-1, "Joe", "Simms", "Patron"},
-				new Object [] {100, "Jess", "King", "Patron"},
-				new Object[] {101, "jim", "simms", "Patron"}
+				new Object [] {1000, "Jess", "King", "Patron"},
+				new Object[] {1001, "jim", "simms", "Patron"}
 		);
 		
 	}
@@ -101,6 +125,7 @@ class TableAccessTest {
 			userTable.insert(user3);
 		}catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("Failed to Insert Record: " + user3);
         }
 		
 		//confirm that the userID is now set if it was not previously. 
@@ -190,9 +215,9 @@ class TableAccessTest {
 		return Stream.of(
 				//int Copy_Id, int Book_Id
 
-				new Object[] {-1, 245},
-				new Object [] {1515, 20},
-				new Object[] {111, 245}
+				new Object[] {-1, 748},
+				new Object [] {1515, 749},
+				new Object[] {111, 750}
 		);
 		
 	}
@@ -253,10 +278,10 @@ class TableAccessTest {
 		
 		return Stream.of(
 			
-				new Object[] {-1, 1515, 100, createDate(2024, 5, 1), createDate(2024, 6, 1), true},
-				new Object[] {20, 1515, 101, createDate(2023, 1, 1), createDate(2023, 2, 1), false},
-				new Object[] {21, 111, 101, createDate(2024, 6, 1), createDate(2024, 7, 1), true},
-				new Object[] {22, 111, 100, createDate(2024,7,1), createDate(2024,8,1), false}
+				new Object[] {-1, 1, 1, createDate(2024, 5, 1), createDate(2024, 6, 1), true},
+				new Object[] {20, 2, 2, createDate(2023, 1, 1), createDate(2023, 2, 1), false},
+				new Object[] {21, 3, 3, createDate(2024, 6, 1), createDate(2024, 7, 1), true},
+				new Object[] {22, 4, 4, createDate(2024,7,1), createDate(2024,8,1), false}
 		);
 		
 	}
@@ -355,10 +380,10 @@ public static Stream<Object[]> addressData(){
 		
 		return Stream.of(
 			//TODO Overwrite foreign Keys
-				new Object[] {-1, 9999, "123 Main St", "Appt 2", "Labanon", "KY", "12345"},
-				new Object[] {15, 9999, "888 Main St", "", "Labanon", "KY", "12345"},
-				new Object[] {18, 9999, "999 Main St", "Unit z", "San Francisco", "CA", "12345"},
-				new Object[] {22, 9999, "1001 Main St", "", "New York", "NY", "12345"}
+				new Object[] {-1, 1, "123 Main St", "Appt 2", "Labanon", "KY", "12345"},
+				new Object[] {100, 2, "888 Main St", "", "Labanon", "KY", "12345"},
+				new Object[] {101, 3, "999 Main St", "Unit z", "San Francisco", "CA", "12345"},
+				new Object[] {102, 4, "1001 Main St", "", "New York", "NY", "12345"}
 		);
 		
 	}

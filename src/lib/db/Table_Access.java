@@ -7,7 +7,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,7 +209,9 @@ public abstract class Table_Access<T extends Has_ID> {
 	                }
 	                stmt.setObject(index++, value);
 	            } catch (Exception e) {
-	                throw new SQLException("Failed to invoke getter method for column: " + column, e);
+	            	
+	            	throw new SQLException("Failed to invoke getter method for column: " + column, e);
+	                
 	            }
 	        }
 	        stmt.executeUpdate();
@@ -222,7 +229,7 @@ public abstract class Table_Access<T extends Has_ID> {
 	                throw new SQLException("Failed to set generated primary key", e);
 	            }
 	        }
-	    }
+	    } 
 }
 	
 	public T read(int recordId) throws SQLException {
@@ -233,14 +240,44 @@ public abstract class Table_Access<T extends Has_ID> {
                 if (rs.next()) {
                     T entity = createEntityInstance();
                     Map<String, Method> setters = getColumnSetterMap();
-                    for (String column : setters.keySet()) {
+                    
+                    
+                    for (Map.Entry<String, Method> entry : setters.entrySet()) {
+                        String columnName = entry.getKey();
+                        Method setter = entry.getValue();
+                        Class<?> paramType = setter.getParameterTypes()[0];
+                        
+                        Object value = rs.getObject(columnName);
+                        
+                        //convert Boolean from DB to java
+                        if (paramType == Boolean.class) {
+                        	value = rs.getInt(columnName) != 0;
+                        }
+                        
+                        //convert Date formats from DB to java
+                        if (paramType == Date.class) { 
+                        		value = parseDate(rs.getString(columnName));
+                        }
+                        
+                        
+                        try {
+                        	setter.invoke(entity, value);
+                        	
+                        } catch (Exception e) {
+                            throw new SQLException("Failed to invoke setter method for column: " + columnName, e);
+                        }
+                        
+                    }
+                    /*for (String column : setters.keySet()) {
+                    	
                         Method setter = setters.get(column);
                         try {
                             setter.invoke(entity, rs.getObject(column));
                         } catch (Exception e) {
                             throw new SQLException("Failed to invoke setter method for column: " + column, e);
                         }
-                    }
+                    }*/
+                    
                     return entity;
                 }
             } catch (Exception e) {
@@ -363,6 +400,19 @@ public abstract class Table_Access<T extends Has_ID> {
         return resultList;
     }
 	
+	private Date parseDate(String dateString) throws NumberFormatException {
+		//SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		//return dateFormat.parse(dateString);
+		Date date = null;
+		try { 
+			long timeMillis = Long.parseLong((String) dateString);
+			date = new Date(timeMillis);
+			
+		} catch (NumberFormatException e) {
+            throw new NumberFormatException("Caught Exception parsing: " + dateString);
+        }
+		return date; 
+	}
 	
 	
 	

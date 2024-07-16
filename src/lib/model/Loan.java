@@ -94,5 +94,25 @@ public class Loan implements Has_ID {
       
         return result;
     }
+    
+    @Override
+    public String toString() {
+    	StringBuilder output = new StringBuilder();
+		output.append("Loan ID:\t")
+			.append(this.Loan_Id)
+			.append("\nCopy ID:\t")
+			.append(this.Copy_Id)
+			.append("\nUser ID:\t")
+			.append(this.User_Id)
+			.append("\nIs Active:\t")
+			.append(this.Active)
+			.append("\nDate Out:\t")
+			.append(this.Date_Out)
+			.append("\nDate Due:\t")
+			.append(this.Date_Due)
+			.append("\n");
+		return output.toString();
+    	
+    }
 
 }
