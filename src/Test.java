@@ -40,6 +40,7 @@ public class Test { //<--Refactor
             e.printStackTrace();
         }
 		try {
+			//Let's load books and create some users here. Need to at a minimum create the 'Librarian' user.
 			DataLoader.loadBooksFromCSV(bookTable, "Data/books.csv");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -48,7 +49,7 @@ public class Test { //<--Refactor
 		System.out.println("Library Manager initialized.");
 
 		Scanner sc = new Scanner(System.in);
-		initUser(sc);
+		UserController.initUser(sc);
 
 		while (!exiting && UserController.getCurrentUser() != null){
 			int rtn = -1;
@@ -76,10 +77,6 @@ public class Test { //<--Refactor
 			state = cli_state.LIBRARY_MANAGEMENT;
 		}
 
-	}
-
-	private static void initUser(Scanner sc){
-		UserController.initUser(sc);
 	}
 
 }
