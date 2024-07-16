@@ -1,13 +1,24 @@
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Scanner;
 
+import lib.controller.UserController;
 import lib.db.*;
-import lib.model.*;
 import lib.utilities.*;
+import lib.view.LibraryView;
 
+// Broadly the state diagram of this app switches between being in the library and interacting with books,
+// and interacting with the social media platform.
 
+enum cli_state {
+	LIBRARY_MANAGEMENT,
+	SOCIAL_MEDIA_PLATFORM
+};
 
-public class Test {
+public class Test { //<--Refactor
+
+	private static cli_state state = cli_state.LIBRARY_MANAGEMENT;
+	private static boolean exiting = false;
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -29,12 +40,46 @@ public class Test {
             e.printStackTrace();
         }
 		try {
-			// DataLoader.loadBooksFromCSV(bookTable, "Data/books.csv");
+			DataLoader.loadBooksFromCSV(bookTable, "Data/books.csv");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 
+		System.out.println("Library Manager initialized.");
+
+		Scanner sc = new Scanner(System.in);
+		initUser(sc);
+
+		while (!exiting && UserController.getCurrentUser() != null){
+			int rtn = -1;
+			switch(state) {
+				case LIBRARY_MANAGEMENT:
+					rtn = LibraryView.basePrompt();
+					break;
+				case SOCIAL_MEDIA_PLATFORM:
+					//rtn = SocialManager.basePrompt();
+					break;
+			}
+			if (rtn == 1){
+				switchState();
+			} else {
+				exiting = true;
+			}
+		}
+
+	}
+
+	private static void switchState(){
+		if (state == cli_state.LIBRARY_MANAGEMENT) {
+			state = cli_state.SOCIAL_MEDIA_PLATFORM;
+		} else {
+			state = cli_state.LIBRARY_MANAGEMENT;
+		}
+
+	}
+
+	private static void initUser(Scanner sc){
+		UserController.initUser(sc);
 	}
 
 }
