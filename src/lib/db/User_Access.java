@@ -51,27 +51,7 @@ public class User_Access extends Table_Access<User> {
         super(User.class);
     }
 
-    // Override delete methods to check for active loans before deleting a user
-    // Users cannot be deleted if a loan is outstanding
-    @Override
-    public void delete(int User_Id) throws SQLException {
-        String checkActiveLoansQuery = "SELECT COUNT(*) FROM Loans WHERE UserID = ? AND IsActive = TRUE";
-        try (var stmt = connection.prepareStatement(checkActiveLoansQuery)) {
-            stmt.setInt(1, User_Id);
-            try (var rs = stmt.executeQuery()) {
-                if (rs.next() && rs.getInt(1) > 0) {
-                    throw new SQLException("Cannot delete user with active loans");
-                }
-            }
-        }
-        super.delete(User_Id);
-    }
-    
-    @Override
-    public void delete(User user) throws SQLException {
-    	this.delete(user.getID());
-    	
-    }
+   
 
     protected  List<String> getTableSchema(){
 		return this.schema;
