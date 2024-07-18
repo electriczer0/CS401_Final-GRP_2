@@ -1,5 +1,10 @@
 package db;
 
+//TODO Implement Find() test
+//TODO Implement readAll() test
+//TODO Implement update() test 
+
+
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -39,7 +44,6 @@ class TableAccessTest {
 	private static final String activeDBLocation = "ActiveTest.db"; 
 	private static final String testDBURL= "jdbc:sqlite:" + activeDBLocation;
 	private static Connection libraryConnection;
-	
 
 	@BeforeAll
 	static void setUpAll() throws Exception {
@@ -95,7 +99,6 @@ class TableAccessTest {
 	@AfterEach
 	void tearDown() throws Exception {
 	}
-
 		
 	public static Stream<Object[]> userData(){
 		return Stream.of(
@@ -111,14 +114,14 @@ class TableAccessTest {
 	@ParameterizedTest
 	@MethodSource("userData")
 	public void testUserDB(int User_Id, String FirstName, String LastName, String Type) {
-		User user1 = UserFactory.create(User_Id, FirstName, LastName, Type); //we use this as our input
+		User user1 = User.create(User_Id, FirstName, LastName, Type); //we use this as our input
 		User user2 = new User(); //we use this to test setters
 		User user4 = null;
 		user2.setID(User_Id);
 		user2.setFirstName(FirstName);
 		user2.setLastName(LastName);
 		user2.setType(Type);
-		User user3 = UserFactory.create(User_Id, FirstName, LastName, Type); //we use this to test the Table_Access class
+		User user3 = User.create(User_Id, FirstName, LastName, Type); //we use this to test the Table_Access class
 		//user3 is different from user1 because Table_Access class may change User_Id
 		
 		try{
@@ -151,7 +154,6 @@ class TableAccessTest {
 	
 		}
 
-
 	public static Stream<Object[]> bookData(){
 		return Stream.of(
 				//int Book_Id, String Author, String ISBN, String Title
@@ -162,24 +164,18 @@ class TableAccessTest {
 		);
 		
 	}
-	
-	//tests that constructor and setter methods are equivalent
-	//tests that insert method works 
-	//tests that insert method updates record ID
-	//tests that database read method works correctly
-	//tests that record is written and read correctly from DB
-	
+
 	@ParameterizedTest
 	@MethodSource("bookData")
 	public void testBookDB(int Book_Id, String author, String isbn, String title) {
-		Book book1 = BookFactory.create(Book_Id, author, isbn, title); //we use this as our input
+		Book book1 = Book.create(Book_Id, author, isbn, title); //we use this as our input
 		Book book2 = new Book(); //we use this to test setters
 		Book book4 = null;
 		book2.setID(Book_Id);
 		book2.setAuthor(author);
 		book2.setISBN(isbn);
 		book2.setTitle(title);
-		Book book3 = BookFactory.create(Book_Id, author, isbn, title); //we use this to test the Table_Access class
+		Book book3 = Book.create(Book_Id, author, isbn, title); //we use this to test the Table_Access class
 		//user3 is different from user1 because Table_Access class may change User_Id
 		
 		try{
@@ -222,22 +218,16 @@ class TableAccessTest {
 		
 	}
 	
-	//tests that constructor and setter methods are equivalent
-	//tests that insert method works 
-	//tests that insert method updates record ID
-	//tests that database read method works correctly
-	//tests that record is written and read correctly from DB
-	
 	@ParameterizedTest
 	@MethodSource("copyData")
 	public void testCopyDB(int Copy_Id, int Book_Id) {
-		Copy copy1 = CopyFactory.create(Copy_Id, Book_Id); //we use this as our input
+		Copy copy1 = Copy.create(Copy_Id, Book_Id); //we use this as our input
 		Copy copy2 = new Copy(); //we use this to test setters
 		Copy copy4 = null;
 		copy2.setID(Copy_Id);
 		copy2.setBookID(Book_Id);
 		
-		Copy copy3 = CopyFactory.create(Copy_Id, Book_Id); //we use this to test the Table_Access class
+		Copy copy3 = Copy.create(Copy_Id, Book_Id); //we use this to test the Table_Access class
 		//copy3 is different from copy1 because Table_Access class may change User_Id
 		
 		try{
@@ -279,13 +269,12 @@ class TableAccessTest {
 		return Stream.of(
 			
 				new Object[] {-1, 1, 1, createDate(2024, 5, 1), createDate(2024, 6, 1), true},
-				new Object[] {20, 2, 2, createDate(2023, 1, 1), createDate(2023, 2, 1), false},
-				new Object[] {21, 3, 3, createDate(2024, 6, 1), createDate(2024, 7, 1), true},
+				new Object[] {20, 5, 2, createDate(2023, 1, 1), createDate(2023, 2, 1), false},
+				new Object[] {21, 6, 3, createDate(2024, 6, 1), createDate(2024, 7, 1), true},
 				new Object[] {22, 4, 4, createDate(2024,7,1), createDate(2024,8,1), false}
 		);
 		
 	}
-	
 	
 	private static Date createDate(int year, int month, int day) {
 		/**
@@ -301,13 +290,7 @@ class TableAccessTest {
 		return calendar.getTime();
 		
 	}
-	
-	//tests that constructor and setter methods are equivalent
-	//tests that insert method works 
-	//tests that insert method updates record ID
-	//tests that database read method works correctly
-	//tests that record is written and read correctly from DB
-	
+
 	@ParameterizedTest
 	@MethodSource("loanData")
 	public void testLoanDB(int Loan_Id, int Copy_Id, int User_Id, Date Date_Out, Date Date_Due, boolean Active) {
@@ -368,10 +351,7 @@ class TableAccessTest {
 	
 		}
 
-
-
-
-public static Stream<Object[]> addressData(){
+	public static Stream<Object[]> addressData(){
 		
 		/**
 		 * Parameterized data function for User_Address object testing. 
@@ -379,7 +359,6 @@ public static Stream<Object[]> addressData(){
 		 */
 		
 		return Stream.of(
-			//TODO Overwrite foreign Keys
 				new Object[] {-1, 1, "123 Main St", "Appt 2", "Labanon", "KY", "12345"},
 				new Object[] {100, 2, "888 Main St", "", "Labanon", "KY", "12345"},
 				new Object[] {101, 3, "999 Main St", "Unit z", "San Francisco", "CA", "12345"},
@@ -387,15 +366,7 @@ public static Stream<Object[]> addressData(){
 		);
 		
 	}
-	
-	
 
-	
-	//tests that constructor and setter methods are equivalent
-	//tests that insert method works 
-	//tests that insert method updates record ID
-	//tests that database read method works correctly
-	//tests that record is written and read correctly from DB
 	
 	@ParameterizedTest
 	@MethodSource("addressData")
@@ -411,7 +382,7 @@ public static Stream<Object[]> addressData(){
 		 * @param Zip string representation 5 numeric digits representing zip code 
 		 */
 		
-		User_Address address1 = UserAddressFactory.create(Address_Id, User_Id, Street1, Street2, City, State, Zip); //we use this as our input
+		User_Address address1 = User_Address.create(Address_Id, User_Id, Street1, Street2, City, State, Zip); //we use this as our input
 		User_Address address2 = new User_Address();
 		address2.setID(Address_Id);
 		address2.setUserID(User_Id);
@@ -423,7 +394,7 @@ public static Stream<Object[]> addressData(){
 		
 	
 		
-		User_Address address3 = UserAddressFactory.create(Address_Id, User_Id, Street1, Street2, City, State, Zip); //we use this to test the Table_Access class
+		User_Address address3 = User_Address.create(Address_Id, User_Id, Street1, Street2, City, State, Zip); //we use this to test the Table_Access class
 		//address3 is needed because the Loan passed to the read operation is mutable; its primary key may change.
 		
 		User_Address address4 = null; // used for read operation
@@ -461,6 +432,58 @@ public static Stream<Object[]> addressData(){
 	
 		}
 
-
-
+	@ParameterizedTest
+	@MethodSource("deleteData")
+	public <T extends Has_ID> void testDelete(Table_Access<T> table, int recordID) {
+		/**
+		 * Unit test which tests the delete() method for any concrete Table_Access class. 
+		 * @param table Instance of the Table_Access class that we're testing
+		 * @param RecordID the ID which should be deleted
+		 */
+		try {
+			Boolean recordExistsPre = table.read(recordID) != null;
+			table.delete(recordID);
+			Boolean recordExistsPost = table.read(recordID) != null;
+			
+			if(!recordExistsPre) {
+				assertEquals(recordExistsPre, recordExistsPost, "Value initially absent, and then found");
+			}else {
+				assertNotEquals(recordExistsPre, recordExistsPost, "Value was not deleted");
+			}
+		}catch (SQLException e) {
+            e.printStackTrace();
+        }
+		
+		
+	}
+	
+	public static Stream<Object[]> deleteData(){
+		
+		/**
+		 * Parameterized data function to test delete operation.
+		 * testDelete(Table_Access<T> table, int recordID) 
+		 * Table_Access<T> table is an instance of the table we're testing
+		 * recordID is the primary key of the record to delete. 
+		 */
+		
+		return Stream.of(
+				//-1 tests record not found logic
+				new Object[] {bookTable, -1},
+				new Object[] {copyTable, -1},
+				new Object[] {loanTable, -1},
+				new Object[] {userTable, -1},
+				new Object[] {userAddressTable, -1},
+				// test actual record deletions
+				//these records must exist in the Test.DB
+				//They also must not be related to ea other so that their deletion 
+				//does not cascade 
+				//Also may not delete records use in other tests 
+				new Object[] {bookTable, 750},
+				new Object[] {copyTable, 2},
+				new Object[] {loanTable, 2033519},
+				new Object[] {userTable, 8},
+				new Object[] {userAddressTable, 10}
+		);
+		
+	}
 }

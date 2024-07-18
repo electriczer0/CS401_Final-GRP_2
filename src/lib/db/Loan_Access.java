@@ -80,6 +80,23 @@ public class Loan_Access extends Table_Access<Loan> {
     protected String getPrimaryKey() {
     	return this.primary_key;
     }
+    public Boolean hasActiveLoans(int User_Id) throws SQLException {
+    	/**
+    	 * Checks for active loans issued to the user represented by User_Id
+    	 * @param User_Id int representation of User primary key 
+    	 * @return Boolean True if User has >0 active loan records outstanding 
+    	 */
+	    String checkActiveLoansQuery = "SELECT COUNT(*) FROM Loans WHERE UserID = ? AND IsActive = TRUE";
+	    try (var stmt = connection.prepareStatement(checkActiveLoansQuery)) {
+	        stmt.setInt(1, User_Id);
+	        try (var rs = stmt.executeQuery()) {
+	            if (rs.next() && rs.getInt(1) > 0) {
+	                return true;
+	            }
+	        }
+	    }
+	    return false;
+	}
 
 }
 

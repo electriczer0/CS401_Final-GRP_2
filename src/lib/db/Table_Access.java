@@ -45,10 +45,12 @@ public abstract class Table_Access<T extends Has_ID> {
 	
 	
 
-	//Generic method to get or create a singleton instance for a given class with the requisite connection variable
-	//This method acts is a helper function which acts as the primary constructor for all subclasses. 
+	
 	public static <T extends Table_Access<?>> T getInstance( Connection connection, Class<T> callerClass) throws SQLException {
-		//Class<T> callerClass = (Class<T>) getCallerClass();
+		/**
+		 * Generic method to get or create a singleton instance for a given class with the requisite connection variable
+		 * This method acts is a helper function which acts as the primary constructor for all subclasses. 
+		 */
 		
 		T instance = null; 
 		synchronized (instances) {
@@ -233,11 +235,16 @@ public abstract class Table_Access<T extends Has_ID> {
 }
 	
 	public T read(int recordId) throws SQLException {
+		/**
+		 * Reads a single record from the table specified by its primary key
+		 * @param recordId the int representing the primary key
+		 * @return Object of type <T> found by primary key or NULL if not found
+		 */
         String sql = "SELECT * FROM " + getTableName() + " WHERE " + getPrimaryKey() + " = ?";
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setInt(1, recordId);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
+                if (rs.next()) { //if a record is returned
                     T entity = createEntityInstance();
                     Map<String, Method> setters = getColumnSetterMap();
                     
@@ -247,8 +254,12 @@ public abstract class Table_Access<T extends Has_ID> {
                         Method setter = entry.getValue();
                         Class<?> paramType = setter.getParameterTypes()[0];
                         
-                        Object value = rs.getObject(columnName);
                         
+                        //Read the column value and pass it to parseValue
+                        //To deal with setting the correct data type for the column 
+                        Object value = parseValue(paramType, rs.getObject(columnName)); 
+                        
+                        /*
                         //convert Boolean from DB to java
                         if (paramType == Boolean.class) {
                         	value = rs.getInt(columnName) != 0;
@@ -257,7 +268,7 @@ public abstract class Table_Access<T extends Has_ID> {
                         //convert Date formats from DB to java
                         if (paramType == Date.class) { 
                         		value = parseDate(rs.getString(columnName));
-                        }
+                        }*/
                         
                         
                         try {
@@ -268,16 +279,7 @@ public abstract class Table_Access<T extends Has_ID> {
                         }
                         
                     }
-                    /*for (String column : setters.keySet()) {
-                    	
-                        Method setter = setters.get(column);
-                        try {
-                            setter.invoke(entity, rs.getObject(column));
-                        } catch (Exception e) {
-                            throw new SQLException("Failed to invoke setter method for column: " + column, e);
-                        }
-                    }*/
-                    
+                                        
                     return entity;
                 }
             } catch (Exception e) {
@@ -286,6 +288,49 @@ public abstract class Table_Access<T extends Has_ID> {
         }
         return null;
     }
+	
+	protected Object parseValue(Class<?> paramType, Object value) throws SQLException {
+		/**
+		 * Parses objects returned from a sql query translating them into 
+		 * the desired java datatypes. Will process a variety of objects. 
+		 * Logic exists for Boolean data types and Date objects
+		 * Otherwise the method returns a typecast copy of the original Object
+		 * @param paramType the java type which is expected
+		 * @param value the Object which was returned by the db query 
+		 * @return an object of type paramType representing the value parameter
+		 */
+		
+		try {
+            if (paramType == Boolean.class) {
+                return value != null && ((Number) value).intValue() != 0;
+            }
+            if (paramType == Date.class) {
+                if (value instanceof String) {
+                    long timeMillis = Long.parseLong((String) value);
+                    return new Date(timeMillis);
+                } else if (value instanceof Number) {
+                    return new Date(((Number) value).longValue());
+                }
+            }
+            if (paramType == int.class && value instanceof Integer) {
+                return (int) value;
+            }
+            if (paramType == long.class && value instanceof Long) {
+                return (long) value;
+            }
+            if (paramType == double.class && value instanceof Double) {
+                return (double) value;
+            }
+            if (paramType == float.class && value instanceof Float) {
+                return (float) value;
+            }
+            return paramType.cast(value);
+        } catch (NumberFormatException e) {
+            throw new SQLException("Failed to parse value: " + value, e);
+        }
+		
+	}
+	
 	
 	public List<T> readAll() throws SQLException {
         String sql = "SELECT * FROM " + getTableName();
