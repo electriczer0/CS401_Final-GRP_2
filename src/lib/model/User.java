@@ -1,6 +1,6 @@
 package lib.model;
 
-public class User implements Has_ID {
+public class User implements Has_ID, Has_Copy {
     private int UserID;
     private String Name_First;
     private String Name_Last;
@@ -102,4 +102,21 @@ public class User implements Has_ID {
 		user.setType(Type);
 		return user; 
 	}
+    
+    public static User copy(User user) {
+    	/**
+    	 * Create a deep copy of user
+    	 * @param user the User object to be copied
+    	 * @return a User object which is a deep copy of user param. 
+    	 * 
+    	 */
+    	return User.create(user.getID(), user.getFirstName(), user.getLastName(), user.getType());
+    }
+    
+    public User copy() {
+    	/**
+    	 * Create a deep copy of this User instance
+    	 */
+    	return User.copy(this);
+    }
 }

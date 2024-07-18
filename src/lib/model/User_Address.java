@@ -1,6 +1,6 @@
 package lib.model;
 
-public class User_Address implements Has_ID {
+public class User_Address implements Has_ID, Has_Copy {
     private Integer Address_Id;
     private Integer User_Id;
     private String Street1;
@@ -125,5 +125,19 @@ public class User_Address implements Has_ID {
 		
 		return address;
 	}
+    
+    public static User_Address copy(User_Address address) {
+    	/**
+    	 * Creates a deep copy of User_Address object
+    	 * @param User_Address the address to be copied
+    	 * @return a User_Address object which is a deep copy of address
+    	 */
+    	return User_Address.create(address.getID(), address.getUserID(), address.getStreet1(),
+    			address.getStreet2(), address.getCity(), address.getState(), address.getZip());
+    }
+    
+    public User_Address copy() {
+    	return User_Address.copy(this);	
+    }
 }
 

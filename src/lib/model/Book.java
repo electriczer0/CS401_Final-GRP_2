@@ -5,7 +5,7 @@ import lib.db.*;
 import lib.model.*;
 
 
-public class Book implements Has_ID{
+public class Book implements Has_ID, Has_Copy{
 	private int Book_Id = -1; //-1 will be the null value for this field
 	private String Author;
 	private String ISBN;
@@ -102,5 +102,19 @@ public class Book implements Has_ID{
 		book.setTitle(Title);
 		return book;
 	}
+    
+    public static Book copy(Book book) {
+    	/**
+    	 * Create a deep copy of book
+    	 */
+    	return Book.create(book.getID(), book.getAuthor(), book.getISBN(), book.getTitle());
+    }
+    
+    public Book copy() {
+    	/**
+    	 * Return a deep copy of this Book instance
+    	 */
+    	return Book.copy(this);
+    }
 
 }

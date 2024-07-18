@@ -1,6 +1,6 @@
 package lib.model;
 
-public class Copy implements Has_ID {
+public class Copy implements Has_ID, Has_Copy {
     private Integer Copy_Id;
     private Integer Book_Id;
 
@@ -70,4 +70,17 @@ public class Copy implements Has_ID {
 		copy.setBookID(Book_Id);
 		return copy; 
 	}
+    
+    public static Copy copy(Copy copy) {
+    	/**
+    	 * return a deep copy of copy
+    	 */
+    	return Copy.create(copy.getID(), copy.getBookID());
+    }
+    public Copy copy() {
+    	/**
+    	 * return a deep copy of this Copy instance
+    	 */
+    	return Copy.copy(this);
+    }
 }

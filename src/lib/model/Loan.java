@@ -3,7 +3,7 @@ package lib.model;
 
 import java.util.Date;
 
-public class Loan implements Has_ID {
+public class Loan implements Has_ID, Has_Copy {
 	private Integer Loan_Id;
     private Integer Copy_Id;
     private Integer User_Id;
@@ -25,7 +25,7 @@ public class Loan implements Has_ID {
         this.Loan_Id = Loan_Id;
     }
 
-    public Integer getCopyID() {
+    public int getCopyID() {
         return Copy_Id;
     }
 
@@ -117,6 +117,9 @@ public class Loan implements Has_ID {
     
 
 	public static Loan create(int loanID, int copyID, int userID, Date dateOut, Date dateDue, boolean isActive) {
+		/**
+		 * Loan Factory for instantiating Loan objects
+		 */
 		Loan loanOut = new Loan(); 
 		loanOut.setID(loanID);
 		loanOut.setCopyID(copyID);
@@ -127,6 +130,26 @@ public class Loan implements Has_ID {
 		
 		return loanOut;
 		
+	}
+	
+	public static Loan copy(Loan loan) {
+		/**
+		 * Create a deep copy of the Loan instance
+		 * @param loan a Loan object to be copied
+		 * @return A Loan object which is a deep copy of the passed param. 
+		 */
+		return Loan.create(loan.getID(), loan.getCopyID(), loan.getUserID(), 
+				new Date(loan.getDateOut().getTime()),
+				new Date(loan.getDateDue().getTime()),
+				loan.isActive()
+				);
+	}
+	
+	public Loan copy() {
+		/**
+		 * create a deep copy of this Loan instance
+		 */
+		return Loan.copy(this);
 	}
 
 }
