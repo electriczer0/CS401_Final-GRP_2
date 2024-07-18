@@ -22,11 +22,17 @@ public class UserController {
                 //Library.listAllusers();
             } else {
                 //currentUser = Library.getUserById(input);
+                currentUser = new User();
+                currentUser.setType("Librarian");
             }
         }
     }
 
     public static User getCurrentUser(){
         return currentUser;
+    }
+
+    public static void createNewUser(String firstName, String lastName, String type){
+        //Create a new user and save to db
     }
 }
