@@ -42,9 +42,9 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class UserController {
-	private static ArrayList<ArrayList<String>> members = new ArrayList<>();
+	private ArrayList<ArrayList<String>> members = new ArrayList<>();
 	
-	public static void createNewUser(Scanner input){
+	public void createNewUser(Scanner input){
 		System.out.println("Enter member's first name: ");
 		String firstName = input.next();
 		System.out.println("Enter member's Last name: ");
@@ -61,7 +61,7 @@ public class UserController {
 		
 	 }
 	
-	public static void removeMemeber(Scanner input) {
+	public void removeMemeber(Scanner input) {
 		System.out.println("Enter member's first name: ");
 		String firstName = input.next();
 		System.out.println("Enter member's Last name: ");
@@ -101,14 +101,14 @@ public class UserController {
 		}
 	}
 	
-	public static void listAllusers(){
+	public void listAllusers(){
 		for(int i = 0; i < members.size(); i++) {
 			System.out.println(members.get(i));
 		}
 	} 
 	
 	
-	public static void borrowBook(Scanner input) {
+	public void borrowBook(Scanner input) {
 		System.out.println("Enter borrowing book's ISBN");
 		String ISBN = input.next();
 		System.out.println("Enter your Library member ID");
@@ -117,7 +117,7 @@ public class UserController {
 		System.out.println("Book " + ISBN +  " is brrowed by member " + id);
 	}
 	
-	public static void returnBook(Scanner input) {
+	public void returnBook(Scanner input) {
 		
 		System.out.println("Enter returning book's ISBN");
 		String ISBN = input.next();
@@ -127,3 +127,4 @@ public class UserController {
 		System.out.println("Book " + ISBN +  " is returned by member " + id);
 	}
 }
+
