@@ -78,7 +78,7 @@ public class UserController {
 		
 	}
 	
-	public static void updateMemberInfo(Scanner input) {
+	public void updateMemberInfo(Scanner input) {
 		System.out.println("Enter member's current first name: ");
 		String firstName = input.next();
 		System.out.println("Enter member's current Last name: ");
