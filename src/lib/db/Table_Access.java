@@ -1,5 +1,8 @@
 package lib.db;
 
+//TODO Make read() a call to find() 
+//reuse internal logic such as creating and setting entity fields from result set
+
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -270,22 +273,9 @@ public abstract class Table_Access<T extends Has_ID> {
                         Method setter = entry.getValue();
                         Class<?> paramType = setter.getParameterTypes()[0];
                         
-                        
                         //Read the column value and pass it to parseValue
                         //To deal with setting the correct data type for the column 
                         Object value = parseValue(paramType, rs.getObject(columnName)); 
-                        
-                        /*
-                        //convert Boolean from DB to java
-                        if (paramType == Boolean.class) {
-                        	value = rs.getInt(columnName) != 0;
-                        }
-                        
-                        //convert Date formats from DB to java
-                        if (paramType == Date.class) { 
-                        		value = parseDate(rs.getString(columnName));
-                        }*/
-                        
                         
                         try {
                         	setter.invoke(entity, value);
@@ -353,29 +343,25 @@ public abstract class Table_Access<T extends Has_ID> {
 	}
 	
 	
-	public List<T> readAll() throws SQLException {
-        String sql = "SELECT * FROM " + getTableName();
-        Map<String, Method> setters = getColumnSetterMap();
-        List<T> resultList = new ArrayList<>();
-        try (PreparedStatement stmt = getConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                T entity = createEntityInstance();
-                for (String column : setters.keySet()) {
-                    Method setter = setters.get(column);
-                    try {
-                        setter.invoke(entity, rs.getObject(column));
-                    } catch (Exception e) {
-                        throw new SQLException("Failed to invoke setter method for column: " + column, e);
-                    }
-                }
-                resultList.add(entity);
-            }
-        } catch (Exception e) {
-            throw new SQLException("Failed to retrieve all records", e);
-        }
-        return resultList;
-    }
+	public Map<Integer, T> readAll(int offset, int limit) throws SQLException {
+		/**
+		 * Reads all records from the table limiting return to limit number and starting at offset'th record
+		 * @param limit the maximum number of records to return
+		 * @param offset the first record to return 
+		 * @return Map<Integer, T> of records where key is the primarykey and value is the record 
+		 */
+		
+        HashMap<String, String> blankQuery = new HashMap<>();
+        return find(blankQuery, offset, limit);
+	}
+	
+	public Map<Integer, T> readAll() throws SQLException {
+		/**
+		 * Convenience method. Returns the first 100 records from table
+		 */
+		
+		return readAll(0,100);
+	}
 	
 	
 	public void update(T record) throws SQLException {
@@ -416,11 +402,18 @@ public abstract class Table_Access<T extends Has_ID> {
         }
     }
 	
-	public List<T> find(HashMap<String, String> parameters) throws SQLException {
-        if (parameters == null || parameters.isEmpty()) {
-            throw new IllegalArgumentException("Parameters cannot be null or empty");
-        }
-
+	public Map<Integer, T> find(HashMap<String, String> parameters, int offset, int limit) throws SQLException {
+		/**
+		 * Find operation. Queries table and returns records found. Null parameters
+		 * will return all records. 
+		 * @param paramaters a HashMap<String, String> of key, value pairs representing
+		 * the query column and search value
+		 * @param limit the maximum records to return
+		 * @param offset the first record to return 
+		 * @return a Map<Integer, T> where key is the record ID, and value is the record 
+		 */
+		
+     
         // Validate that each key in the parameters map matches a column in the table
         Map<String, Method> setters = getColumnSetterMap();
         for (String key : parameters.keySet()) {
@@ -429,8 +422,12 @@ public abstract class Table_Access<T extends Has_ID> {
             }
         }
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM ").append(getTableName()).append(" WHERE ");
+        StringBuilder sql = new StringBuilder("SELECT * FROM ").append(getTableName());
         List<String> values = new ArrayList<>();
+        
+        if (parameters != null && !parameters.isEmpty()) {
+        	sql.append(" WHERE ");
+        }
 
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             sql.append(entry.getKey()).append(" = ? AND ");
@@ -438,9 +435,13 @@ public abstract class Table_Access<T extends Has_ID> {
         }
 
         // Remove the trailing "AND "
-        sql.setLength(sql.length() - 4);
+        if (parameters != null && !parameters.isEmpty()) {
+        	sql.setLength(sql.length() - 4);
+        }
+        
+        sql.append(String.format(" LIMIT %d OFFSET %d", limit, offset));
 
-        List<T> resultList = new ArrayList<>();
+        Map<Integer, T> resultMap = new HashMap<>();
         try (PreparedStatement stmt = getConnection().prepareStatement(sql.toString())) {
             for (int i = 0; i < values.size(); i++) {
                 stmt.setString(i + 1, values.get(i));
@@ -451,20 +452,34 @@ public abstract class Table_Access<T extends Has_ID> {
                     T entity = createEntityInstance();
                     for (String column : setters.keySet()) {
                         Method setter = setters.get(column);
+                        
+                        Class<?> paramType = setter.getParameterTypes()[0];
+                        Object value = parseValue(paramType, rs.getObject(column));
+                        
                         try {
-                            setter.invoke(entity, rs.getObject(column));
+                            setter.invoke(entity, value);
                         } catch (Exception e) {
                             throw new SQLException("Failed to invoke setter method for column: " + column, e);
                         }
                     }
-                    resultList.add(entity);
+                    resultMap.put(entity.getID(), entity);
                 }
             } catch (Exception e) {
                 throw new SQLException("Failed to retrieve records via reflection", e);
             }
         }
-        return resultList;
+        return resultMap;
     }
+
+	public Map<Integer, T> find(HashMap<String, String> parameters) throws SQLException {
+		/**
+		 * Convenience function returns up to the first 100 records of the specified query 
+		 * @param paramaters a HashMap<String, String> of key, value pairs representing
+		 * the query column and search value
+		 * @return a Map<Integer, T> where key is the record ID, and value is the record 
+		 */
+		return find(parameters, 0, 100);
+	}
 	
 	private Date parseDate(String dateString) throws NumberFormatException {
 		//SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

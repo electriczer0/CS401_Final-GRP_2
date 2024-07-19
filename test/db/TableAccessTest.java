@@ -1,13 +1,13 @@
 package db;
 
-//TODO Implement Find() test
-//TODO Implement readAll() test
+//TODO Write additional Find() cases
 
 
 
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -34,6 +34,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import lib.db.*;
@@ -88,10 +93,11 @@ class TableAccessTest {
 		//Copy the test database so that we maintain a clean test source
 		Path sourcePath = Paths.get(testDBLocation);
 		Path destinationPath = Paths.get(activeDBLocation);	
+		
 		try {
 			Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			e.printStackTrace();
+				e.printStackTrace();
 		}
 		
 		
@@ -348,4 +354,84 @@ class TableAccessTest {
 		);
 	}
 	
+	@ParameterizedTest
+	@MethodSource("findData")
+	public <T extends Has_ID & Has_Copy<T>, J extends Table_Access<T>> void testFind(Class<J> clazz,HashMap<String, String> queryParams, Map<Integer, T> expected) {
+		/**
+		 * Basic find functionality test
+		 * @param clazz the Table_Access class we're searching
+		 * @param queryParams a HashMap<String, String> representing the search query where key = column name, and value = search term. 
+		 * @param expected a List<T> representing the list that should be returned by the DB
+		 */
+		
+		Map<Integer, T> found = null;
+		try {
+			found = Table_Access.getInstance(clazz).find(queryParams);
+		}catch (SQLException e) {
+			SQLException e2 = new SQLException("Caught exception executing find on table: " + clazz + " query: " + queryParams, e);
+            e2.printStackTrace();
+		}
+		
+		assertEquals(expected, found);
+			
+		
+		
+	}
+	
+	@SuppressWarnings("serial")
+	public static Stream<Arguments> findData(){
+		return Stream.of(
+				//Class<J> clazz,HashMap<String, String> queryParams, List <T> expected
+				
+				Arguments.of(
+						User_Address_Access.class,
+						new HashMap<String, String>() {{
+							put("State", "NM");
+						}},
+						new HashMap<Integer, User_Address>() {{ 
+							put(9, User_Address.create(9, 9, "24700 Garcia Street Suite 249", "Suite 643", "West Maryton", "NM", "23231"));
+							put(12, User_Address.create(12, 12, "192 Avila Mission", "Suite 034", "Waltonchester", "NM", "52659"));
+						}}
+				)
+		);
+	}
+	
+	
+	@ParameterizedTest
+	@MethodSource("readAllData")
+	public <T extends Has_ID & Has_Copy<T>, J extends Table_Access<T>> void testReadAll(Class<J> clazz) {
+		/**
+		 * Simple test confirms that findAll() returns the same results as find()
+		 */
+		
+		Map<Integer, T> found1 = null;
+		Map<Integer, T> found2 = null;
+		HashMap<String, String> blankQuery = new HashMap();
+		try {
+			found1 = Table_Access.getInstance(clazz).find(blankQuery);
+			found2 = Table_Access.getInstance(clazz).readAll(); 
+		}catch (SQLException e) {
+			SQLException e2 = new SQLException("Caught exception executing find / readall on table: " + clazz, e);
+            e2.printStackTrace();
+		}
+		
+		assertEquals(found1, found2);
+			
+		
+		
+	}
+	
+	public static Stream<Arguments> readAllData(){
+		return Stream.of(
+				//Class<J> clazz
+				
+				Arguments.of(Book_Access.class),
+				Arguments.of(Copy_Access.class),
+				Arguments.of(Loan_Access.class),
+				Arguments.of(User_Access.class),
+				Arguments.of(User_Address_Access.class)
+		);
+	}
+
+
 }
