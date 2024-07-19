@@ -2,9 +2,6 @@ package db;
 
 //TODO Implement Find() test
 //TODO Implement readAll() test
-//TODO Implement update() test 
-//TODO Review and fix parse value error on date string from DB (sometimes it's returning YYYY-MM-DD string format, sometimes its a unix epoch code)
-//TODO review "failed to set fields via reflection" error if the above does not fix this
 
 
 
@@ -13,6 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -38,6 +39,8 @@ import java.util.Calendar;
 import lib.db.*;
 import lib.model.*;
 
+@Execution(ExecutionMode.SAME_THREAD)
+@TestInstance(Lifecycle.PER_CLASS)
 class TableAccessTest {
 	private static Book_Access bookTable = null;
 	private static Copy_Access copyTable = null;
@@ -51,6 +54,24 @@ class TableAccessTest {
 
 	@BeforeAll
 	static void setUpAll() throws Exception {
+		
+		
+		
+		
+	}
+
+	@AfterAll
+	static void tearDownAll() throws Exception {
+		
+		if(libraryConnection != null && !libraryConnection.isClosed()) {
+			libraryConnection.close(); //close out the DB connection
+		}
+		
+		
+	}
+
+	@BeforeEach
+	void setUp() throws Exception {
 		/**
 		 * Sets up database environment for tests
 		 * Uses the file defined at testDBLocation 
@@ -58,7 +79,11 @@ class TableAccessTest {
 		 * primary keys between 10,000 and 100,000
 		 * The tables' primary key sequence should be set to 100,000 or more
 		 * And there should be no existing keys in the range of 10,000 to 100,000
+		 * We run this as a BeforeEach method so that the test environment is clean
+		 * and we need not worry about conflicting actions in the test environ 
+		 * eg a test which deletes a record expected to exist by another method. 
 		 */
+		
 		
 		//Copy the test database so that we maintain a clean test source
 		Path sourcePath = Paths.get(testDBLocation);
@@ -68,6 +93,7 @@ class TableAccessTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		
 		try {
 			libraryConnection = Connection_Factory.getConnection(testDBURL,
@@ -80,13 +106,29 @@ class TableAccessTest {
 		} catch (SQLException e) {
             e.printStackTrace();
         }
-		
+				
+		assert bookTable != null && copyTable != null &&
+				loanTable != null && userTable != null &&
+				userAddressTable != null : "Caught null tables"; 
 	}
 
-	@AfterAll
-	static void tearDownAll() throws Exception {
+	@AfterEach
+	void tearDown() throws Exception {
 		
-		libraryConnection.close(); //close out the DB connection
+		if(libraryConnection != null && !libraryConnection.isClosed()) {
+			libraryConnection.close(); //close out the DB connection
+		}
+		
+		Table_Access.removeInstance(Book_Access.class);
+		Table_Access.removeInstance(Copy_Access.class);
+		Table_Access.removeInstance(Loan_Access.class);
+		Table_Access.removeInstance(User_Access.class);
+		Table_Access.removeInstance(User_Address_Access.class);
+		bookTable=null;
+		copyTable=null;
+		loanTable=null;
+		userTable=null;
+		userAddressTable=null;
 		
 		//Delete test db file if it exists
 		File dbFile = new File(activeDBLocation);
@@ -94,14 +136,10 @@ class TableAccessTest {
 			dbFile.delete();
 		}
 		
-	}
-
-	@BeforeEach
-	void setUp() throws Exception {
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
+		
+		
+				
+		
 	}
 	private static Date createDate(int year, int month, int day) {
 		/**
@@ -111,6 +149,9 @@ class TableAccessTest {
 		 * @param day - the day
 		 * @return A Date object of the specified day at time 00:00:00
 		 */
+		
+		
+		
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(year,  month, day, 0,0,0);
 		calendar.set(Calendar.MILLISECOND,  0);
@@ -120,16 +161,16 @@ class TableAccessTest {
 	
 	@ParameterizedTest
 	@MethodSource("deleteData")
-	public <T extends Has_ID> void testDelete(Table_Access<T> table, int recordID) {
+	public <T extends Table_Access<?>> void testDelete(Class<T> clazz, int recordID) {
 		/**
 		 * Unit test which tests the delete() method for any concrete Table_Access class. 
 		 * @param table Instance of the Table_Access class that we're testing
 		 * @param RecordID the ID which should be deleted
 		 */
 		try {
-			Boolean recordExistsPre = table.read(recordID) != null;
-			table.delete(recordID);
-			Boolean recordExistsPost = table.read(recordID) != null;
+			Boolean recordExistsPre = Table_Access.getInstance(clazz).read(recordID) != null;
+			Table_Access.getInstance(clazz).delete(recordID);
+			Boolean recordExistsPost = Table_Access.getInstance(clazz).read(recordID) != null;
 			
 			if(!recordExistsPre) {
 				assertEquals(recordExistsPre, recordExistsPost, "Value initially absent, and then found");
@@ -137,7 +178,8 @@ class TableAccessTest {
 				assertNotEquals(recordExistsPre, recordExistsPost, "Value was not deleted");
 			}
 		}catch (SQLException e) {
-            e.printStackTrace();
+			SQLException e2 = new SQLException("Caught exception deleting record " + recordID + " from " + clazz, e);
+            e2.printStackTrace();
         }
 		
 		
@@ -154,52 +196,52 @@ class TableAccessTest {
 		
 		return Stream.of(
 				//-1 tests record not found logic
-				new Object[] {bookTable, -1},
-				new Object[] {copyTable, -1},
-				new Object[] {loanTable, -1},
-				new Object[] {userTable, -1},
-				new Object[] {userAddressTable, -1},
+				new Object[] {Book_Access.class, -1},
+				new Object[] {Copy_Access.class, -1},
+				new Object[] {Loan_Access.class, -1},
+				new Object[] {User_Access.class, -1},
+				new Object[] {User_Address_Access.class, -1},
 				// test actual record deletions
 				//these records must exist in the Test.DB
 				//They also must not be related to ea other so that their deletion 
 				//does not cascade 
 				//Also may not delete records use in other tests 
-				new Object[] {bookTable, 750},
-				new Object[] {copyTable, 2},
-				new Object[] {loanTable, 2033519},
-				new Object[] {userTable, 8},
-				new Object[] {userAddressTable, 10}
+				new Object[] {Book_Access.class, 750},
+				new Object[] {Copy_Access.class, 2},
+				new Object[] {Loan_Access.class, 2033519},
+				new Object[] {User_Access.class, 8},
+				new Object[] {User_Address_Access.class, 10}
 		);
 		
 	}
 
 	public static Stream<Object[]> readWriteData(){
 		return Stream.of(
-				//Table_Access<T> table, T record
+				//Class<T> clazz, T record
 
-				new Object[] {userTable, User.create( -1, "Joe", "Simms", "Patron")},
-				new Object [] {userTable, User.create(1000, "Jess", "King", "Patron")},
-				new Object[] {userTable, User.create(1001, "jim", "simms", "Patron")},
-				new Object[] {bookTable, Book.create(-1, "Keringham & Ritchie", "1234567890", "The C Programming Language")},
-				new Object[] {bookTable, Book.create(245, "Michael Chricton", "2345678901", "Jurassic Park")},
-				new Object[] {bookTable, Book.create(20, "laksdf", "3456789012", "jfjei")},
-				new Object[] {copyTable, Copy.create(-1, 748)},
-				new Object[] {copyTable, Copy.create(1515, 749)},
-				new Object[] {copyTable, Copy.create(111, 755)},
-				new Object[] {loanTable, Loan.create(-1, 1, 1, createDate(2024, 5, 1), createDate(2024, 6, 1), true)},
-				new Object[] {loanTable, Loan.create(20, 5, 2, createDate(2023, 1, 1), createDate(2023, 2, 1), false)},
-				new Object[] {loanTable, Loan.create(21, 6, 3, createDate(2024, 6, 1), createDate(2024, 7, 1), true)},
-				new Object[] {loanTable, Loan.create(22, 4, 4, createDate(2024,7,1), createDate(2024,8,1), false)},
-				new Object[] {userAddressTable,User_Address.create(-1, 1, "123 Main St", "Appt 2", "Labanon", "KY", "12345")},
-				new Object[] {userAddressTable, User_Address.create(100, 2, "888 Main St", "", "Labanon", "KY", "12345")},
-				new Object[] {userAddressTable, User_Address.create(101, 3, "999 Main St", "Unit z", "San Francisco", "CA", "12345")},
-				new Object[] {userAddressTable, User_Address.create(102, 4, "1001 Main St", "", "New York", "NY", "12345")}
+				new Object[] {User_Access.class, User.create( -1, "Joe", "Simms", "Patron")},
+				new Object[] {User_Access.class, User.create(1000, "Jess", "King", "Patron")},
+				new Object[] {User_Access.class, User.create(1001, "jim", "simms", "Patron")},
+				new Object[] {Book_Access.class, Book.create(-1, "Keringham & Ritchie", "1234567890", "The C Programming Language")},
+				new Object[] {Book_Access.class, Book.create(245, "Michael Chricton", "2345678901", "Jurassic Park")},
+				new Object[] {Book_Access.class, Book.create(20, "laksdf", "3456789012", "jfjei")},
+				new Object[] {Copy_Access.class, Copy.create(-1, 748)},
+				new Object[] {Copy_Access.class, Copy.create(1515, 749)},
+				new Object[] {Copy_Access.class, Copy.create(111, 755)},
+				new Object[] {Loan_Access.class, Loan.create(-1, 1, 1, createDate(2024, 5, 1), createDate(2024, 6, 1), true)},
+				new Object[] {Loan_Access.class, Loan.create(20, 5, 2, createDate(2023, 1, 1), createDate(2023, 2, 1), false)},
+				new Object[] {Loan_Access.class, Loan.create(21, 6, 3, createDate(2024, 6, 1), createDate(2024, 7, 1), true)},
+				new Object[] {Loan_Access.class, Loan.create(22, 4, 4, createDate(2024,7,1), createDate(2024,8,1), false)},
+				new Object[] {User_Address_Access.class,User_Address.create(-1, 1, "123 Main St", "Appt 2", "Labanon", "KY", "12345")},
+				new Object[] {User_Address_Access.class, User_Address.create(100, 2, "888 Main St", "", "Labanon", "KY", "12345")},
+				new Object[] {User_Address_Access.class, User_Address.create(101, 3, "999 Main St", "Unit z", "San Francisco", "CA", "12345")},
+				new Object[] {User_Address_Access.class, User_Address.create(102, 4, "1001 Main St", "", "New York", "NY", "12345")}
 		);
 	}
 	
 	@ParameterizedTest
 	@MethodSource("readWriteData")
-	public <T extends Has_ID & Has_Copy<T>> void testReadWrite(Table_Access<T> table, T record1) {
+	public <T extends Has_ID & Has_Copy<T>, J extends Table_Access<T>> void testReadWrite(Class<J> clazz, T record1) {
 		/**
 		 * Unit test for User_Address objects and the User_Address_Access controller. 
 		 * @param Address_Id the primary key for the User_Address object may be set to -1 as a null value
@@ -211,22 +253,16 @@ class TableAccessTest {
 		 * @param Zip string representation 5 numeric digits representing zip code 
 		 */
 		
-		
-		
-	
-		
 		T record2 = record1.copy(); //we use this to test the Table_Access class
 		//address3 is needed because the Loan passed to the read operation is mutable; its primary key may change.
 		
 		T record3 = null; // used for read operation
 		
-		
-		
-		
 		try{
-			table.insert(record2);
+			Table_Access.getInstance(clazz).insert(record2);
 		}catch (SQLException e) {
-            e.printStackTrace();
+			SQLException e2 = new SQLException("Caught exception inserting: " + record1, e);
+            e2.printStackTrace();
         }
 		
 		//confirm that the userID is now set if it was not previously. 
@@ -239,15 +275,77 @@ class TableAccessTest {
 		
 		//Test the read function to ensure the record was properly inserted. 
 		try{
-			record3 = table.read(record1.getID());
+			record3 = Table_Access.getInstance(clazz).read(record1.getID());
 		}catch (SQLException e) {
-            e.printStackTrace();
+			SQLException e2 = new SQLException("Caught exception reading: " + record1, e);
+            e2.printStackTrace();
         }
 		
 		assertEquals(record1, record2);
 		assertEquals(record2, record3);
+	}
+
+	@ParameterizedTest
+	@MethodSource("updateData")
+	public <T extends Has_ID & Has_Copy<T>, J extends Table_Access<T>> void testUpdate(Class<J> clazz, T record1) {
+		/**
+		 * Basic update functionality test
+		 * @param clazz the Table_Access class we're updating to
+		 * @param record1 the entity to be updated. primary key must match existing record and at least 1 field must be updated
+		 */
 		
-	
+		T record2 = null; //the original record before update
+		T record3 = null; //the updated record
+		try {
+			record2 = Table_Access.getInstance(clazz).read(record1.getID());
+		}catch (SQLException e) {
+			SQLException e2 = new SQLException("Caught exception reading: " + record1.getClass() + " " + record1.getID(), e);
+            e2.printStackTrace();
 		}
 		
+		try {
+			Table_Access.getInstance(clazz).update(record1);
+		}catch (SQLException e) {
+			SQLException e2 = new SQLException("Caught exception updating: " + record1, e);
+            e2.printStackTrace();
+		}
+		
+		try {
+			record3 = Table_Access.getInstance(clazz).read(record1.getID());
+		}catch (SQLException e) {
+			SQLException e2 = new SQLException("Caught exception reading: " + record1.getClass() + " " + record1.getID(), e);
+            e2.printStackTrace();
+		}
+		
+		assertEquals(record1, record3);
+		assertNotEquals(record2, record3);
+			
+		
+		
+	}
+	
+	public static Stream<Object[]> updateData(){
+		return Stream.of(
+				//Class<T> clazz, T record
+
+				new Object[] {User_Access.class, User.create(1, "Joe", "Simms", "Patron")},
+				new Object[] {User_Access.class, User.create(2, "Jess", "King", "Patron")},
+				new Object[] {User_Access.class, User.create(3, "jim", "simms", "Patron")},
+				new Object[] {Book_Access.class, Book.create(748, "Keringham & Ritchie", "1234567890", "The C Programming Language")},
+				new Object[] {Book_Access.class, Book.create(749, "Michael Chricton", "2345678901", "Jurassic Park")},
+				new Object[] {Book_Access.class, Book.create(750, "laksdf", "3456789012", "jfjei")},
+				new Object[] {Copy_Access.class, Copy.create(5, 748)},
+				new Object[] {Copy_Access.class, Copy.create(6, 749)},
+				new Object[] {Copy_Access.class, Copy.create(7, 755)},
+				new Object[] {Loan_Access.class, Loan.create(2033519, 1, 1, createDate(2024, 5, 1), createDate(2024, 6, 1), true)},
+				new Object[] {Loan_Access.class, Loan.create(2033520, 5, 2, createDate(2023, 1, 1), createDate(2023, 2, 1), false)},
+				new Object[] {Loan_Access.class, Loan.create(2033521, 6, 3, createDate(2024, 6, 1), createDate(2024, 7, 1), true)},
+				new Object[] {Loan_Access.class, Loan.create(2033522, 4, 4, createDate(2024,7,1), createDate(2024,8,1), false)},
+				new Object[] {User_Address_Access.class,User_Address.create(1, 1, "123 Main St", "Appt 2", "Labanon", "KY", "12345")},
+				new Object[] {User_Address_Access.class, User_Address.create(2, 2, "888 Main St", "", "Labanon", "KY", "12345")},
+				new Object[] {User_Address_Access.class, User_Address.create(3, 3, "999 Main St", "Unit z", "San Francisco", "CA", "12345")},
+				new Object[] {User_Address_Access.class, User_Address.create(4, 4, "1001 Main St", "", "New York", "NY", "12345")}
+		);
+	}
+	
 }

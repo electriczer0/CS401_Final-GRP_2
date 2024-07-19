@@ -66,4 +66,7 @@ public class Copy_Access extends Table_Access<Copy> {
     protected String getPrimaryKey() {
     	return this.primary_key;
     }
+    public static Copy_Access getInstance() {
+    	return Table_Access.getInstance(Copy_Access.class);
+    }
 }

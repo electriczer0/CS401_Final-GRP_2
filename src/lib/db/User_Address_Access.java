@@ -80,5 +80,8 @@ public class User_Address_Access extends Table_Access<User_Address> {
     protected String getPrimaryKey() {
     	return this.primary_key;
     }
+    public static User_Address_Access getInstance() {
+    	return Table_Access.getInstance(User_Address_Access.class);
+    }
    
 }

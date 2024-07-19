@@ -77,14 +77,25 @@ public abstract class Table_Access<T extends Has_ID> {
 		}catch (SQLException e) {
 			throw new SQLException("Failed to check or create the table " + instance.getTableName() , e);
 		}
-
+		
+		assert instance != null: "Caught returning null instance of " + callerClass; 
 		return instance;
 	}
 	
+	public static void removeInstance(Class<? extends Table_Access<?>> clazz) {
+		/**
+		 * Public class to remove instances of Table_Access objects. 
+		 * Needed, for example in testing when the database must be reinitialized
+		 * Example usage Table_Access.removeInstance(Loan_Access.class)
+		 * @param clazz a class of type <T extends Table_Access<?>> representing the concrete class to be removed
+		 */
+		synchronized (instances){
+			instances.remove(clazz);
+		}
+	}
 	
 	//Generic method to get the existing singleton instance for a given class
-	public static <T extends Table_Access<?>> T getInstance() {
-		Class<T> callerClass = (Class<T>) getCallerClass();
+	public static <T extends Table_Access<?>> T getInstance(Class<T> callerClass) {
 		
 		synchronized(instances) {
 			if(!instances.containsKey(callerClass)) {
@@ -191,9 +202,14 @@ public abstract class Table_Access<T extends Has_ID> {
 	            columnsBuilder.append(column);
 	            valuesBuilder.append("?");
 	            first = false;
+	        } catch (IllegalArgumentException e) {
+	        	System.err.println("Caught IllegalArgumentException");
+	        	System.err.println("Entity class: " + entity.getClass().getName());
+                System.err.println("Getter declaring class: " + getter.getDeclaringClass().getName());
+                throw new SQLException("Failed to invoke getter method for column: " + column, e);
 	        } catch (Exception e) {
 	            throw new SQLException("Failed to invoke getter method for column: " + column, e);
-	        }
+	        } 
 	    }
 
 	    String columns = columnsBuilder.toString();
@@ -283,7 +299,7 @@ public abstract class Table_Access<T extends Has_ID> {
                     return entity;
                 }
             } catch (Exception e) {
-                throw new SQLException("Failed to set fields via reflection", e);
+                throw new SQLException("Failed to set fields via reflection reading record: " + recordId + " from " + getTableName(), e);
             }
         }
         return null;
@@ -300,15 +316,20 @@ public abstract class Table_Access<T extends Has_ID> {
 		 * @return an object of type paramType representing the value parameter
 		 */
 		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); //Format of date string from SQLITE
+		
 		try {
             if (paramType == Boolean.class) {
                 return value != null && ((Number) value).intValue() != 0;
             }
             if (paramType == Date.class) {
-                if (value instanceof String) {
-                    long timeMillis = Long.parseLong((String) value);
-                    return new Date(timeMillis);
-                } else if (value instanceof Number) {
+            	if (value instanceof String) {
+	               	try {              	
+	               		return dateFormat.parse((String) value);
+	               	} catch(ParseException e) {
+	               		e.printStackTrace();
+	               	}
+            	} else if (value instanceof Number) {
                     return new Date(((Number) value).longValue());
                 }
             }
@@ -460,7 +481,9 @@ public abstract class Table_Access<T extends Has_ID> {
 	}
 	
 	
-	
+	public String toString() {
+		return this.getClass().toString();
+	}
 		
 	
 

@@ -73,4 +73,8 @@ public class Book_Access extends Table_Access<Book> {
     protected String getPrimaryKey() {
     	return this.primary_key;
     }
+    
+    public static Book_Access getInstance() {
+    	return Table_Access.getInstance(Book_Access.class);
+    }
 }

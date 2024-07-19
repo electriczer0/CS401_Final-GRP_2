@@ -74,5 +74,8 @@ public class User_Access extends Table_Access<User> {
     protected String getPrimaryKey() {
     	return this.primary_key;
     }
+    public static User_Access getInstance() {
+    	return Table_Access.getInstance(User_Access.class);
+    }
 
 }

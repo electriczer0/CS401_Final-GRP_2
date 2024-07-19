@@ -97,6 +97,9 @@ public class Loan_Access extends Table_Access<Loan> {
 	    }
 	    return false;
 	}
+    public static Loan_Access getInstance() {
+    	return Table_Access.getInstance(Loan_Access.class);
+    }
 
 }
 
