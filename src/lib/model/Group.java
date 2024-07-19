@@ -14,7 +14,7 @@ public class Group implements Has_ID, Has_Interactions {
 	protected Integer owner_Id;
 
 	//A list of associated interactions in this group.
-	protected List<Interaction> interactions;
+	protected List<Interaction> interactions; 
 
 	protected String name;
 	protected String description;
@@ -73,7 +73,7 @@ public class Group implements Has_ID, Has_Interactions {
 	public void setOwnerId(int id) { this.owner_Id = id; }
 	public void setName(String name) { this.name = name; }
 	public void setDescription(String desc) { this.description = desc; }
-	public void setInteractions(List<Interaction> interactions) { this.interactions = interactions; }
+	public void setInteractions(List<Interaction> interactions) { this.interactions = interactions; } 
 
 	
 	// Overriding equals method

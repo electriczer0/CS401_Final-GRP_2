@@ -1,6 +1,7 @@
 package db;
 
 //TODO Write additional Find() cases
+//TODO write test for Loan_Access.hasActiveLoans()
 
 
 

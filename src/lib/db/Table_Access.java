@@ -1,7 +1,8 @@
 package lib.db;
 
 //TODO Make read() a call to find() 
-//reuse internal logic such as creating and setting entity fields from result set
+//TODO reuse internal logic such as creating and setting entity fields from result set
+
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
