@@ -69,4 +69,32 @@ class LibraryController{
 			System.out.println(books.get(i));
 		}
 	}
+
+	public static void borrowBook(Scanner input) {
+		
+		System.out.println("Enter borrowing book's ISBN");
+		String ISBN = input.next();
+		System.out.println("Enter your Library member ID");
+		int id = input.nextInt();
+		
+		for(int i = 0; i < books.size(); i++) {
+			if (books.get(i).contains(ISBN)) {
+				books.get(i).add("Book is brrowed by member: "+ id);
+			}
+		}
+	}
+	
+	public static void returnBook(Scanner input) {
+		
+		System.out.println("Enter returning book's ISBN");
+		String ISBN = input.next();
+		System.out.println("Enter your Library member ID");
+		int id = input.nextInt();
+		
+		for(int i = 0; i < books.size(); i++) {
+			if (books.get(i).contains(ISBN)) {
+				books.get(i).add("Book is returned by member: "+ id);
+			}
+		}
+	}
 }
