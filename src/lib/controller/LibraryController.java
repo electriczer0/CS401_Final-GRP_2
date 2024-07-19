@@ -11,11 +11,11 @@ import java.util.*;
 
 class LibraryController{
 	
-	private static ArrayList<ArrayList<String>> books = new ArrayList<>();
+	private ArrayList<ArrayList<String>> books = new ArrayList<>();
 	
 	LibraryController(){}
 	
-	public static void addbook(Scanner input){
+	public void addbook(Scanner input){
 		
 		System.out.println("Enter new book's title: ");
 		String title = input.next();
@@ -31,7 +31,7 @@ class LibraryController{
 		
 	}
 	
-	public static void removeBook(Scanner input) {
+	public void removeBook(Scanner input) {
 		
 		System.out.println("Enter deprecated book's title: ");
 		String title = input.next();
@@ -48,7 +48,7 @@ class LibraryController{
 
 	}
 	
-	public static boolean searchBook(Scanner input){
+	public boolean searchBook(Scanner input){
 		System.out.println("Enter your book's title: ");
 		String title = input.next();
 		System.out.println("Enter your new book's author");
@@ -64,7 +64,7 @@ class LibraryController{
 		return false;
 	}
 	
-	public static void listAllBook() {
+	public void listAllBook() {
 		for(int i = 0; i < books.size(); i++) {
 			System.out.println(books.get(i));
 		}
