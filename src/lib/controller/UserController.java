@@ -36,3 +36,94 @@ public class UserController {
         //Create a new user and save to db
     }
 }
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class UserController {
+	private static ArrayList<ArrayList<String>> members = new ArrayList<>();
+	
+	public static void createNewUser(Scanner input){
+		System.out.println("Enter member's first name: ");
+		String firstName = input.next();
+		System.out.println("Enter member's Last name: ");
+		String lasttName = input.next();
+		System.out.println("Enter your Library member ID");
+		String id = input.next();
+		String type = "Registered";
+		System.out.println("Congulation, You're the new member of our Library!");
+		
+		int i = 0;
+		members.add(new ArrayList<String>());
+		members.get(i).addAll(Arrays.asList(firstName, lasttName, id, type));
+		i++;
+		
+	 }
+	
+	public static void removeMemeber(Scanner input) {
+		System.out.println("Enter member's first name: ");
+		String firstName = input.next();
+		System.out.println("Enter member's Last name: ");
+		String lasttName = input.next();
+		System.out.println("Enter your Library member ID");
+		String id = input.next();
+		String type = "Registered";
+		
+		for(int i = 0; i < members.size(); i++) {
+			if (members.get(i).containsAll(Arrays.asList(firstName, lasttName, id, type))) {
+				members.get(i).removeAll(Arrays.asList(firstName, lasttName, id, type));
+			}
+		}
+		
+	}
+	
+	public static void updateMemberInfo(Scanner input) {
+		System.out.println("Enter member's current first name: ");
+		String firstName = input.next();
+		System.out.println("Enter member's current Last name: ");
+		String lasttName = input.next();
+		System.out.println("Enter your Library member ID");
+		String id = input.next();
+		String type = "Registered";
+		for(int i = 0; i < members.size(); i++) {
+			if (members.get(i).containsAll(Arrays.asList(firstName, lasttName, id, type))) {
+				members.get(i).removeAll(Arrays.asList(firstName, lasttName, id, type));
+				
+				System.out.println("Enter your new first name: ");
+				String newFirstName = input.next();
+				System.out.println("Enter your new Last name: ");
+				String newLasttName = input.next();
+				System.out.println("Enter your Library member ID now in use: ");
+				String newId = input.next();
+				members.get(i).addAll(Arrays.asList(newFirstName, newLasttName, newId, type));
+			}
+		}
+	}
+	
+	public static void listAllusers(){
+		for(int i = 0; i < members.size(); i++) {
+			System.out.println(members.get(i));
+		}
+	} 
+	
+	
+	public static void borrowBook(Scanner input) {
+		System.out.println("Enter borrowing book's ISBN");
+		String ISBN = input.next();
+		System.out.println("Enter your Library member ID");
+		int id = input.nextInt();
+		
+		System.out.println("Book " + ISBN +  " is brrowed by member " + id);
+	}
+	
+	public static void returnBook(Scanner input) {
+		
+		System.out.println("Enter returning book's ISBN");
+		String ISBN = input.next();
+		System.out.println("Enter your Library member ID");
+		int id = input.nextInt();
+		
+		System.out.println("Book " + ISBN +  " is returned by member " + id);
+	}
+}
