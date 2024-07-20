@@ -1,12 +1,16 @@
 package lib.controller;
 
+import lib.db.Copy_Access;
+import lib.db.User_Access;
 import lib.model.Book;
 import lib.model.Copy;
 import lib.model.Loan;
 import lib.model.User;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class LibraryController {
     public static void addNewBook(String title, String author, String isbn){
@@ -39,7 +43,15 @@ public class LibraryController {
      */
     public static List<User> listUsers(){
         //Delete a user from the library by their id.
-        return new ArrayList<>();
+        try {
+            User_Access accessor = User_Access.getInstance();
+            Map<Integer, User> map = accessor.readAll();
+
+            Collection<User> col = map.values();
+            return new ArrayList<User>(col);
+        } catch (Exception e){
+            return null;
+        }
     }
 
     /**
