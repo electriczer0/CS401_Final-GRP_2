@@ -21,10 +21,12 @@ public class SMInteraction_Access extends Table_Access<Interaction> {
 					primary_key + " INTEGER PRIMARY KEY AUTOINCREMENT",
 					"TargetID INTEGER NOT NULL",
 					"UserID INTEGER NOT NULL",
+					"GroupID INTEGER NOT NULL",
 					"Content TEXT",
 					"Type TEXT NOT NULL",
 					"Timestamp DATE NOT NULL",
-					"FOREIGN KEY (UserID) REFERENCES Users(UserID)"
+					"FOREIGN KEY (UserID) REFERENCES Users(UserID)",
+					"FOREIGN KEY (GroupID) REFERENCES SMGroups(GroupID) ON DELETE CASCADE"
 					);
 
 	private final Map<String, Method> columnGetterMap = new HashMap<>();
@@ -42,6 +44,7 @@ public class SMInteraction_Access extends Table_Access<Interaction> {
               columnGetterMap.put("Content", Interaction.class.getMethod("getContent"));
               columnGetterMap.put("Type", Interaction.class.getMethod("getType"));
               columnGetterMap.put("Timestamp", Interaction.class.getMethod("getTimestamp"));
+              columnGetterMap.put("GroupID", Interaction.class.getMethod("getGroupId"));
 
               columnSetterMap.put(primary_key, Interaction.class.getMethod("setID", int.class));
               columnSetterMap.put("UserID", Interaction.class.getMethod("setUserId", int.class));
@@ -49,6 +52,7 @@ public class SMInteraction_Access extends Table_Access<Interaction> {
               columnSetterMap.put("Content", Interaction.class.getMethod("setContent", String.class));
               columnSetterMap.put("Type", Interaction.class.getMethod("setType", Interaction.Interaction_Type.class));
               columnSetterMap.put("Timestamp", Interaction.class.getMethod("setTimestamp", Date.class));
+              columnSetterMap.put("GroupID", Interaction.class.getMethod("setGroupId", int.class));
           } catch (NoSuchMethodException e) {
               throw new RuntimeException("Failed to initialize column getter/setter maps", e);
           }

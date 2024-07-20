@@ -7,14 +7,11 @@ import java.util.List;
  * A group of interactions. A user can create a group and post interactions to it; other users can join or leave
  * that group.
  */
-public class Group implements Has_ID, Has_Interactions {
-	protected Integer id = -1; //-1 will be the null value for this field
+public class Group implements Has_ID {
+	protected int id = -1; //-1 will be the null value for this field
 
 	//The user that owns this group, typically the person who made it
-	protected Integer owner_Id;
-
-	//A list of associated interactions in this group.
-	protected List<Interaction> interactions; 
+	protected int owner_Id;
 
 	protected String name;
 	protected String description;
@@ -34,7 +31,6 @@ public class Group implements Has_ID, Has_Interactions {
 			.append("\nOwner ID:\t")
 			.append(this.owner_Id)
 			.append("\nInteraction Count:\t")
-			.append(this.interactions.size())
 			.append("\nName:\t")
 			.append(this.name)
 			.append("\nDescription:\t")
@@ -50,7 +46,7 @@ public class Group implements Has_ID, Has_Interactions {
 		return this.id;
 	}
 	
-	public Integer getOwnerId() {
+	public int getOwnerId() {
 		return this.owner_Id;
 	}
 	public String getName() {
@@ -58,9 +54,6 @@ public class Group implements Has_ID, Has_Interactions {
 	}
 	public String getDescription() {
 		return this.description;
-	}
-	public List<Interaction> getInteractions(){
-		return this.interactions;
 	}
 	public Date getTimestamp() {
 		return this.timestamp;
@@ -73,7 +66,6 @@ public class Group implements Has_ID, Has_Interactions {
 	public void setOwnerId(int id) { this.owner_Id = id; }
 	public void setName(String name) { this.name = name; }
 	public void setDescription(String desc) { this.description = desc; }
-	public void setInteractions(List<Interaction> interactions) { this.interactions = interactions; } 
 	public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
 
 	

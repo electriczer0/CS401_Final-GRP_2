@@ -7,9 +7,9 @@ import java.util.List;
  * A meeting. Similar to group, has interactions, and users can join/leave meetings and post new interactions,
  * but a meeting both has an owning Group and has a specific timestamp and location.
  */
-public class Meeting extends Group implements Has_ID, Has_Interactions {
+public class Meeting extends Group implements Has_ID {
 	//The associated group for this meeting.
-	private Integer group_Id;
+	private int group_Id;
 
 	//When the meeting is supposed to be, and where
 	private Date meetingTimestamp;
@@ -29,7 +29,6 @@ public class Meeting extends Group implements Has_ID, Has_Interactions {
 			.append("\nOwner ID:\t")
 			.append(this.owner_Id)
 			.append("\nInteraction Count:\t")
-			.append(this.interactions.size())
 			.append("\nName:\t")
 			.append(this.name)
 			.append("\nDescription:\t")
@@ -39,7 +38,7 @@ public class Meeting extends Group implements Has_ID, Has_Interactions {
 		
 	}
 
-	public Integer getGroupId() {
+	public int getGroupId() {
 		return this.group_Id;
 	}
 	public Date getMeetingTime() {

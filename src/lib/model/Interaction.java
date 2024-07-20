@@ -17,13 +17,17 @@ public class Interaction implements Has_ID {
 		SHARE_ON_CONTENT
 	}
 	
-	private Integer id = -1; //-1 will be the null value for this field
+	private int id = -1; //-1 will be the null value for this field
 
 	//The user that owns this interaction, typically the person who made it
-	private Integer user_Id;
+	private int user_Id;
 
 	//The target of this interaction. This will be null if it is original content.
-	private Integer target_Id;
+	private int target_Id;
+	
+	//Group owner of interaction. All interactions will have a group owner
+	//Defaults to "global" group ID
+	private int group_Id;
 
 	private Interaction_Type type;
 
@@ -60,11 +64,14 @@ public class Interaction implements Has_ID {
 		return this.id;
 	}
 	
-	public Integer getUserId() {
+	public int getUserId() {
 		return this.user_Id;
 	}
-	public Integer getTargetId() {
+	public int getTargetId() {
 		return this.target_Id;
+	}
+	public int getGroupId() {
+		return this.group_Id;
 	}
 	public Interaction_Type getType() {
 		return this.type;
@@ -96,6 +103,9 @@ public class Interaction implements Has_ID {
 	public void setTimestamp(Date timestamp){
 		this.timestamp = timestamp;
 	}
+	public void setGroupId(int id) {
+		this.group_Id = id; 
+	}
 
 	
 	// Overriding equals method
@@ -124,8 +134,9 @@ public class Interaction implements Has_ID {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + user_Id.toString().hashCode();
-        result = 31 * result + target_Id.toString().hashCode();
+        result = 31 * result + user_Id;
+        result = 31 * result + target_Id;
+        result = 31 * result + group_Id; 
         result = 31 * result + content.hashCode();
         return result;
     }
