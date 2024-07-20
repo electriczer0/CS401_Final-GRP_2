@@ -336,6 +336,9 @@ public abstract class Table_Access<T extends Has_ID> {
             if (paramType == float.class && value instanceof Float) {
                 return (float) value;
             }
+            if (paramType.isEnum()) {
+            	return Enum.valueOf((Class<Enum>) paramType, value.toString());
+            }
             return paramType.cast(value);
         } catch (NumberFormatException e) {
             throw new SQLException("Failed to parse value: " + value, e);

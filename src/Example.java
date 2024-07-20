@@ -27,6 +27,9 @@ public class Example { //<--Refactor
 		Loan_Access loanTable = null;
 		User_Access userTable = null;
 		User_Address_Access userAddressTable = null;
+		SMGroup_Access groupTable = null;
+		SMInteraction_Access interactionTable = null;
+		SMMeeting_Access meetingTable = null;
 		
 		try {
 			Connection libraryConnection = Connection_Factory.getConnection(DB_PARAMS.dbURL,
@@ -36,6 +39,10 @@ public class Example { //<--Refactor
 			loanTable = Table_Access.getInstance(libraryConnection, Loan_Access.class);
 			userTable = Table_Access.getInstance(libraryConnection, User_Access.class);
 			userAddressTable = Table_Access.getInstance(libraryConnection, User_Address_Access.class);
+			groupTable = Table_Access.getInstance(libraryConnection, SMGroup_Access.class);
+			interactionTable = Table_Access.getInstance(libraryConnection, SMInteraction_Access.class);
+			meetingTable = Table_Access.getInstance(libraryConnection, SMMeeting_Access.class);
+			
 		} catch (SQLException e) {
             e.printStackTrace();
         }
@@ -46,7 +53,7 @@ public class Example { //<--Refactor
 			e.printStackTrace();
 		}
 
-		System.out.println("Library Manager initialized.");
+		/*System.out.println("Library Manager initialized.");
 
 		Scanner sc = new Scanner(System.in);
 		UserController.initUser(sc);
@@ -66,7 +73,7 @@ public class Example { //<--Refactor
 			} else {
 				exiting = true;
 			}
-		}
+		}*/
 
 	}
 

@@ -19,8 +19,8 @@ public class SMInteraction_Access extends Table_Access<Interaction> {
 	private final List<String> schema =
 			Arrays.asList(
 					primary_key + " INTEGER PRIMARY KEY AUTOINCREMENT",
-					"TargetID INTEGER",
-					"UserID INTEGER",
+					"TargetID INTEGER NOT NULL",
+					"UserID INTEGER NOT NULL",
 					"Content TEXT",
 					"Type TEXT NOT NULL",
 					"Timestamp DATE NOT NULL",
@@ -36,19 +36,19 @@ public class SMInteraction_Access extends Table_Access<Interaction> {
   	{
   		
           try {
-              columnGetterMap.put(primary_key, Book.class.getMethod("getID"));
-              columnGetterMap.put("UserID", Book.class.getMethod("getUserId"));
-              columnGetterMap.put("TargetID", Book.class.getMethod("getTargetId"));
-              columnGetterMap.put("Content", Book.class.getMethod("getContent"));
-              columnGetterMap.put("Type", Book.class.getMethod("getType"));
-              columnGetterMap.put("Timestamp", Book.class.getMethod("getTimestamp"));
+              columnGetterMap.put(primary_key, Interaction.class.getMethod("getID"));
+              columnGetterMap.put("UserID", Interaction.class.getMethod("getUserId"));
+              columnGetterMap.put("TargetID", Interaction.class.getMethod("getTargetId"));
+              columnGetterMap.put("Content", Interaction.class.getMethod("getContent"));
+              columnGetterMap.put("Type", Interaction.class.getMethod("getType"));
+              columnGetterMap.put("Timestamp", Interaction.class.getMethod("getTimestamp"));
 
-              columnSetterMap.put(primary_key, Book.class.getMethod("setID", int.class));
-              columnSetterMap.put("UserID", Book.class.getMethod("setUserId", int.class));
-              columnSetterMap.put("TargetID", Book.class.getMethod("setTargetId", int.class));
-              columnSetterMap.put("Content", Book.class.getMethod("setContent", String.class));
-              columnSetterMap.put("Type", Book.class.getMethod("setType", String.class));
-              columnSetterMap.put("Timestamp", Book.class.getMethod("setTimestamp", Date.class));
+              columnSetterMap.put(primary_key, Interaction.class.getMethod("setID", int.class));
+              columnSetterMap.put("UserID", Interaction.class.getMethod("setUserId", int.class));
+              columnSetterMap.put("TargetID", Interaction.class.getMethod("setTargetId", int.class));
+              columnSetterMap.put("Content", Interaction.class.getMethod("setContent", String.class));
+              columnSetterMap.put("Type", Interaction.class.getMethod("setType", Interaction.Interaction_Type.class));
+              columnSetterMap.put("Timestamp", Interaction.class.getMethod("setTimestamp", Date.class));
           } catch (NoSuchMethodException e) {
               throw new RuntimeException("Failed to initialize column getter/setter maps", e);
           }
