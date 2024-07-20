@@ -74,6 +74,7 @@ public class Group implements Has_ID, Has_Interactions {
 	public void setName(String name) { this.name = name; }
 	public void setDescription(String desc) { this.description = desc; }
 	public void setInteractions(List<Interaction> interactions) { this.interactions = interactions; } 
+	public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
 
 	
 	// Overriding equals method

@@ -2,18 +2,21 @@ package lib.model;
 
 import java.util.Date;
 
-enum Interaction_Type {
-	ORIGINAL_CONTENT,
-	COMMENT_ON_CONTENT,
-	LIKE_CONTENT,
-	SHARE_ON_CONTENT
-}
+
 
 /**
  * A class that describes social media interactions. Users can post, comment on each other's posts, and like and
  * share each other's posts (whether they are root comments or child comments).
  */
 public class Interaction implements Has_ID {
+	
+	public enum Interaction_Type {
+		ORIGINAL_CONTENT,
+		COMMENT_ON_CONTENT,
+		LIKE_CONTENT,
+		SHARE_ON_CONTENT
+	}
+	
 	private Integer id = -1; //-1 will be the null value for this field
 
 	//The user that owns this interaction, typically the person who made it

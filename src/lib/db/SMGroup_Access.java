@@ -19,8 +19,8 @@ public class SMGroup_Access extends Table_Access<Group> {
 	private final List<String> schema =
 			Arrays.asList(
 					primary_key + " INTEGER PRIMARY KEY AUTOINCREMENT",
-					"OwnerID INTEGER",
-					"Description TEXT NOT NULL",
+					"OwnerID INTEGER NOT NULL",
+					"Description TEXT",
 					"Name TEXT NOT NULL",
 					"Timestamp DATE NOT NULL",
 					"FOREIGN KEY (OwnerID) REFERENCES Users(UserID)"
@@ -35,17 +35,17 @@ public class SMGroup_Access extends Table_Access<Group> {
   	{
   		
           try {
-              columnGetterMap.put(primary_key, Book.class.getMethod("getID"));
-              columnGetterMap.put("OwnerID", Book.class.getMethod("getOwnerId"));
-              columnGetterMap.put("Description", Book.class.getMethod("getDescription"));
-              columnGetterMap.put("Name", Book.class.getMethod("getName"));
-              columnGetterMap.put("Timestamp", Book.class.getMethod("getTimestamp"));
+              columnGetterMap.put(primary_key, Group.class.getMethod("getID"));
+              columnGetterMap.put("OwnerID", Group.class.getMethod("getOwnerId"));
+              columnGetterMap.put("Description", Group.class.getMethod("getDescription"));
+              columnGetterMap.put("Name", Group.class.getMethod("getName"));
+              columnGetterMap.put("Timestamp", Group.class.getMethod("getTimestamp"));
 
-              columnSetterMap.put(primary_key, Book.class.getMethod("setID", int.class));
-              columnSetterMap.put("OwnerID", Book.class.getMethod("setOwnerId", int.class));
-              columnSetterMap.put("Description", Book.class.getMethod("setDescription", String.class));
-              columnSetterMap.put("Name", Book.class.getMethod("setName", String.class));
-              columnSetterMap.put("Timestamp", Book.class.getMethod("setTimestamp", Date.class));
+              columnSetterMap.put(primary_key, Group.class.getMethod("setID", int.class));
+              columnSetterMap.put("OwnerID", Group.class.getMethod("setOwnerId", int.class));
+              columnSetterMap.put("Description", Group.class.getMethod("setDescription", String.class));
+              columnSetterMap.put("Name", Group.class.getMethod("setName", String.class));
+              columnSetterMap.put("Timestamp", Group.class.getMethod("setTimestamp", Date.class));
           } catch (NoSuchMethodException e) {
               throw new RuntimeException("Failed to initialize column getter/setter maps", e);
           }
