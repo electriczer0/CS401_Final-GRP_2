@@ -1,5 +1,8 @@
 package lib.controller;
 
+import lib.model.Book;
+import lib.model.Copy;
+import lib.model.Loan;
 import lib.model.User;
 
 import java.util.ArrayList;
@@ -37,6 +40,82 @@ public class LibraryController {
     public static List<User> listUsers(){
         //Delete a user from the library by their id.
         return new ArrayList<>();
+    }
+
+    /**
+     * Deletes a copy of a book from the library. Should also delete any outstanding loan for that book.
+     * @param id
+     */
+    public static void deleteBookById(String id){
+        return;
+    }
+
+    /**
+     * Returns a list of all copies of books in the library. Note that this should return *Copies*, not books.
+     * @return
+     */
+    public static List<Copy> listCopies(){
+        //Delete a user from the library by their id.
+        return new ArrayList<>();
+    }
+
+    /**
+     * Returns all outstanding checked out books by the user_id. If user_id is null, returns all
+     * checked out books. Used to generate library reports for loaned books as well as user reports
+     * of their own borrowed books.
+     * @param user_id
+     * @return
+     */
+    public static List<Loan> generateCheckoutBookList(Integer userId){
+        return new ArrayList<Loan>();
+    }
+
+    /**
+     * Looks up a book by id. A useful helper method.
+     * @param id
+     * @return
+     */
+    public static Book getBookById(int id){
+        return new Book();
+    }
+
+    /**
+     * Looks up a copy by id. A useful helper method.
+     * @param id
+     * @return
+     */
+    public static Copy getCopyById(int id){
+        return new Copy();
+    }
+
+    /**
+     * Checks to see if a copy of a book is available, i.e. there are no current Loans for that book.
+     * If there is one, returns a Loan so that the user can be made aware of when the book will be returned.
+     * Returning null means that the book is available.
+     * @param copyId
+     * @return
+     */
+    public static Loan checkIfBookHasLoan(String copyId){
+        return null;
+    }
+
+    /**
+     * Checks a copy of a book out to the specified user. Creates a loan for that copy and marks the date.
+     * Let's say that all book loans are for two weeks.
+     * @param copyId
+     */
+    public static void checkoutBook(String copyId, User user){
+
+    }
+
+    /**
+     * Deposits a book back in the library. Should mark the corresponding loan as inactive, if an active
+     * loan exists for that copy,
+     * for this user.
+     * @param copyId
+     */
+    public static void depositBook(String copyId, User user){
+
     }
 }
 /*

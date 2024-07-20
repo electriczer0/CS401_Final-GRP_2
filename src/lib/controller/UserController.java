@@ -22,6 +22,14 @@ public class UserController {
 		currentUser.setType("Librarian");
 		//^^ Replace this
 	}
+
+    /**
+     * Gets a user by ID.
+     * @param id
+     */
+    public static User getUserById(int id){
+        return new User();
+    }
 }
 
 /*
