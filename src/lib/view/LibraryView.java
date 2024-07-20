@@ -2,7 +2,11 @@ package lib.view;
 
 import lib.controller.LibraryController;
 import lib.controller.UserController;
+import lib.model.Book;
+import lib.model.Copy;
+import lib.model.Loan;
 import lib.model.User;
+import lib.utilities.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,8 +86,8 @@ public class LibraryView {
             case ADD_USER -> {return "Add a new user to the list of library patrons.";}
             case REMOVE_USER -> {return "Remove a user from the list of library patrons.";}
             case LIST_USERS -> {return "List all users.";}
-            case ADD_BOOK -> {return "Add a book to the collection.";}
-            case REMOVE_BOOK -> {return "Remove a book from the collection.";}
+            case ADD_BOOK -> {return "Add a copy of a book to the collection.";}
+            case REMOVE_BOOK -> {return "Remove a copy of a book from the collection.";}
             case LIST_BOOKS -> {return "List all books in the collection.";}
             case GENERATE_LIBRARY_CHECKOUT_REPORT -> {return "Print a list of all book loans.";}
             case CHECK_BOOK_AVAILABLE -> {return "Check a book for availability.";}
@@ -102,8 +106,8 @@ public class LibraryView {
             case LIST_USERS -> {listUsers(sc); break;}
             case ADD_BOOK -> {addNewBook(sc); break;}
             case REMOVE_BOOK -> {removeBook(sc); break;}
-            case LIST_BOOKS -> {listBooks(sc); break;}
-            case GENERATE_LIBRARY_CHECKOUT_REPORT -> {genLibReport(sc); break;}
+            case LIST_BOOKS -> {listBooks(); break;}
+            case GENERATE_LIBRARY_CHECKOUT_REPORT -> {genLibReport(); break;}
             case CHECK_BOOK_AVAILABLE -> {checkAvailability(sc); break;}
             case CHECKOUT_BOOK -> {checkoutBook(sc); break;}
             case DEPOSIT_BOOK -> {depositBook(sc); break;}
@@ -120,18 +124,31 @@ public class LibraryView {
         System.out.println("Type out this user's role. Ex. 'Patron' or 'Librarian'.");
         String type = sc.next();
         LibraryController.createNewUser(fn, ln, type);
-        return;
     }
 
     private static void removeUser(Scanner sc){
         System.out.println("What is the id of the user you want to remove?");
         String id = sc.next();
         LibraryController.deleteUserById(id);
-        return;
     }
     private static void listUsers(Scanner sc){
         List<User> userList = LibraryController.listUsers();
-
+        /*
+        User k = new User();
+        k.setID(93);
+        k.setFirstName("John");
+        k.setLastName("Doo");
+        k.setType("Librarian");
+        userList.add(k);*/
+        System.out.println("------------------------------------------------------------"); //60 dashes
+        System.out.println("| Id   | Name                          | Role              |");
+        System.out.println("------------------------------------------------------------");
+        for (User user: userList){
+            System.out.println("| " + Utils.fitString(user.getID() + "", 4) +
+                    " | " + Utils.fitString(user.getFirstName() + " " + user.getLastName(), 29) +
+                    " | " + Utils.fitString( user.getType(), 17) + " |");
+        }
+        System.out.println("------------------------------------------------------------");
     }
     private static void addNewBook(Scanner sc){
         System.out.println("What is the new book's title?");
@@ -141,28 +158,186 @@ public class LibraryView {
         System.out.println("What's the ISBN?");
         String isbn = sc.next();
         LibraryController.addNewBook(title, author, isbn);
-        return;
     }
     private static void removeBook(Scanner sc){
-        return;
+        System.out.println("What is the book's id?");
+        String id = sc.next();
+        LibraryController.deleteBookById(id);
     }
-    private static void listBooks(Scanner sc){
-        return;
+    private static void listBooks(){
+        List<Copy> bookList = LibraryController.listCopies();
+        /*
+        Book k = new Book();
+        k.setID(93);
+        k.setAuthor("John Doo");
+        k.setTitle("Paradise Found");
+        k.setISBN("238732895");
+        bookList.add(k);*/
+        System.out.println("------------------------------------------------------------------------------------------"); //90 dashes
+        System.out.println("| Id   | Title                          | Author                         | ISBN          |");
+        System.out.println("------------------------------------------------------------------------------------------");
+        for (Copy copy: bookList){
+            //For every copy of the book, we look up the original book.
+            Book thisbook = LibraryController.getBookById(copy.getID());
+            System.out.println("| " + Utils.fitString(copy.getID() + "", 4) +
+                    " | " + Utils.fitString(thisbook.getTitle(), 30) +
+                    " | " + Utils.fitString(thisbook.getAuthor(), 30) +
+                    " | " + Utils.fitString(thisbook.getISBN(), 13) + " |");
+        }
+        System.out.println("------------------------------------------------------------------------------------------");
     }
-    private static void genLibReport(Scanner sc){
-        return;
+    private static void genLibReport(){
+        List<Loan> loanList = LibraryController.generateCheckoutBookList(null);
+        System.out.println("------------------------------------------------------------------------------------------"); //90 dashes
+        System.out.println("| Book Id | Title                           | Loaned to                    | Due back by |");
+        System.out.println("------------------------------------------------------------------------------------------");
+        for (Loan loan: loanList){
+            Copy c = LibraryController.getCopyById(loan.getCopyID());
+            Book thisBook = LibraryController.getBookById(c.getBookID());
+            User thisUser = UserController.getUserById(loan.getUserID());
+            System.out.println("| " + Utils.fitString(loan.getCopyID() + "", 7) +
+                    " | " + Utils.fitString(thisBook.getTitle(), 31) +
+                    " | " + Utils.fitString( thisUser.getFirstName() + " " + thisUser.getLastName(), 28) +
+                    " | " + Utils.fitString(loan.getDateDue().toString(), 11) + " |");
+        }
+        System.out.println("------------------------------------------------------------------------------------------");
     }
     private static void checkAvailability(Scanner sc){
-        return;
+        System.out.println("Enter the id of the book you'd like to check.");
+        String id = sc.next();
+        Loan loan = LibraryController.checkIfBookHasLoan(id);
+        if (loan == null){
+            System.out.println("Book is available.");
+        } else {
+            System.out.println("This book was checked out on " + loan.getDateOut().toString());
+            System.out.println("It will be returned after " + loan.getDateDue().toString());
+        }
     }
     private static void checkoutBook(Scanner sc){
-        return;
+        System.out.println("Enter the id of the book you'd like to borrow.");
+        String id = sc.next();
+        LibraryController.checkoutBook(id, UserController.getCurrentUser());
     }
     private static void depositBook(Scanner sc){
-        return;
+        System.out.println("Enter the id of the book you'd like to deposit.");
+        String id = sc.next();
+        LibraryController.depositBook(id, UserController.getCurrentUser());
     }
     private static void genUserReport(Scanner sc){
-        return;
+        List<Loan> loanList = LibraryController.generateCheckoutBookList(UserController.getCurrentUser().getID());
+        System.out.println("------------------------------------------------------------------------------------------"); //90 dashes
+        System.out.println("| Book Id | Title                           | Author                       | Due back by |");
+        System.out.println("------------------------------------------------------------------------------------------");
+        for (Loan loan: loanList){
+            Copy c = LibraryController.getCopyById(loan.getCopyID());
+            Book thisBook = LibraryController.getBookById(c.getBookID());
+            System.out.println("| " + Utils.fitString(loan.getCopyID() + "", 7) +
+                    " | " + Utils.fitString(thisBook.getTitle(), 31) +
+                    " | " + Utils.fitString( thisBook.getAuthor(), 28) +
+                    " | " + Utils.fitString(loan.getDateDue().toString(), 11) + " |");
+        }
+        System.out.println("------------------------------------------------------------------------------------------");
     }
 
 }
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+/*
+Here is my code. -- Jian Xiong Lu
+
+public class LibraryView {
+
+	
+	private static void removeUser(Scanner sc){
+		System.out.println("Enter member's first name: ");
+		String firstName = sc.next();
+		System.out.println("Enter member's Last name: ");
+		String lastName = sc.next();
+		System.out.println("Enter your Library member ID");
+		String id = sc.next();
+		String type = "Deprecated";
+		UserController.removeMemeber(firstName,lastName,id,type);
+    }
+	private static void listUsers(){
+        UserController.listAllusers();
+    }
+    //....
+    private static void removeBook(Scanner sc){
+    	System.out.println("Enter deprecated book's title: ");
+		String title = sc.next();
+		System.out.println("Enter deprecated book's author");
+		String author = sc.next();
+		System.out.println("Enter deprecated book's ISBN");
+		String ISBN = sc.next();
+        LibraryController.removeBook(title, author, ISBN);
+    }
+    
+    private static void listBooks(){
+    	LibraryController.listAllAvaliableBook();
+    }
+    
+    private static void genLibReport(Scanner sc){
+    	LibraryController.Report();
+    }
+    private static void checkAvailability(Scanner sc){
+    	System.out.println("Enter your book's title: ");
+		String title = sc.next();
+		System.out.println("Enter your new book's author");
+		String author = sc.next();
+		System.out.println("Enter your book's ISBN");
+		String ISBN = sc.next();
+		LibraryController.searchBook(title, author, ISBN);
+    }
+    private static void checkoutBook(Scanner sc){
+    	System.out.println("Enter your Library member ID");
+		String id = sc.next();
+		System.out.println("Enter borrowing book's ISBN");
+		String ISBN = sc.next();
+		System.out.println("Enter borrowing book's due date(yyyy-mm-dd)");
+		String dueDate = sc.next();
+		LibraryController.borrowBook(id, ISBN, dueDate);
+		
+    }
+    public void depositBook(Scanner sc){
+        System.out.println("Enter returning book's ISBN");
+		String ISBN = sc.next();
+		System.out.println("Enter your Library member ID");
+		String id = sc.next();
+		System.out.println("Enter your book's actual returned date(yyyy-mm-dd)");
+		String actualReturnedDate = sc.next();
+		LibraryController.returnBook(id, ISBN, actualReturnedDate);
+    }
+    
+    public void trackBooks(Scanner sc) {
+		System.out.println("Enter tracking book's ISBN");
+		String ISBN = sc.next();
+		LibraryController.trackBooks(ISBN);
+		}
+    
+    
+    public static void genUserReport(){
+        return;
+    }
+    
+    public static void createNewUser(Scanner input){
+		System.out.println("Enter member's first name: ");
+		String firstName = input.next();
+		System.out.println("Enter member's Last name: ");
+		String lastName = input.next();
+		System.out.println("Enter your Library member ID");
+		String id = input.next();
+		String type = "Registered";
+		System.out.println("Congulation, You're the new member of our Library!");
+		UserController.createNewUser(firstName,lastName, id,type);
+    }
+    
+    public void updateMemberInfo(Scanner input) {
+		System.out.println("Enter member's current first name: ");
+		String firstName = input.next();
+		System.out.println("Enter member's current Last name: ");
+		String lastName = input.next();
+		System.out.println("Enter your Library member ID");
+		String id = input.next();
+		String type = "Registered";
+		UserController.updateMemberInfo(firstName,lastName, id,type);}
+}
+*/

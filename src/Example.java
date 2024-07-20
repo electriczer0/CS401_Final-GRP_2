@@ -54,7 +54,7 @@ public class Example { //<--Refactor
 			e.printStackTrace();
 		}
 
-		/*System.out.println("Library Manager initialized.");
+		System.out.println("Library Manager initialized.");
 
 		Scanner sc = new Scanner(System.in);
 		initUser(sc);
@@ -74,7 +74,7 @@ public class Example { //<--Refactor
 			} else {
 				exiting = true;
 			}
-		}*/
+		}
 
 	}
 
