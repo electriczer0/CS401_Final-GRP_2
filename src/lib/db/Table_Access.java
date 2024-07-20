@@ -260,40 +260,12 @@ public abstract class Table_Access<T extends Has_ID> {
 		 * @param recordId the int representing the primary key
 		 * @return Object of type <T> found by primary key or NULL if not found
 		 */
-        String sql = "SELECT * FROM " + getTableName() + " WHERE " + getPrimaryKey() + " = ?";
-        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
-            stmt.setInt(1, recordId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) { //if a record is returned
-                    T entity = createEntityInstance();
-                    Map<String, Method> setters = getColumnSetterMap();
-                    
-                    
-                    for (Map.Entry<String, Method> entry : setters.entrySet()) {
-                        String columnName = entry.getKey();
-                        Method setter = entry.getValue();
-                        Class<?> paramType = setter.getParameterTypes()[0];
-                        
-                        //Read the column value and pass it to parseValue
-                        //To deal with setting the correct data type for the column 
-                        Object value = parseValue(paramType, rs.getObject(columnName)); 
-                        
-                        try {
-                        	setter.invoke(entity, value);
-                        	
-                        } catch (Exception e) {
-                            throw new SQLException("Failed to invoke setter method for column: " + columnName, e);
-                        }
-                        
-                    }
-                                        
-                    return entity;
-                }
-            } catch (Exception e) {
-                throw new SQLException("Failed to set fields via reflection reading record: " + recordId + " from " + getTableName(), e);
-            }
-        }
-        return null;
+       HashMap<String,String> recordQuery = new HashMap<String, String>();
+       recordQuery.put(getPrimaryKey(), String.valueOf(recordId));
+       
+       Map<Integer, T> recordsFound = find(recordQuery);
+       
+       return recordsFound.values().stream().findFirst().orElse(null);
     }
 	
 	protected Object parseValue(Class<?> paramType, Object value) throws SQLException {

@@ -393,7 +393,7 @@ class TableAccessTest {
 							put(9, User_Address.create(9, 9, "24700 Garcia Street Suite 249", "Suite 643", "West Maryton", "NM", "23231"));
 							put(12, User_Address.create(12, 12, "192 Avila Mission", "Suite 034", "Waltonchester", "NM", "52659"));
 						}}
-				)
+						)
 		);
 	}
 	

@@ -26,7 +26,8 @@ public class SMInteraction_Access extends Table_Access<Interaction> {
 					"Type TEXT NOT NULL",
 					"Timestamp DATE NOT NULL",
 					"FOREIGN KEY (UserID) REFERENCES Users(UserID)",
-					"FOREIGN KEY (GroupID) REFERENCES SMGroups(GroupID) ON DELETE CASCADE"
+					"FOREIGN KEY (GroupID) REFERENCES SMGroups(GroupID) ON DELETE CASCADE",
+					"FOREIGN KEY (TargetID) REFERENCES SMInteractions(InteractionID) ON DELETE CASCADE"
 					);
 
 	private final Map<String, Method> columnGetterMap = new HashMap<>();

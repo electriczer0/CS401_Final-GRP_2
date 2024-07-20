@@ -1,4 +1,6 @@
 package lib.db;
+//TODO overload DB methods to add a type filter on queries
+
 
 import java.util.Arrays;
 import java.util.Date;
@@ -13,21 +15,22 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 
 public class SMMeeting_Access extends Table_Access<Meeting> {
-	protected final String table_name = "SMMeetings";
-	protected final String primary_key = "MeetingID";
+	protected final String table_name = "SMGroups";
+	protected final String primary_key = "GroupID";
 	protected Connection connection; 
 	private final List<String> schema =
 			Arrays.asList(
 					primary_key + " INTEGER PRIMARY KEY AUTOINCREMENT",
-					"GroupID INTEGER NOT NULL",
 					"OwnerID INTEGER NOT NULL",
+					"Type TEXT NOT NULL",
 					"Description TEXT",
 					"Name TEXT NOT NULL",
 					"MeetingLocation TEXT",
+					"MeetingGroupID INTEGER",
 					"MeetingTimestamp DATE NOT NULL",
 					"Timestamp DATE NOT NULL",
 					"FOREIGN KEY (OwnerID) REFERENCES Users(UserID)",
-					"FOREIGN KEY (GroupID) REFERENCES SMGroups(GroupID) ON DELETE CASCADE"
+					"FOREIGN KEY (MeetingGroupID) REFERENCES SMGroups(GroupID) ON DELETE CASCADE"
 					);
 
 	private final Map<String, Method> columnGetterMap = new HashMap<>();
