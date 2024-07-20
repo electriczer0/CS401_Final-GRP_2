@@ -1,5 +1,6 @@
 package lib.db;
 //TODO overload DB methods to add a type filter on queries
+//check copy functionality
 
 
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import lib.model.*;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class SMMeeting_Access extends Table_Access<Meeting> {
 	protected final String table_name = "SMGroups";
@@ -50,6 +52,7 @@ public class SMMeeting_Access extends Table_Access<Meeting> {
               columnGetterMap.put("Timestamp", Meeting.class.getMethod("getTimestamp"));
               columnGetterMap.put("MeetingLocation", Meeting.class.getMethod("getMeetingLocation"));
               columnGetterMap.put("MeetingTimestamp", Meeting.class.getMethod("getMeetingTime"));
+              columnGetterMap.put("Type", Meeting.class.getMethod("getType"));
 
               columnSetterMap.put(primary_key, Meeting.class.getMethod("setID", int.class));
               columnSetterMap.put("OwnerID", Meeting.class.getMethod("setOwnerId", int.class));
@@ -59,6 +62,7 @@ public class SMMeeting_Access extends Table_Access<Meeting> {
               columnSetterMap.put("Timestamp", Meeting.class.getMethod("setTimestamp", Date.class));
               columnSetterMap.put("MeetingLocation", Meeting.class.getMethod("setMeetingLocation", String.class));
               columnSetterMap.put("MeetingTimestamp", Meeting.class.getMethod("setMeetingTimestamp", Date.class));
+              columnSetterMap.put("Type", Meeting.class.getMethod("setType", String.class));
               
               
           } catch (NoSuchMethodException e) {
@@ -96,5 +100,21 @@ public class SMMeeting_Access extends Table_Access<Meeting> {
     
     public static SMGroup_Access getInstance() {
     	return Table_Access.getInstance(SMGroup_Access.class);
+    }
+    
+    @Override
+    public Map<Integer, Meeting> find(HashMap<String, String> searchParams, int offset, int limit) throws SQLException{
+    	/**
+		 * Find operation. Queries table and returns records found. Null parameters
+		 * will return all records. 
+		 * @param searchParams a HashMap<String, String> of key, value pairs representing
+		 * the query column and search value. This method automatically adds Type=Group
+		 * @param limit the maximum records to return
+		 * @param offset the first record to return 
+		 * @return a Map<Integer, T> where key is the record ID, and value is the record 
+    	 */
+    	searchParams.put("Type", "Meeting");
+    	return super.find(searchParams, offset, limit);
+    	
     }
 }

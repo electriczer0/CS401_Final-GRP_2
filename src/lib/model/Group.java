@@ -7,7 +7,7 @@ import java.util.List;
  * A group of interactions. A user can create a group and post interactions to it; other users can join or leave
  * that group.
  */
-public class Group implements Has_ID {
+public class Group implements Has_ID, Has_Copy {
 	protected int id = -1; //-1 will be the null value for this field
 
 	//The user that owns this group, typically the person who made it
@@ -16,10 +16,13 @@ public class Group implements Has_ID {
 	protected String name;
 	protected String description;
 	protected Date timestamp;
+	
+	//defines the object type distinguishing subtypes
+	protected String type = "Group"; 
 
 
 
-	public Group() {
+	protected Group() {
 		
 	}
 		
@@ -58,6 +61,7 @@ public class Group implements Has_ID {
 	public Date getTimestamp() {
 		return this.timestamp;
 	}
+	public String getType() { return this.type;}
 
 	@Override
 	public void setID(int id){
@@ -67,6 +71,7 @@ public class Group implements Has_ID {
 	public void setName(String name) { this.name = name; }
 	public void setDescription(String desc) { this.description = desc; }
 	public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
+	public void setType(String type) {this.type = type;}
 
 	
 	// Overriding equals method
@@ -93,6 +98,39 @@ public class Group implements Has_ID {
         result = 31 * result + name.hashCode();
         result = 31 * result + description.hashCode();
         return result;
+    }
+    
+    public static Group create(int groupID, int ownerID, String name, String description, Date timestamp) {
+    	/**
+    	 * Object Factory for Group class. 
+    	 * @param groupID int primary key
+    	 * @param ownerID int foreign key to users table representing group owner
+    	 * @param name String name of the group
+    	 * @param description String description of group
+    	 * @param timestamp Date timestamp of group's creation 
+    	 */
+    	Group groupOut = new Group();
+    	groupOut.setID(groupID);
+    	groupOut.setOwnerId(ownerID);
+    	groupOut.setName(name);
+    	groupOut.setDescription(description);
+    	groupOut.setTimestamp(timestamp);
+    	return groupOut;
+    	
+    	
+    }
+    public static Group copy(Group group) {
+    	/**
+    	 * Create a deep copy of group
+    	 */
+    	return Group.create(group.getID(), group.getOwnerId(), group.getName(), group.getDescription(), group.getTimestamp());
+    }
+    
+    public Group copy() {
+    	/**
+    	 * Return a deep copy of this Group instance
+    	 */
+    	return Group.copy(this);
     }
 
 }

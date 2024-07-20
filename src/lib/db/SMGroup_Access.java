@@ -13,6 +13,7 @@ import lib.model.*;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class SMGroup_Access extends Table_Access<Group> {
 	protected final String table_name = "SMGroups";
@@ -47,12 +48,14 @@ public class SMGroup_Access extends Table_Access<Group> {
               columnGetterMap.put("Description", Group.class.getMethod("getDescription"));
               columnGetterMap.put("Name", Group.class.getMethod("getName"));
               columnGetterMap.put("Timestamp", Group.class.getMethod("getTimestamp"));
+              columnGetterMap.put("Type", Group.class.getMethod("getType"));
 
               columnSetterMap.put(primary_key, Group.class.getMethod("setID", int.class));
               columnSetterMap.put("OwnerID", Group.class.getMethod("setOwnerId", int.class));
               columnSetterMap.put("Description", Group.class.getMethod("setDescription", String.class));
               columnSetterMap.put("Name", Group.class.getMethod("setName", String.class));
               columnSetterMap.put("Timestamp", Group.class.getMethod("setTimestamp", Date.class));
+              columnSetterMap.put("Type", Group.class.getMethod("setType", String.class));
           } catch (NoSuchMethodException e) {
               throw new RuntimeException("Failed to initialize column getter/setter maps", e);
           }
@@ -89,4 +92,24 @@ public class SMGroup_Access extends Table_Access<Group> {
     public static SMGroup_Access getInstance() {
     	return Table_Access.getInstance(SMGroup_Access.class);
     }
+
+    @Override
+    public Map<Integer, Group> find(HashMap<String, String> searchParams, int offset, int limit) throws SQLException{
+    	/**
+		 * Find operation. Queries table and returns records found. Null parameters
+		 * will return all records. 
+		 * @param searchParams a HashMap<String, String> of key, value pairs representing
+		 * the query column and search value. This method automatically adds Type=Group
+		 * @param limit the maximum records to return
+		 * @param offset the first record to return 
+		 * @return a Map<Integer, T> where key is the record ID, and value is the record 
+    	 */
+    	searchParams.put("Type", "Group");
+    	return super.find(searchParams, offset, limit);
+    	
+    }
+    
+   
+    
+    
 }

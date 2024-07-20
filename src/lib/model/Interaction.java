@@ -8,7 +8,7 @@ import java.util.Date;
  * A class that describes social media interactions. Users can post, comment on each other's posts, and like and
  * share each other's posts (whether they are root comments or child comments).
  */
-public class Interaction implements Has_ID {
+public class Interaction implements Has_ID, Has_Copy {
 	
 	public enum Interaction_Type {
 		ORIGINAL_CONTENT,
@@ -38,7 +38,7 @@ public class Interaction implements Has_ID {
 
 
 
-	public Interaction() {
+	protected Interaction() {
 
 	}
 		
@@ -139,6 +139,46 @@ public class Interaction implements Has_ID {
         result = 31 * result + group_Id; 
         result = 31 * result + content.hashCode();
         return result;
+    }
+    
+    public static Interaction create(int interactionID, int userID, int groupID, int targetID, Interaction_Type type, String content, Date timestamp) {
+    	/**
+    	 * Object factory for Interaction class
+    	 * @param interactionID primary key for class. Can be -1 for null
+    	 * @param userID foreign key to users table. user who created interaction
+    	 * @param groupID foreign key to groups table. should not be null, can use global group 
+    	 * @param targetID foreign key to Interaction table representing nested interactions 
+    	 * @param type Interaction_Type enum representing the type of interaction
+    	 * @param content the content of the social message
+    	 * @param timestamp Date type object representing the time of creation. 
+    	 * @return Interaction object. 
+    	 */
+    	
+    	Interaction intOut = new Interaction();
+    	intOut.setID(interactionID);
+    	intOut.setUserId(userID);
+    	intOut.setGroupId(groupID);
+    	intOut.setTargetId(targetID);
+    	intOut.setType(type);
+    	intOut.setContent(content);
+    	intOut.setTimestamp(timestamp);
+    	return intOut;
+    	
+    }
+    
+    public static Interaction copy(Interaction interaction) {
+    	/**
+    	 * Create a deep copy of interaction
+    	 */
+    	return Interaction.create(interaction.getID(), interaction.getUserId(), interaction.getGroupId(), interaction.getTargetId(),
+    			interaction.getType(), interaction.getContent(), interaction.getTimestamp() );
+    }
+    
+    public Interaction copy() {
+    	/**
+    	 * Return a deep copy of this Interaction instance
+    	 */
+    	return Interaction.copy(this);
     }
 
 }

@@ -7,7 +7,7 @@ import java.util.List;
  * A meeting. Similar to group, has interactions, and users can join/leave meetings and post new interactions,
  * but a meeting both has an owning Group and has a specific timestamp and location.
  */
-public class Meeting extends Group implements Has_ID {
+public class Meeting extends Group implements Has_ID, Has_Copy {
 	//The associated group for this meeting.
 	private int group_Id;
 
@@ -16,6 +16,8 @@ public class Meeting extends Group implements Has_ID {
 	private String meetingLocation;
 
 
+	//Type differentiates between class subtypes
+	private String type = "Meeting"; 
 
 	public Meeting() {
 		super();
@@ -77,6 +79,40 @@ public class Meeting extends Group implements Has_ID {
         result = 31 * result + meetingTimestamp.hashCode();
         result = 31 * result + meetingLocation.hashCode();
         return result;
+    }
+    
+    
+    public static Meeting create(int groupID, int ownerID, String name, String description, Date timestamp) {
+    	/**
+    	 * Object Factory for Group class. 
+    	 * @param groupID int primary key
+    	 * @param ownerID int foreign key to users table representing group owner
+    	 * @param name String name of the group
+    	 * @param description String description of group
+    	 * @param timestamp Date timestamp of group's creation 
+    	 */
+    	Meeting meetingOut = new Meeting();
+    	meetingOut.setID(groupID);
+    	meetingOut.setOwnerId(ownerID);
+    	meetingOut.setName(name);
+    	meetingOut.setDescription(description);
+    	meetingOut.setTimestamp(timestamp);
+    	return meetingOut;
+    	
+    	
+    }
+    public static Meeting copy(Meeting meeting) {
+    	/**
+    	 * Create a deep copy of meeting
+    	 */
+    	return Meeting.create(meeting.getID(), meeting.getOwnerId(), meeting.getName(), meeting.getDescription(), meeting.getTimestamp());
+    }
+    
+    public Meeting copy() {
+    	/**
+    	 * Return a deep copy of this Meeting instance
+    	 */
+    	return Meeting.copy(this);
     }
 
 }
