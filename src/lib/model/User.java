@@ -6,7 +6,7 @@ public class User implements Has_ID, Has_Copy {
     private String Name_Last;
     private String Type;
 
-    public User() {
+    protected User() {
     }
 
     @Override
@@ -102,6 +102,13 @@ public class User implements Has_ID, Has_Copy {
 		user.setType(Type);
 		return user; 
 	}
+    
+    public static User create() {
+    	/**
+    	 * User Factory for generating blank User objects
+    	 */
+    	return new User();
+    }
     
     public static User copy(User user) {
     	/**

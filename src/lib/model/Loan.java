@@ -11,7 +11,7 @@ public class Loan implements Has_ID, Has_Copy {
     private Date Date_Due;
     private Boolean Active;
 
-    public Loan() {
+    protected Loan() {
     }
   
 
@@ -130,6 +130,13 @@ public class Loan implements Has_ID, Has_Copy {
 		
 		return loanOut;
 		
+	}
+	
+	public static Loan create() {
+		/**
+		 * Loan factory for generating empty Loan objects
+		 */
+		return new Loan();
 	}
 	
 	public static Loan copy(Loan loan) {

@@ -166,6 +166,13 @@ public class Interaction implements Has_ID, Has_Copy {
     	
     }
     
+    public static Interaction create() {
+    	/**
+    	 * Object Factory for Interaction class. returning empty Interaction instance
+    	 */
+    	return new Interaction();
+    }
+    
     public static Interaction copy(Interaction interaction) {
     	/**
     	 * Create a deep copy of interaction

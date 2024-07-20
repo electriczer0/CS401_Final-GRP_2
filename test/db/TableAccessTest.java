@@ -44,6 +44,7 @@ import java.util.Calendar;
 
 import lib.db.*;
 import lib.model.*;
+import lib.model.Interaction.Interaction_Type;
 
 @Execution(ExecutionMode.SAME_THREAD)
 @TestInstance(Lifecycle.PER_CLASS)
@@ -52,6 +53,11 @@ class TableAccessTest {
 	private static Copy_Access copyTable = null;
 	private static Loan_Access loanTable = null;
 	private static User_Access userTable = null;
+	private static SMInteraction_Access interactionTable = null;
+	private static SMMeeting_Access meetingTable = null;
+	private static SMGroup_Access groupTable = null; 
+	
+	
 	private static User_Address_Access userAddressTable = null;
 	private static final String testDBLocation = "Data/Test.db";
 	private static final String activeDBLocation = "ActiveTest.db"; 
@@ -110,13 +116,17 @@ class TableAccessTest {
 			loanTable = Table_Access.getInstance(libraryConnection, Loan_Access.class);
 			userTable = Table_Access.getInstance(libraryConnection, User_Access.class);
 			userAddressTable = Table_Access.getInstance(libraryConnection, User_Address_Access.class);
+			interactionTable = Table_Access.getInstance(libraryConnection, SMInteraction_Access.class);
+			groupTable = Table_Access.getInstance(libraryConnection, SMGroup_Access.class);
+			meetingTable = Table_Access.getInstance(libraryConnection, SMMeeting_Access.class);
 		} catch (SQLException e) {
             e.printStackTrace();
         }
 				
 		assert bookTable != null && copyTable != null &&
 				loanTable != null && userTable != null &&
-				userAddressTable != null : "Caught null tables"; 
+				userAddressTable != null && interactionTable != null &&
+				groupTable != null && meetingTable != null : "Caught null tables"; 
 	}
 
 	@AfterEach
@@ -131,11 +141,18 @@ class TableAccessTest {
 		Table_Access.removeInstance(Loan_Access.class);
 		Table_Access.removeInstance(User_Access.class);
 		Table_Access.removeInstance(User_Address_Access.class);
+		Table_Access.removeInstance(SMInteraction_Access.class);
+		Table_Access.removeInstance(SMGroup_Access.class);
+		Table_Access.removeInstance(SMMeeting_Access.class);
+		
 		bookTable=null;
 		copyTable=null;
 		loanTable=null;
 		userTable=null;
 		userAddressTable=null;
+		interactionTable = null; 
+		groupTable = null;
+		meetingTable = null;
 		
 		//Delete test db file if it exists
 		File dbFile = new File(activeDBLocation);
@@ -242,7 +259,10 @@ class TableAccessTest {
 				new Object[] {User_Address_Access.class,User_Address.create(-1, 1, "123 Main St", "Appt 2", "Labanon", "KY", "12345")},
 				new Object[] {User_Address_Access.class, User_Address.create(100, 2, "888 Main St", "", "Labanon", "KY", "12345")},
 				new Object[] {User_Address_Access.class, User_Address.create(101, 3, "999 Main St", "Unit z", "San Francisco", "CA", "12345")},
-				new Object[] {User_Address_Access.class, User_Address.create(102, 4, "1001 Main St", "", "New York", "NY", "12345")}
+				new Object[] {User_Address_Access.class, User_Address.create(102, 4, "1001 Main St", "", "New York", "NY", "12345")},
+				new Object[] {SMGroup_Access.class, Group.create(-1, 79, "newgroup1", "Dan's new group", new Date()) },
+				new Object[] {SMMeeting_Access.class, Meeting.create(-1, 1, "study session", "To win the finals", new Date())},
+				new Object[] {SMInteraction_Access.class, Interaction.create(-1, 1, 1, 1, Interaction_Type.COMMENT_ON_CONTENT, "My comment here" , new Date())} 
 		);
 	}
 	

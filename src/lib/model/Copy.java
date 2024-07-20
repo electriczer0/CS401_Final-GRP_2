@@ -4,7 +4,7 @@ public class Copy implements Has_ID, Has_Copy {
     private Integer Copy_Id;
     private Integer Book_Id;
 
-    public Copy() {
+    protected Copy() {
     }
 
   
@@ -70,6 +70,13 @@ public class Copy implements Has_ID, Has_Copy {
 		copy.setBookID(Book_Id);
 		return copy; 
 	}
+    
+    public static Copy create() {
+    	/**
+    	 * Factory for creating empty copy objects
+    	 */
+    	return new Copy();
+    }
     
     public static Copy copy(Copy copy) {
     	/**

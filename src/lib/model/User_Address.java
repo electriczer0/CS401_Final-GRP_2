@@ -9,7 +9,7 @@ public class User_Address implements Has_ID, Has_Copy {
     private String Zip;
     private String State;
 
-    public User_Address() {
+    protected User_Address() {
     }
 
     @Override
@@ -125,6 +125,13 @@ public class User_Address implements Has_ID, Has_Copy {
 		
 		return address;
 	}
+    
+    public static User_Address create() {
+    	/**
+    	 * User_Address factory for generating blank objects
+    	 */
+    	return new User_Address();
+    }
     
     public static User_Address copy(User_Address address) {
     	/**

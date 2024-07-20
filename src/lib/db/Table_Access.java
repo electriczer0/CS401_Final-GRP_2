@@ -5,6 +5,7 @@ package lib.db;
 
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -44,9 +45,26 @@ public abstract class Table_Access<T extends Has_ID> {
 	}
 	
 	protected Table_Access(Class<T> type) {
-		this.type = type; 
+		this.type = type;
+		ensureFactoryExists();
 	}
 	
+	private void ensureFactoryExists() {
+		/**
+		 * This method is called at instantiation of Table_Access objects
+		 * We are establishing object factories within the data model classes
+		 * Because java has no interface model to enforce the presence of these static methods
+		 * we instead use reflection to confirm their existence 
+		 */
+        try {
+            Method method = type.getMethod("create");
+            if (!Modifier.isStatic(method.getModifiers())) {
+                throw new RuntimeException("The create method must be static in " + type.getName());
+            }
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("The create method must be present in " + type.getName(), e);
+        }
+    }
 	
 
 	

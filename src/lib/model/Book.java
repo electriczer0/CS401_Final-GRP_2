@@ -13,7 +13,7 @@ public class Book implements Has_ID, Has_Copy{
 	
 	
 		
-	public Book() {
+	protected Book() {
 		
 	}
 		
@@ -102,6 +102,10 @@ public class Book implements Has_ID, Has_Copy{
 		book.setTitle(Title);
 		return book;
 	}
+    
+    public static Book create() {
+    	return new Book(); 
+    }
     
     public static Book copy(Book book) {
     	/**

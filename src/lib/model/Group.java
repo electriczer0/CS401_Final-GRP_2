@@ -116,9 +116,15 @@ public class Group implements Has_ID, Has_Copy {
     	groupOut.setDescription(description);
     	groupOut.setTimestamp(timestamp);
     	return groupOut;
-    	
-    	
     }
+    
+    public static Group create() {
+    	/**
+    	 * Object Factory for Group class returning empty group objects
+    	 */
+    	return new Group();
+    }
+    
     public static Group copy(Group group) {
     	/**
     	 * Create a deep copy of group

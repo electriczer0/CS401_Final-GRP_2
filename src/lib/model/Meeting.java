@@ -19,7 +19,7 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
 	//Type differentiates between class subtypes
 	private String type = "Meeting"; 
 
-	public Meeting() {
+	protected Meeting() {
 		super();
 	}
 		
@@ -84,7 +84,7 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
     
     public static Meeting create(int groupID, int ownerID, String name, String description, Date timestamp) {
     	/**
-    	 * Object Factory for Group class. 
+    	 * Object Factory for Meeting class. 
     	 * @param groupID int primary key
     	 * @param ownerID int foreign key to users table representing group owner
     	 * @param name String name of the group
@@ -98,8 +98,13 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
     	meetingOut.setDescription(description);
     	meetingOut.setTimestamp(timestamp);
     	return meetingOut;
-    	
-    	
+    }
+    
+    public static Meeting create() {
+    	/**
+    	 * Object Factory for instantiating blank Meeting Objects. 
+    	 */
+    	return new Meeting(); 
     }
     public static Meeting copy(Meeting meeting) {
     	/**
