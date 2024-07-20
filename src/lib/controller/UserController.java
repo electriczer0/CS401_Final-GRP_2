@@ -11,31 +11,20 @@ public class UserController {
      */
     private static User currentUser = null;
 
-    public static void initUser(Scanner sc){
-        while (currentUser == null) {
-            System.out.println("Who is using this system? Enter an id, or type 'list' to list all users.");
-            String input = sc.next();
-            if (input == "exit") {
-                return;
-            }
-            if (input == "list") {
-                //Library.listAllusers();
-            } else {
-                //currentUser = Library.getUserById(input);
-                currentUser = new User();
-                currentUser.setType("Librarian");
-            }
-        }
-    }
-
     public static User getCurrentUser(){
         return currentUser;
     }
 
-    public static void createNewUser(String firstName, String lastName, String type){
-        //Create a new user and save to db
-    }
+	public static void setCurrentUserById(String id){
+		//Lookup the user by their id, then set currentUser to that User.
+
+		currentUser = new User();
+		currentUser.setType("Librarian");
+		//^^ Replace this
+	}
 }
+
+/*
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -128,3 +117,4 @@ public class UserController {
 	}
 }
 
+*/

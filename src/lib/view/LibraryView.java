@@ -2,6 +2,7 @@ package lib.view;
 
 import lib.controller.LibraryController;
 import lib.controller.UserController;
+import lib.model.User;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -115,17 +116,21 @@ public class LibraryView {
         String fn = sc.next();
         System.out.println("What is the new user's last name?");
         String ln = sc.next();
-        System.out.println("Type out this user's role. Ex. 'patron' or 'librarian'.");
+        System.out.println("Type out this user's role. Ex. 'Patron' or 'Librarian'.");
         String type = sc.next();
-        UserController.createNewUser(fn, ln, type);
+        LibraryController.createNewUser(fn, ln, type);
         return;
     }
 
     private static void removeUser(Scanner sc){
+        System.out.println("What is the id of the user you want to remove?");
+        String id = sc.next();
+        LibraryController.deleteUserById(id);
         return;
     }
     private static void listUsers(Scanner sc){
-        return;
+        List<User> userList = LibraryController.listUsers();
+
     }
     private static void addNewBook(Scanner sc){
         System.out.println("What is the new book's title?");

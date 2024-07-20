@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import lib.controller.UserController;
 import lib.db.*;
+import lib.model.User;
 import lib.utilities.*;
 import lib.view.LibraryView;
 
@@ -49,7 +50,7 @@ public class Example { //<--Refactor
 		System.out.println("Library Manager initialized.");
 
 		Scanner sc = new Scanner(System.in);
-		UserController.initUser(sc);
+		initUser(sc);
 
 		while (!exiting && UserController.getCurrentUser() != null){
 			int rtn = -1;
@@ -77,6 +78,22 @@ public class Example { //<--Refactor
 			state = cli_state.LIBRARY_MANAGEMENT;
 		}
 
+	}
+
+	public static void initUser(Scanner sc){
+		while (UserController.getCurrentUser() == null) {
+			System.out.println("Who is using this system? Enter an id, or type 'list' to list all users, or 'exit' to quit.");
+			String input = sc.next();
+			if (input == "exit") {
+				return;
+			}
+			if (input == "list") {
+				//LibraryController.listAllusers();
+			} else {
+				//currentUser = Library.getUserById(input);
+				UserController.setCurrentUserById(input);
+			}
+		}
 	}
 
 }

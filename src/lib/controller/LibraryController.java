@@ -4,7 +4,16 @@ public class LibraryController {
     public static void addNewBook(String title, String author, String isbn){
         return;
     }
+
+    public static void createNewUser(String firstName, String lastName, String type){
+        //Create a new user and save to db. This user is a member of the library.
+    }
+
+    public static void deleteUserById(String id){
+        //Delete a user from the library by their id.
+    }
 }
+/*
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 import java.util.*;
@@ -70,3 +79,4 @@ class LibraryController{
 		}
 	}
 }
+*/
