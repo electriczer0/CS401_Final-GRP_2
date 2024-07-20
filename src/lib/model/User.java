@@ -56,7 +56,7 @@ public class User implements Has_ID, Has_Copy {
         if (!Name_Last.equals(user.getLastName())) return false;
         
         
-        return Type.equals(user.getType());  // Compare the authors
+        return Type.equals(user.getType());  // Compare the types
     }
 
     // Overriding hashCode method

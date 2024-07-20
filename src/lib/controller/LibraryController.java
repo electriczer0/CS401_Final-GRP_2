@@ -7,6 +7,7 @@ import lib.model.Copy;
 import lib.model.Loan;
 import lib.model.User;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +27,13 @@ public class LibraryController {
      */
     public static void createNewUser(String firstName, String lastName, String type){
         //Create a new user and save to db. This user is a member of the library.
+        try {
+            User_Access accessor = User_Access.getInstance();
+            User k = User.create(-1, firstName, lastName, type);
+            accessor.insert(k);
+        } catch (SQLException e){
+            return;
+        }
     }
 
     /**
@@ -45,7 +53,7 @@ public class LibraryController {
         //Delete a user from the library by their id.
         try {
             User_Access accessor = User_Access.getInstance();
-            Map<Integer, User> map = accessor.readAll();
+            Map<Integer, User> map = accessor.readAll(0, 1000);
 
             Collection<User> col = map.values();
             return new ArrayList<User>(col);
@@ -67,7 +75,7 @@ public class LibraryController {
      * @return
      */
     public static List<Copy> listCopies(){
-        //Delete a user from the library by their id.
+        //Returns a list of all book copies.
         return new ArrayList<>();
     }
 
@@ -75,7 +83,7 @@ public class LibraryController {
      * Returns all outstanding checked out books by the user_id. If user_id is null, returns all
      * checked out books. Used to generate library reports for loaned books as well as user reports
      * of their own borrowed books.
-     * @param user_id
+     * @param userId
      * @return
      */
     public static List<Loan> generateCheckoutBookList(Integer userId){

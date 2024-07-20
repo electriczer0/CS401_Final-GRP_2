@@ -2,6 +2,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import lib.controller.LibraryController;
 import lib.controller.UserController;
 import lib.db.*;
 import lib.model.User;
@@ -95,7 +96,7 @@ public class Example { //<--Refactor
 				return;
 			}
 			if (input == "list") {
-				//LibraryController.listAllusers();
+				LibraryController.listUsers();
 			} else {
 				//currentUser = Library.getUserById(input);
 				UserController.setCurrentUserById(input);
