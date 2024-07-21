@@ -100,4 +100,15 @@ public class SocialController {
     public static void shareComment(User user, int interactionId){
         return;
     }
+
+    /**
+     * Creates a new group. This group is owned by the creating user and has a name, type, and description.
+     * @param user
+     * @param name
+     * @param type
+     * @param description
+     */
+    public static void createNewGroup(User user, String name, String type, String description){
+        return;
+    }
 }

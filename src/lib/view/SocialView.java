@@ -50,10 +50,12 @@ public class SocialView {
         actions.add(SocialAction.REPLY_TO_COMMENT);
         actions.add(SocialAction.LIKE_COMMENT);
         actions.add(SocialAction.SHARE_COMMENT);
+        actions.add(SocialAction.LIST_GROUPS);
         actions.add(SocialAction.CREATE_GROUP);
         actions.add(SocialAction.UPDATE_GROUP);
         actions.add(SocialAction.JOIN_GROUP);
         actions.add(SocialAction.LEAVE_GROUP);
+        actions.add(SocialAction.LIST_MEETINGS);
         actions.add(SocialAction.CREATE_MEETING);
         actions.add(SocialAction.UPDATE_MEETING);
         actions.add(SocialAction.CHECK_UPCOMING_MEETINGS);
@@ -82,13 +84,15 @@ public class SocialView {
             case REPLY_TO_COMMENT -> {return "Reply to a comment.";}
             case LIKE_COMMENT -> {return "Like a comment.";}
             case SHARE_COMMENT -> {return "Share a comment.";}
+            case LIST_GROUPS -> {return "List all groups.";}
             case CREATE_GROUP -> {return "Create a social group.";}
             case UPDATE_GROUP -> {return "Update a group's details.";}
             case JOIN_GROUP -> {return "Join a group.";}
             case LEAVE_GROUP -> {return "Leave a group.";}
+            case LIST_MEETINGS -> {return "List upcoming meetings of the groups you belong to.";}
             case CREATE_MEETING -> {return "Create a meeting. You'll need a group ID.";}
             case UPDATE_MEETING -> {return "Update a meeting's details.";}
-            case CHECK_UPCOMING_MEETINGS -> (return "Check for your upcoming meetings.";)
+            case CHECK_UPCOMING_MEETINGS -> {return "Check for your upcoming meetings.";}
             default -> {return "";}
 
         }
@@ -102,10 +106,12 @@ public class SocialView {
             case REPLY_TO_COMMENT -> {replyComment(sc); break;}
             case LIKE_COMMENT -> {likeComment(sc); break;}
             case SHARE_COMMENT -> {shareComment(sc); break;}
+            case LIST_GROUPS -> {listGroups(); break;}
             case CREATE_GROUP -> {createGroup(sc); break;}
             case UPDATE_GROUP -> {updateGroup(sc); break;}
             case JOIN_GROUP -> {joinGroup(sc); break;}
             case LEAVE_GROUP -> {leaveGroup(sc); break;}
+            case LIST_MEETINGS -> {listMeetings(); break;}
             case CREATE_MEETING -> {createMeeting(sc); break;}
             case UPDATE_MEETING -> {updateMeeting(sc); break;}
             case CHECK_UPCOMING_MEETINGS -> {checkUpcomingMeetings(sc); break;}
@@ -240,9 +246,19 @@ public class SocialView {
         SocialController.shareComment(UserController.getCurrentUser(), Integer.parseInt(id));
     }
 
+    private static void listGroups(){
+
+    }
+
     //Create a new group.
     private static void createGroup(Scanner sc){
-
+        System.out.println("What's the name of your new group?");
+        String name = sc.next();
+        System.out.println("What kind of group is this? This is entirely freeform, think of a descriptive adjective.");
+        String type = sc.nextLine();
+        System.out.println("Add a description for this new group.");
+        String desc = sc.nextLine();
+        SocialController.createNewGroup(UserController.getCurrentUser(), name, type, desc);
     }
 
     private static void updateGroup(Scanner sc){
@@ -255,6 +271,10 @@ public class SocialView {
 
     private static void leaveGroup(Scanner sc){
 
+    }
+
+    private static void listMeetings(){
+        
     }
 
     private static void createMeeting(Scanner sc){
