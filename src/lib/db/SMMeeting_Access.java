@@ -29,8 +29,8 @@ public class SMMeeting_Access extends Table_Access<Meeting> {
 					"Name TEXT NOT NULL",
 					"MeetingLocation TEXT",
 					"MeetingGroupID INTEGER",
-					"MeetingTimestamp DATE NOT NULL",
-					"Timestamp DATE NOT NULL",
+					"MeetingTimestamp DATETIME",
+					"Timestamp DATETIME NOT NULL",
 					"FOREIGN KEY (OwnerID) REFERENCES Users(UserID)",
 					"FOREIGN KEY (MeetingGroupID) REFERENCES SMGroups(GroupID) ON DELETE CASCADE"
 					);
@@ -46,22 +46,22 @@ public class SMMeeting_Access extends Table_Access<Meeting> {
           try {
               columnGetterMap.put(primary_key, Meeting.class.getMethod("getID"));
               columnGetterMap.put("OwnerID", Meeting.class.getMethod("getOwnerId"));
-              columnGetterMap.put("GroupID", Meeting.class.getMethod("getGroupId"));
               columnGetterMap.put("Description", Meeting.class.getMethod("getDescription"));
               columnGetterMap.put("Name", Meeting.class.getMethod("getName"));
               columnGetterMap.put("Timestamp", Meeting.class.getMethod("getTimestamp"));
               columnGetterMap.put("MeetingLocation", Meeting.class.getMethod("getMeetingLocation"));
               columnGetterMap.put("MeetingTimestamp", Meeting.class.getMethod("getMeetingTime"));
+              columnGetterMap.put("MeetingGroupID", Meeting.class.getMethod("getGroupId"));
               columnGetterMap.put("Type", Meeting.class.getMethod("getType"));
 
               columnSetterMap.put(primary_key, Meeting.class.getMethod("setID", int.class));
               columnSetterMap.put("OwnerID", Meeting.class.getMethod("setOwnerId", int.class));
-              columnSetterMap.put("GroupID", Meeting.class.getMethod("setGroupId", int.class));
               columnSetterMap.put("Description", Meeting.class.getMethod("setDescription", String.class));
               columnSetterMap.put("Name", Meeting.class.getMethod("setName", String.class));
               columnSetterMap.put("Timestamp", Meeting.class.getMethod("setTimestamp", Date.class));
               columnSetterMap.put("MeetingLocation", Meeting.class.getMethod("setMeetingLocation", String.class));
               columnSetterMap.put("MeetingTimestamp", Meeting.class.getMethod("setMeetingTimestamp", Date.class));
+              columnSetterMap.put("MeetingGroupID", Meeting.class.getMethod("setGroupId", int.class));
               columnSetterMap.put("Type", Meeting.class.getMethod("setType", String.class));
               
               

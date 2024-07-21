@@ -26,9 +26,16 @@ import lib.db.*;
 import lib.model.*;
 
 public abstract class Table_Access<T extends Has_ID> {
-
+	/**
+	 * The Table_Access super class enforces a singleton pattern by maintaining this
+	 * Map between Class and Instance, wherein the class is a subclass of Table_Access
+	 */
 	private static final Map<Class<? extends Table_Access<?>>, Table_Access<?>> instances = new HashMap<>();
+	/**
+	 * a class representing the type of object the table instance accesses
+	 */
 	private Class<T> type;
+	
 	
     protected abstract List<String> getTableSchema();
     protected abstract Map<String, Method> getColumnGetterMap();
@@ -44,18 +51,24 @@ public abstract class Table_Access<T extends Has_ID> {
 	private Table_Access() {
 	}
 	
+	/**
+	 * Instantiates Table_Access controller
+	 * @param type the class of the object being accessed. must extend Has_ID
+	 */
 	protected Table_Access(Class<T> type) {
 		this.type = type;
 		ensureFactoryExists();
 	}
 	
+	/**
+	 * This method is called at instantiation of Table_Access objects
+	 * We are establishing object factories within the data model classes
+	 * Because java has no interface model to enforce the presence of these static methods
+	 * we instead use reflection to confirm their existence. 
+	 * Our CRUD operations depend on these factories for object instantiation so they must exist 
+	 */
 	private void ensureFactoryExists() {
-		/**
-		 * This method is called at instantiation of Table_Access objects
-		 * We are establishing object factories within the data model classes
-		 * Because java has no interface model to enforce the presence of these static methods
-		 * we instead use reflection to confirm their existence 
-		 */
+		
         try {
             Method method = type.getMethod("create");
             if (!Modifier.isStatic(method.getModifiers())) {
@@ -67,12 +80,12 @@ public abstract class Table_Access<T extends Has_ID> {
     }
 	
 
-	
+	/**
+	 * Generic method to get or create a singleton instance for a given class with the requisite connection variable
+	 * This method acts is a helper function which acts as the primary constructor for all subclasses. 
+	 */
 	public static <T extends Table_Access<?>> T getInstance( Connection connection, Class<T> callerClass) throws SQLException {
-		/**
-		 * Generic method to get or create a singleton instance for a given class with the requisite connection variable
-		 * This method acts is a helper function which acts as the primary constructor for all subclasses. 
-		 */
+		
 		
 		T instance = null; 
 		synchronized (instances) {
@@ -104,18 +117,25 @@ public abstract class Table_Access<T extends Has_ID> {
 		return instance;
 	}
 	
+	/**
+	 * Public class to remove instances of Table_Access objects. 
+	 * Needed, for example in testing when the database must be reinitialized
+	 * Example usage Table_Access.removeInstance(Loan_Access.class)
+	 * @param clazz a class of type <T extends Table_Access<?>> representing the concrete class to be removed
+	 */
 	public static void removeInstance(Class<? extends Table_Access<?>> clazz) {
-		/**
-		 * Public class to remove instances of Table_Access objects. 
-		 * Needed, for example in testing when the database must be reinitialized
-		 * Example usage Table_Access.removeInstance(Loan_Access.class)
-		 * @param clazz a class of type <T extends Table_Access<?>> representing the concrete class to be removed
-		 */
+		
 		synchronized (instances){
 			instances.remove(clazz);
 		}
 	}
 	
+	/**
+	 * Used when the table instance is known to exist, returns a singleton of the Table_Access concrete class specified
+	 * @param <T> a subclass of Table_Access
+	 * @param callerClass the class whose instance should be returned
+	 * @return a singleton instance of the class in question
+	 */
 	//Generic method to get the existing singleton instance for a given class
 	public static <T extends Table_Access<?>> T getInstance(Class<T> callerClass) {
 		
@@ -127,7 +147,10 @@ public abstract class Table_Access<T extends Has_ID> {
 		}
 	}
 	
-	//Determine the concrete class that called this method
+/**
+ * Deprecated
+ * @return
+ */
 	private static Class<?> getCallerClass() {
         try {
             String callerClassName = Thread.currentThread().getStackTrace()[3].getClassName();
@@ -136,7 +159,12 @@ public abstract class Table_Access<T extends Has_ID> {
             throw new RuntimeException("Failed to determine caller class", e);
         }
     }
-	//Checks if this table already exists in the database
+	
+	/**
+	 * helper function determines if the table already exists within the DB
+	 * @return
+	 * @throws SQLException
+	 */
 	protected boolean tableExists() throws SQLException{
 		DatabaseMetaData dbMeta = getConnection().getMetaData();
 		try (var rs = dbMeta.getTables(null,  null,  this.getTableName(), null)){
@@ -144,7 +172,10 @@ public abstract class Table_Access<T extends Has_ID> {
 		}
 	}
 	
-	//creates the table within the database if it does not already exist. 
+/**
+ * Creates the table in the DB if it does not exist using the specified schema
+ * @throws SQLException
+ */
 	protected void createTable() throws SQLException {
 		List<String> schema = getTableSchema();
 		StringBuilder createTableSQL = new StringBuilder("CREATE TABLE IF NOT EXISTS " + getTableName() + " (");
@@ -163,19 +194,31 @@ public abstract class Table_Access<T extends Has_ID> {
         }
     }
 	
-	// Helper method to create an instance of the generic type T
-    protected T createEntityInstance() throws ReflectiveOperationException{
-    	return type.getDeclaredConstructor().newInstance();
-    	
+	/**
+	 * Helper method creates blank instances of the class defined by type 
+	 * used to load return data from DB 
+	 * @return
+	 * @throws ReflectiveOperationException
+	 */
+	protected T createEntityInstance(){
+		try {
+			Method method = type.getMethod("create");
+			if (!Modifier.isStatic(method.getModifiers())) {
+				throw new IllegalArgumentException("The create method in " + type.getName() + " is not static.");
+			}
+		
+			return type.cast(method.invoke(null));
+		} catch (Exception e) {
+            throw new RuntimeException("Failed to create entity instance", e);
+        }
     }
 	
-    
-	
-	
-	
-	
+	/**
+	 * Delete record where the column this.getPrimaryKey() matches Record_Id
+	 * @param Record_Id the record primary key to delete
+	 * @throws SQLException
+	 */
 	public void delete(int Record_Id) throws SQLException{
-		//delete record where the column this.getPrimaryKey() matches Record_Id
 		String sql = String.format("DELETE FROM %s WHERE %s = ?", this.getTableName(), this.getPrimaryKey()); 
 		try(PreparedStatement stmt = getConnection().prepareStatement(sql)){
 			stmt.setInt(1,  Record_Id);
@@ -184,7 +227,12 @@ public abstract class Table_Access<T extends Has_ID> {
             throw new SQLException("Failed to delete record with id: " + Record_Id, e);
         }
 	}
-	
+
+	/**
+	 * Convenience function to delete record. calls delete(int Record_Id)
+	 * @param record the record to delete
+	 * @throws SQLException
+	 */
 	public void delete(T record) throws SQLException{
 		int Record_Id = record.getID();
 		try {
@@ -197,10 +245,13 @@ public abstract class Table_Access<T extends Has_ID> {
 	
 	
 	
-	//Uses getter/setter maps from the subclass to add a record to the DB
+	/**
+	 * Inserts specified record into DB
+	 * @param entity
+	 * @throws SQLException
+	 */
 	public void insert(T entity) throws SQLException {
-		
-	
+			
 		Map<String, Method> getters = getColumnGetterMap();
 	    Map<String, Method> setters = getColumnSetterMap();
 	    
@@ -210,13 +261,17 @@ public abstract class Table_Access<T extends Has_ID> {
 	    
 	    boolean first = true;
 
+	    //Builds the SQL query statement. We need the column getters so that we can identify and extract
+	    //the primary key value. If it is "null" then we do not include it in the insert statement. 
 	    for (String column : getters.keySet()) {
 	        Method getter = getters.get(column);
 	        try {
 	            Object value = getter.invoke(entity);
+	            
 	            if (column.equals(getPrimaryKey()) && (value == null || ((int) value == -1))) {
 	                continue; // Skip the primary key if it is not set
 	            }
+	           	            
 	            if (!first) {
 	                columnsBuilder.append(", ");
 	                valuesBuilder.append(", ");
@@ -247,7 +302,20 @@ public abstract class Table_Access<T extends Has_ID> {
 	                if (column.equals(getPrimaryKey()) && (value == null || (value instanceof Integer && (int) value == -1))) {
 	                    continue; // Skip the primary key if it is not set
 	                }
-	                stmt.setObject(index++, value);
+	                
+	                //TODO fix this 
+	                //This is a hack to overwrite foreign keys which are set to -1 to "null" 
+	                //So that we can enforce foreign key relationships when the fk is not set
+	                //really we should set these foreign keys up as Integer values so that we 
+	                //use null values in the object itself, but this would be a significant refactor. 
+	                //this code could cause problems in int fields where -1 is a valid entry.
+	                //currently the system does not have any such fields. 
+	                if (value instanceof Integer && ((Integer) value).intValue() == -1) { 
+                        // Replace -1 with NULL for integer values
+                        stmt.setNull(index++, java.sql.Types.INTEGER);
+                    } else {
+                    	stmt.setObject(index++, value);
+                    }
 	            } catch (Exception e) {
 	            	
 	            	throw new SQLException("Failed to invoke getter method for column: " + column, e);
@@ -272,12 +340,13 @@ public abstract class Table_Access<T extends Has_ID> {
 	    } 
 }
 	
+	/**
+	 * Reads a single record from the table specified by its primary key
+	 * @param recordId the int representing the primary key
+	 * @return Object of type <T> found by primary key or NULL if not found
+	 */
 	public T read(int recordId) throws SQLException {
-		/**
-		 * Reads a single record from the table specified by its primary key
-		 * @param recordId the int representing the primary key
-		 * @return Object of type <T> found by primary key or NULL if not found
-		 */
+		
        HashMap<String,String> recordQuery = new HashMap<String, String>();
        recordQuery.put(getPrimaryKey(), String.valueOf(recordId));
        
@@ -286,16 +355,17 @@ public abstract class Table_Access<T extends Has_ID> {
        return recordsFound.values().stream().findFirst().orElse(null);
     }
 	
+	
+	/**
+	 * Parses objects returned from a sql query translating them into 
+	 * the desired java datatypes. Will process a variety of objects. 
+	 * Logic exists for Boolean data types and Date objects
+	 * Otherwise the method returns a typecast copy of the original Object
+	 * @param paramType the java type which is expected
+	 * @param value the Object which was returned by the db query 
+	 * @return an object of type paramType representing the value parameter
+	 */
 	protected Object parseValue(Class<?> paramType, Object value) throws SQLException {
-		/**
-		 * Parses objects returned from a sql query translating them into 
-		 * the desired java datatypes. Will process a variety of objects. 
-		 * Logic exists for Boolean data types and Date objects
-		 * Otherwise the method returns a typecast copy of the original Object
-		 * @param paramType the java type which is expected
-		 * @param value the Object which was returned by the db query 
-		 * @return an object of type paramType representing the value parameter
-		 */
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); //Format of date string from SQLITE
 		
@@ -314,18 +384,11 @@ public abstract class Table_Access<T extends Has_ID> {
                     return new Date(((Number) value).longValue());
                 }
             }
-            if (paramType == int.class && value instanceof Integer) {
-                return (int) value;
-            }
-            if (paramType == long.class && value instanceof Long) {
-                return (long) value;
-            }
-            if (paramType == double.class && value instanceof Double) {
-                return (double) value;
-            }
-            if (paramType == float.class && value instanceof Float) {
-                return (float) value;
-            }
+            if(paramType == int.class && value == null) { return (int) -1; } 
+            if (paramType == int.class && value instanceof Integer) { return (int) value; }
+            if (paramType == long.class && value instanceof Long) { return (long) value; }
+            if (paramType == double.class && value instanceof Double) {return (double) value;}
+            if (paramType == float.class && value instanceof Float) { return (float) value;}
             if (paramType.isEnum()) {
             	return Enum.valueOf((Class<Enum>) paramType, value.toString());
             }
@@ -349,15 +412,18 @@ public abstract class Table_Access<T extends Has_ID> {
         return find(blankQuery, offset, limit);
 	}
 	
-	public Map<Integer, T> readAll() throws SQLException {
-		/**
-		 * Convenience method. Returns the first 100 records from table
-		 */
-		
-		return readAll(0,100);
-	}
+	
+	/**
+	 * Convenience method. Returns the first 100 records from table
+	 */
+	public Map<Integer, T> readAll() throws SQLException { return readAll(0,100); }
 	
 	
+	/**
+	 * Updates the record specified by record.getId() using the attributes of record
+	 * @param record
+	 * @throws SQLException
+	 */
 	public void update(T record) throws SQLException {
         int recordId = record.getID();
         String sql = "UPDATE " + getTableName() + " SET ";
@@ -381,7 +447,19 @@ public abstract class Table_Access<T extends Has_ID> {
                     Method getter = getters.get(column);
                     try {
                         Object value = getter.invoke(record);
-                        stmt.setObject(index++, value);
+                        //TODO fix this 
+    	                //This is a hack to overwrite foreign keys which are set to -1 to "null" 
+    	                //So that we can enforce foreign key relationships when the fk is not set
+    	                //really we should set these foreign keys up as Integer values so that we 
+    	                //use null values in the object itself, but this would be a significant refactor. 
+    	                //this code could cause problems in int fields where -1 is a valid entry.
+    	                //currently the system does not have any such fields. 
+    	                if (value instanceof Integer && ((Integer) value).intValue() == -1) { 
+                            // Replace -1 with NULL for integer values
+                            stmt.setNull(index++, java.sql.Types.INTEGER);
+                        } else {
+                        	stmt.setObject(index++, value);
+                        }
                     } catch (Exception e) {
                         throw new SQLException("Failed to invoke getter method for column: " + column, e);
                     }
@@ -396,18 +474,16 @@ public abstract class Table_Access<T extends Has_ID> {
         }
     }
 	
+	/**
+	 * Find operation. Queries table and returns records found. Null parameters
+	 * will return all records. 
+	 * @param paramaters a HashMap<String, String> of key, value pairs representing
+	 * the query column and search value
+	 * @param limit the maximum records to return
+	 * @param offset the first record to return 
+	 * @return a Map<Integer, T> where key is the record ID, and value is the record 
+	 */
 	public Map<Integer, T> find(HashMap<String, String> parameters, int offset, int limit) throws SQLException {
-		/**
-		 * Find operation. Queries table and returns records found. Null parameters
-		 * will return all records. 
-		 * @param paramaters a HashMap<String, String> of key, value pairs representing
-		 * the query column and search value
-		 * @param limit the maximum records to return
-		 * @param offset the first record to return 
-		 * @return a Map<Integer, T> where key is the record ID, and value is the record 
-		 */
-		
-     
         // Validate that each key in the parameters map matches a column in the table
         Map<String, Method> setters = getColumnSetterMap();
         for (String key : parameters.keySet()) {
@@ -465,19 +541,23 @@ public abstract class Table_Access<T extends Has_ID> {
         return resultMap;
     }
 
-	public Map<Integer, T> find(HashMap<String, String> parameters) throws SQLException {
-		/**
-		 * Convenience function returns up to the first 100 records of the specified query 
-		 * @param paramaters a HashMap<String, String> of key, value pairs representing
-		 * the query column and search value
-		 * @return a Map<Integer, T> where key is the record ID, and value is the record 
-		 */
-		return find(parameters, 0, 100);
-	}
 	
+	/**
+	 * Convenience function returns up to the first 100 records of the specified query 
+	 * @param paramaters a HashMap<String, String> of key, value pairs representing
+	 * the query column and search value
+	 * @return a Map<Integer, T> where key is the record ID, and value is the record 
+	 */
+	public Map<Integer, T> find(HashMap<String, String> parameters) throws SQLException {return find(parameters, 0, 100);}
+	
+	
+	/**
+	 * Deprecated replaced by praseValue
+	 * @param dateString
+	 * @return
+	 * @throws NumberFormatException
+	 */
 	private Date parseDate(String dateString) throws NumberFormatException {
-		//SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		//return dateFormat.parse(dateString);
 		Date date = null;
 		try { 
 			long timeMillis = Long.parseLong((String) dateString);
@@ -490,6 +570,8 @@ public abstract class Table_Access<T extends Has_ID> {
 	}
 	
 	
+	
+	@Override
 	public String toString() {
 		return this.getClass().toString();
 	}

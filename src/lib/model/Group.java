@@ -18,7 +18,7 @@ public class Group implements Has_ID, Has_Copy {
 	protected Date timestamp;
 	
 	//defines the object type distinguishing subtypes
-	protected String type = "Group"; 
+	protected String type; 
 
 
 
@@ -115,14 +115,17 @@ public class Group implements Has_ID, Has_Copy {
     	groupOut.setName(name);
     	groupOut.setDescription(description);
     	groupOut.setTimestamp(timestamp);
+    	groupOut.setType("Group");
     	return groupOut;
     }
     
+    /**
+	 * Object Factory for Group class returning empty group objects
+	 */
     public static Group create() {
-    	/**
-    	 * Object Factory for Group class returning empty group objects
-    	 */
-    	return new Group();
+    	Group group = new Group();
+    	group.setType("Group");
+    	return group;
     }
     
     public static Group copy(Group group) {

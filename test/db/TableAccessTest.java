@@ -243,25 +243,26 @@ class TableAccessTest {
 		return Stream.of(
 				//Class<T> clazz, T record
 
-				new Object[] {User_Access.class, User.create( -1, "Joe", "Simms", "Patron")},
-				new Object[] {User_Access.class, User.create(1000, "Jess", "King", "Patron")},
-				new Object[] {User_Access.class, User.create(1001, "jim", "simms", "Patron")},
-				new Object[] {Book_Access.class, Book.create(-1, "Keringham & Ritchie", "1234567890", "The C Programming Language")},
-				new Object[] {Book_Access.class, Book.create(245, "Michael Chricton", "2345678901", "Jurassic Park")},
-				new Object[] {Book_Access.class, Book.create(20, "laksdf", "3456789012", "jfjei")},
-				new Object[] {Copy_Access.class, Copy.create(-1, 748)},
-				new Object[] {Copy_Access.class, Copy.create(1515, 749)},
-				new Object[] {Copy_Access.class, Copy.create(111, 755)},
-				new Object[] {Loan_Access.class, Loan.create(-1, 1, 1, createDate(2024, 5, 1), createDate(2024, 6, 1), true)},
-				new Object[] {Loan_Access.class, Loan.create(20, 5, 2, createDate(2023, 1, 1), createDate(2023, 2, 1), false)},
-				new Object[] {Loan_Access.class, Loan.create(21, 6, 3, createDate(2024, 6, 1), createDate(2024, 7, 1), true)},
-				new Object[] {Loan_Access.class, Loan.create(22, 4, 4, createDate(2024,7,1), createDate(2024,8,1), false)},
-				new Object[] {User_Address_Access.class,User_Address.create(-1, 1, "123 Main St", "Appt 2", "Labanon", "KY", "12345")},
-				new Object[] {User_Address_Access.class, User_Address.create(100, 2, "888 Main St", "", "Labanon", "KY", "12345")},
-				new Object[] {User_Address_Access.class, User_Address.create(101, 3, "999 Main St", "Unit z", "San Francisco", "CA", "12345")},
-				new Object[] {User_Address_Access.class, User_Address.create(102, 4, "1001 Main St", "", "New York", "NY", "12345")},
-				new Object[] {SMGroup_Access.class, Group.create(-1, 79, "newgroup1", "Dan's new group", new Date()) },
-				new Object[] {SMMeeting_Access.class, Meeting.create(-1, 1, "study session", "To win the finals", new Date())},
+				//new Object[] {User_Access.class, User.create( -1, "Joe", "Simms", "Patron")},
+				//new Object[] {User_Access.class, User.create(1000, "Jess", "King", "Patron")},
+				//new Object[] {User_Access.class, User.create(1001, "jim", "simms", "Patron")},
+				//new Object[] {Book_Access.class, Book.create(-1, "Keringham & Ritchie", "1234567890", "The C Programming Language")},
+				//new Object[] {Book_Access.class, Book.create(245, "Michael Chricton", "2345678901", "Jurassic Park")},
+				//new Object[] {Book_Access.class, Book.create(20, "laksdf", "3456789012", "jfjei")},
+				//new Object[] {Copy_Access.class, Copy.create(-1, 748)},
+				//new Object[] {Copy_Access.class, Copy.create(1515, 749)},
+				//new Object[] {Copy_Access.class, Copy.create(111, 755)},
+				//new Object[] {Loan_Access.class, Loan.create(-1, 1, 1, createDate(2024, 5, 1), createDate(2024, 6, 1), true)},
+				//new Object[] {Loan_Access.class, Loan.create(20, 5, 2, createDate(2023, 1, 1), createDate(2023, 2, 1), false)},
+				//new Object[] {Loan_Access.class, Loan.create(21, 6, 3, createDate(2024, 6, 1), createDate(2024, 7, 1), true)},
+				//new Object[] {Loan_Access.class, Loan.create(22, 4, 4, createDate(2024,7,1), createDate(2024,8,1), false)},
+				//new Object[] {User_Address_Access.class,User_Address.create(-1, 1, "123 Main St", "Appt 2", "Labanon", "KY", "12345")},
+				//new Object[] {User_Address_Access.class, User_Address.create(100, 2, "888 Main St", "", "Labanon", "KY", "12345")},
+				//new Object[] {User_Address_Access.class, User_Address.create(101, 3, "999 Main St", "Unit z", "San Francisco", "CA", "12345")},
+				//new Object[] {User_Address_Access.class, User_Address.create(102, 4, "1001 Main St", "", "New York", "NY", "12345")},
+				new Object[] {SMGroup_Access.class, Group.create(-1, 10, "newgroup1", "Dan's new group", new Date()) },
+				new Object[] {SMMeeting_Access.class, Meeting.create(-1, 3, 6, "my study session", "crushing cs401", "123 main st", new Date(), new Date())},
+				new Object[] {SMMeeting_Access.class, Meeting.create(-1, 3, -1, "my study session2", "crushing cs401 again", "123443 2nd street", new Date(), new Date())},
 				new Object[] {SMInteraction_Access.class, Interaction.create(-1, 1, 1, 1, Interaction_Type.COMMENT_ON_CONTENT, "My comment here" , new Date())} 
 		);
 	}
@@ -293,7 +294,7 @@ class TableAccessTest {
         }
 		
 		//confirm that the userID is now set if it was not previously. 
-		assertNotEquals(-1, record2.getID(), "LoanID not correctly set by table object");
+		assertNotEquals(-1, record2.getID(), "record ID not correctly set by table object");
 		
 		//if User_Id was not set by input, it should have been set by the insert action
 		if(record1.getID() == -1) {

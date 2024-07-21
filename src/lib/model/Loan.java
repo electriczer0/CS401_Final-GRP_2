@@ -79,7 +79,7 @@ public class Loan implements Has_ID, Has_Copy {
         if (!Active.equals(loan.isActive())) return false;
         if (!Date_Due.equals(loan.getDateDue())) return false;
         
-        return Date_Out.equals(loan.getDateOut());  // Compare the authors
+        return Date_Out.equals(loan.getDateOut());  
     }
 
     // Overriding hashCode method

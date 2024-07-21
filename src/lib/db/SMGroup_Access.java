@@ -28,8 +28,8 @@ public class SMGroup_Access extends Table_Access<Group> {
 					"Name TEXT NOT NULL",
 					"MeetingLocation TEXT",
 					"MeetingGroupID INTEGER",
-					"MeetingTimestamp DATE NOT NULL",
-					"Timestamp DATE NOT NULL",
+					"MeetingTimestamp DATETIME",
+					"Timestamp DATETIME NOT NULL",
 					"FOREIGN KEY (OwnerID) REFERENCES Users(UserID)",
 					"FOREIGN KEY (MeetingGroupID) REFERENCES SMGroups(GroupID) ON DELETE CASCADE"
 					);
