@@ -14,10 +14,12 @@ enum SocialAction {
     REPLY_TO_COMMENT,
     LIKE_COMMENT,
     SHARE_COMMENT,
+    LIST_GROUPS,
     CREATE_GROUP,
     UPDATE_GROUP,
     JOIN_GROUP,
     LEAVE_GROUP,
+    LIST_MEETINGS,
     CREATE_MEETING,
     UPDATE_MEETING,
     CHECK_UPCOMING_MEETINGS
@@ -99,8 +101,8 @@ public class SocialView {
             case EDIT_COMMENT -> {editComment(sc); break;}
             case REPLY_TO_COMMENT -> {replyComment(sc); break;}
             case LIKE_COMMENT -> {likeComment(sc); break;}
-            case SHARE_COMMENT -> {shareComment(); break;}
-            case CREATE_GROUP -> {createGroup(); break;}
+            case SHARE_COMMENT -> {shareComment(sc); break;}
+            case CREATE_GROUP -> {createGroup(sc); break;}
             case UPDATE_GROUP -> {updateGroup(sc); break;}
             case JOIN_GROUP -> {joinGroup(sc); break;}
             case LEAVE_GROUP -> {leaveGroup(sc); break;}
