@@ -1,6 +1,6 @@
 package lib.model;
 
-public class Copy implements Has_ID, Has_Copy {
+public class Copy implements Has_ID, Has_Copy<Copy> {
     private Integer Copy_Id;
     private Integer Book_Id;
 

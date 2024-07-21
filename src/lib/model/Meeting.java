@@ -7,7 +7,7 @@ import java.util.List;
  * A meeting. Similar to group, has interactions, and users can join/leave meetings and post new interactions,
  * but a meeting both has an owning Group and has a specific timestamp and location.
  */
-public class Meeting extends Group implements Has_ID, Has_Copy {
+public class Meeting extends Grouping implements Has_Copy<Meeting> {
 	
 	/**
 	 * Foreign key to the Group class which is the group associated with this meeting
@@ -30,15 +30,8 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
 	@Override
 	public String toString() {
 		StringBuilder output = new StringBuilder();
-		output.append("ID:\t")
-			.append(this.id)
-			.append("\nOwner ID:\t")
-			.append(this.owner_Id)
-			.append("\nName:\t")
-			.append(this.name)
-			.append("\nDescription:\t")
-			.append(this.description)
-			.append("\nRefGroupID:\t")
+		output.append(super.toString());
+		output.append("RefGroupID:\t")
 			.append(this.group_Id)
 			.append("\nLocation:\t")
 			.append(this.meetingLocation)
@@ -53,15 +46,9 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
 		
 	}
 
-	public int getGroupId() {
-		return this.group_Id;
-	}
-	public Date getMeetingTime() {
-		return this.meetingTimestamp;
-	}
-	public String getMeetingLocation() {
-		return this.meetingLocation;
-	}
+	public int getGroupId() {return this.group_Id;}
+	public Date getMeetingTime() {return this.meetingTimestamp;	}
+	public String getMeetingLocation() {return this.meetingLocation;}
 
 	public void setGroupId(int id) { this.group_Id = id; }
 	public void setMeetingTimestamp(Date meetingTime) { this.meetingTimestamp = meetingTime; }
@@ -75,12 +62,8 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
         if (o == null || getClass() != o.getClass()) return false;  // Check if the classes are the same
 
         Meeting meeting = (Meeting) o;
-        
-        if(this.id != meeting.getID()) return false;
-        if(this.owner_Id != meeting.getOwnerId()) return false; 
-        if(this.description != null && !this.description.equals(meeting.getDescription())) return false;
-        if(this.name != null && !this.name.equals(meeting.getName()))return false; 
-        if(this.timestamp != null && !this.timestamp.equals(meeting.getTimestamp())) return false;
+
+        if(!super.equals(meeting)) return false; 
         if(this.meetingLocation != null && !this.meetingLocation.equals(meeting.getMeetingLocation())) return false;
         if(this.meetingTimestamp != null && !this.meetingTimestamp.equals(meeting.getMeetingTime())) return false;
         if(this.group_Id != meeting.getGroupId()) return false;
@@ -94,7 +77,8 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
     // Overriding hashCode method
     @Override
     public int hashCode() {
-        int result = id;
+        int result = super.hashCode();
+        result = 31 * result + group_Id;
         result = 31 * result + meetingTimestamp.hashCode();
         result = 31 * result + meetingLocation.hashCode();
         return result;
@@ -114,7 +98,7 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
     public static Meeting create(int recordID, int ownerID, int groupID, String name,
     		String description, String location, Date meetingTimestamp, Date timestamp) {
     
-    	Meeting meetingOut = new Meeting();
+    	Meeting meetingOut = Meeting.create();
     	meetingOut.setID(recordID);
     	meetingOut.setOwnerId(ownerID);
     	meetingOut.setGroupId(groupID);
@@ -133,6 +117,7 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
     public static Meeting create() {
     	Meeting meeting = new Meeting();
     	meeting.setType("Meeting");
+    	meeting.setID(-1);
     	return meeting; 
     }
     
@@ -149,9 +134,6 @@ public class Meeting extends Group implements Has_ID, Has_Copy {
     /**
 	 * Return a deep copy of this Meeting instance
 	 */
-    public Meeting copy() {
-    	
-    	return Meeting.copy(this);
-    }
+    public Meeting copy() {	return Meeting.copy(this); }
 
 }

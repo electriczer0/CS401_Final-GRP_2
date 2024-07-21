@@ -3,7 +3,7 @@ package lib.model;
 
 import java.util.Date;
 
-public class Loan implements Has_ID, Has_Copy {
+public class Loan implements Has_ID, Has_Copy<Loan> {
 	private Integer Loan_Id;
     private Integer Copy_Id;
     private Integer User_Id;

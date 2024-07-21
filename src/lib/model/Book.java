@@ -5,7 +5,7 @@ import lib.db.*;
 import lib.model.*;
 
 
-public class Book implements Has_ID, Has_Copy{
+public class Book implements Has_ID, Has_Copy<Book>{
 	private int Book_Id = -1; //-1 will be the null value for this field
 	private String Author;
 	private String ISBN;

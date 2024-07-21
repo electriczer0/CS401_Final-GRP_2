@@ -1,6 +1,6 @@
 package lib.model;
 
-public class User_Address implements Has_ID, Has_Copy {
+public class User_Address implements Has_ID, Has_Copy<User_Address> {
     private Integer Address_Id;
     private Integer User_Id;
     private String Street1;

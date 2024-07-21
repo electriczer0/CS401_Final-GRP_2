@@ -1,6 +1,6 @@
 package lib.model;
 
-public class User implements Has_ID, Has_Copy {
+public class User implements Has_ID, Has_Copy<User> {
     private int UserID;
     private String Name_First;
     private String Name_Last;

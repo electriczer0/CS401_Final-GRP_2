@@ -18,7 +18,7 @@ public class UserController {
 	public static void setCurrentUserById(String id){
 		//Lookup the user by their id, then set currentUser to that User.
 
-		currentUser = new User();
+		currentUser = User.create();
 		currentUser.setType("Librarian");
 		//^^ Replace this
 	}
@@ -28,7 +28,7 @@ public class UserController {
      * @param id
      */
     public static User getUserById(int id){
-        return new User();
+        return User.create();
     }
 }
 

@@ -23,7 +23,7 @@ public class DataLoader {
                 String title = csvRecord.get("Title");
                 String author = csvRecord.get("Author");
 
-                Book book = new Book();
+                Book book = Book.create();
                 book.setISBN(isbn);
                 book.setTitle(title);
                 book.setAuthor(author);

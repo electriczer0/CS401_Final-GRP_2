@@ -5,74 +5,41 @@ import java.util.List;
 /**
  * A user social profile.
  */
-public class User_Profile implements Has_ID {
-    private Integer Profile_Id;
+public class User_Profile implements Has_ID, Has_Copy<User_Profile> {
+    private int Profile_Id;
     //The user this profile belongs to
-    private Integer User_Id;
+    private int User_Id;
     private String username;
-    private List<String> favoriteBookIds;
     private String readingHabits;
     private String literaryPreferences;
-    private List<String> recentBookIds;
 
     public User_Profile() {
     }
 
     @Override
-    public int getID() {
-        return Profile_Id;
-    }
+    public int getID() { return Profile_Id;}
 
     @Override
-    public void setID(int Profile_Id) {
-        this.Profile_Id = Profile_Id;
-    }
+    public void setID(int Profile_Id) {this.Profile_Id = Profile_Id;}
 
-    public int getUserId() {
-        return User_Id;
-    }
-    public void setUserId(int user_Id) {
-        this.User_Id = user_Id;
-    }
+    public int getUserId() {return User_Id;}
+    public void setUserId(int user_Id) { this.User_Id = user_Id;}
 
 
-    public String getUsername() {
-        return username;
-    }
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getUsername() { return username;}
+    public void setUsername(String username) { this.username = username;}
 
-    public List<String> getFavoriteBookIds() {
-        return favoriteBookIds;
-    }
-    public void setFavoriteBookIds(List<String> favoriteBookIds) {
-        this.favoriteBookIds = favoriteBookIds;
-    }
 
-    public String getReadingHabits() {
-        return readingHabits;
-    }
+    public String getReadingHabits() {return readingHabits;}
 
-    public void setReadingHabits(String readingHabits) {
-        this.readingHabits = readingHabits;
-    }
+    public void setReadingHabits(String readingHabits) {this.readingHabits = readingHabits;}
 
-    public String getLiteraryPreferences() {
-        return literaryPreferences;
-    }
+    public String getLiteraryPreferences() {return literaryPreferences;}
 
-    public void setLiteraryPreferences(String literaryPreferences) {
-        this.literaryPreferences = literaryPreferences;
-    }
+    public void setLiteraryPreferences(String literaryPreferences) {this.literaryPreferences = literaryPreferences; }
 
-    public List<String> getRecentBookIds() {
-        return recentBookIds;
-    }
-    public void setRecentBookIds(List<String> recentBookIds) {
-        this.recentBookIds = recentBookIds;
-    }
-
+//TODO implement favorite book IDs
+//TODO implement recent book IDs
  // Overriding equals method
 
     @Override
@@ -84,10 +51,8 @@ public class User_Profile implements Has_ID {
 
         if (Profile_Id != profile.getID()) return false;  // Compare the ids
         if (username != profile.getUsername()) return false;
-        if (readingHabits != profile.getReadingHabits()) return false;
-        if (literaryPreferences != profile.getLiteraryPreferences()) return false;
-        if (!favoriteBookIds.equals(profile.getFavoriteBookIds())) return false;
-        if (!recentBookIds.equals(profile.getRecentBookIds())) return false;
+        if (!readingHabits.equals(getReadingHabits())) return false;
+        if (!literaryPreferences.equals(profile.getLiteraryPreferences())) return false;
 
         return true;
     }
@@ -101,28 +66,29 @@ public class User_Profile implements Has_ID {
         return result;
     }
 
-    public static User_Profile create(int id, int user_Id, String username) {
+    public static User_Profile create(int id, int user_Id, String username, String litPrefs, String readingHabits) {
 
-		User_Profile profile = new User_Profile();
+		User_Profile profile = User_Profile.create();
 		profile.setID(id);
         profile.setUserId(user_Id);
 		profile.setUsername(username);
+		profile.setLiteraryPreferences(litPrefs);
+		profile.setReadingHabits(readingHabits);
 
 		return profile;
 	}
+    
+    public static User_Profile create() {
+    	return new User_Profile();
+    }
 
     public static User_Profile copy(User_Profile profile) {
 
-    	User_Profile newUser = User_Profile.create(profile.getID(), profile.getUserId(), profile.getUsername());
-        newUser.setFavoriteBookIds(profile.getFavoriteBookIds());
-        newUser.setReadingHabits(profile.getReadingHabits());
-        newUser.setLiteraryPreferences(profile.getLiteraryPreferences());
-        newUser.setRecentBookIds(profile.getRecentBookIds());
+    	User_Profile newUser = User_Profile.create(profile.getID(), profile.getUserId(), profile.getUsername(),
+    			profile.getLiteraryPreferences(), profile.getReadingHabits());
         return newUser;
     }
 
-    public User_Profile copy() {
-    	return User_Profile.copy(this);
-    }
+    public User_Profile copy() {return User_Profile.copy(this); }
 }
 

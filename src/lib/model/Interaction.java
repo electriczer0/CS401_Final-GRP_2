@@ -8,7 +8,7 @@ import java.util.Date;
  * A class that describes social media interactions. Users can post, comment on each other's posts, and like and
  * share each other's posts (whether they are root comments or child comments).
  */
-public class Interaction implements Has_ID, Has_Copy {
+public class Interaction implements Has_ID, Has_Copy<Interaction> {
 	
 	public enum Interaction_Type {
 		ORIGINAL_CONTENT,

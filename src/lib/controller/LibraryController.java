@@ -96,7 +96,7 @@ public class LibraryController {
      * @return
      */
     public static Book getBookById(int id){
-        return new Book();
+        return Book.create();
     }
 
     /**
@@ -105,7 +105,7 @@ public class LibraryController {
      * @return
      */
     public static Copy getCopyById(int id){
-        return new Copy();
+        return Copy.create();
     }
 
     /**
