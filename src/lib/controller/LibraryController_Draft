@@ -1,0 +1,194 @@
+package lib.controller;
+
+import lib.db.Book_Access;
+import lib.db.Copy_Access;
+import lib.db.Loan_Access;
+import lib.db.Table_Access;
+import lib.db.User_Access;
+import lib.model.Book;
+import lib.model.Copy;
+import lib.model.Loan;
+import lib.model.User;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+public class LibraryController {
+	
+	protected static Book_Access bookTable = Table_Access.getInstance(Book_Access.class);
+	protected static User_Access userTable = Table_Access.getInstance(User_Access.class);
+	protected static Copy_Access copyTable = Table_Access.getInstance(Copy_Access.class);
+	protected static Loan_Access loanTable = Table_Access.getInstance(Loan_Access.class);
+
+	
+	public static void addNewBook(String title, String author, String isbn) throws SQLException{
+    	 Book book = Book.create(-1, author, isbn, title); 
+    	 bookTable.insert(book);
+    	return;
+        
+    }
+
+    /**
+     * Creates a new user in the DB. The Library is an implicit construct - all users in the DB are
+     * considered library users.
+     * @param firstName
+     * @param lastName
+     * @param type
+     * @throws SQLException 
+     */
+    public static void createNewUser(String firstName, String lastName, String type) throws SQLException{
+        //Create a new user and save to db. This user is a member of the library.
+    	
+    	User user = User.create(-1, firstName, lastName, type);
+    	userTable.insert(user);		
+    }
+
+    /**
+     * Deletes a user by their Id. This should both remove a user and also clean up anything related to
+     * that user (i.e. auto returns all books that user checked out).
+     * @param id
+     * @throws SQLException 
+     */
+    public static void deleteUserById(int id) throws SQLException{
+        //Delete a user from the library by their id.
+    	userTable.delete(id);
+    }
+
+    /**
+     * Returns a list of all Library users.
+     * @return
+     */
+    public static List<User> listUsers(){
+        //Delete a user from the library by their id.
+        try {
+            User_Access accessor = User_Access.getInstance();
+            Map<Integer, User> map = accessor.readAll();
+
+            Collection<User> col = map.values();
+            return new ArrayList<User>(col);
+        } catch (Exception e){
+            return null;
+        }
+    }
+
+    /**
+     * Deletes a copy of a book from the library. Should also delete any outstanding loan for that book.
+     * @param id
+     * @throws SQLException 
+     */
+    public static void deleteBookById(int id) throws SQLException{
+        bookTable.delete(id);
+    }
+
+    /**
+     * Returns a list of all copies of books in the library. Note that this should return *Copies*, not books.
+     * @return
+     */
+    public static ArrayList<Book> listCopies(){
+        //Delete a user from the library by their id.
+        
+    	Book_Access bookAccess = Book_Access.getInstance();
+        Map<Integer, Book> map;
+		try {
+			map = bookAccess.readAll();
+			Collection<Book> col = map.values();
+	    	return new ArrayList<Book>(col);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+    }
+
+    /**
+     * Returns all outstanding checked out books by the user_id. If user_id is null, returns all
+     * checked out books. Used to generate library reports for loaned books as well as user reports
+     * of their own borrowed books.
+     * @param user_id
+     * @return
+     * @throws SQLException 
+     */
+    public static List<Loan> generateCheckoutBookList(Integer userId) throws SQLException{
+    	userTable.read(userId);
+        return new ArrayList<Loan>();
+    }
+
+    /**
+     * Looks up a book by id. A useful helper method.
+     * @param id
+     * @return
+     * @throws SQLException 
+     */
+    public static Book getBookById(int id) throws SQLException{
+    	bookTable.find(null, id, id);
+        return new Book();
+    }
+
+    /**
+     * Looks up a copy by id. A useful helper method.
+     * @param id
+     * @return
+     * @throws SQLException 
+     */
+    public static Copy getCopyById(int id) throws SQLException{
+    	copyTable.find(null, id, id);
+        return new Copy();
+    }
+
+    /**
+     * Checks to see if a copy of a book is available, i.e. there are no current Loans for that book.
+     * If there is one, returns a Loan so that the user can be made aware of when the book will be returned.
+     * Returning null means that the book is available.
+     * @param copyId
+     * @return
+     * @throws SQLException 
+     */
+    public static Loan checkIfBookHasLoan(int copyId) throws SQLException{
+    	//bookTable.read(copyId);
+    	if (copyTable.read(copyId)!=null) {
+    		loanTable.find(null, copyId, copyId);
+    		return null;
+        }
+    	else {
+    		return loanTable.read(copyId);
+    	}
+    }
+
+    /**
+     * Checks a copy of a book out to the specified user. Creates a loan for that copy and marks the date.
+     * Let's say that all book loans are for two weeks.
+     * @param copyId
+     * @throws SQLException 
+     */
+    public static void checkoutBook(int copyId, User user) throws SQLException{
+    	Copy copy = Copy.create(copyId, -1);
+    	copyTable.update(copy);
+    	
+    	userTable.update(user);
+    	
+    	Loan loan = Loan.copy(null);
+    	loanTable.update(loan);
+    	
+    }
+
+    /**
+     * Deposits a book back in the library. Should mark the corresponding loan as inactive, if an active
+     * loan exists for that copy,
+     * for this user.
+     * @param copyId
+     * @throws SQLException 
+     */
+    public static void depositBook(int copyId, User user) throws SQLException{
+    	Loan loan = Loan.copy(null);
+    	loanTable.insert(loan);
+    	
+    	if(loanTable.hasActiveLoans(copyId)) {
+    		userTable.update(user);
+    	}
+    	
+    	
+    }
+}
