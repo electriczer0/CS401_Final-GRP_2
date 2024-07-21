@@ -66,6 +66,7 @@ public class LibraryView {
         }
         while (!exiting){
             System.out.println("Please select one of the actions available, or 'exit' to exit.");
+            System.out.println("You'll need a book id to check out or deposit a book.");
             for (int i = 0; i < actions.size(); i++){
                 System.out.println((i + 1) + ". " + printAction(actions.get(i)));
             }

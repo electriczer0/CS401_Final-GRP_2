@@ -13,6 +13,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The controller for library functions. Services the LibraryView.
+ */
 public class LibraryController {
     public static void addNewBook(String title, String author, String isbn){
         return;

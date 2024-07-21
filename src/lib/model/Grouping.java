@@ -4,6 +4,9 @@ package lib.model;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Add comment here about how this grouping is better for the DB
+ */
 public abstract class Grouping implements Has_ID {
 
 	protected int id; //-1 will be the null value for this field
