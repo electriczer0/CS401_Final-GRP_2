@@ -1,6 +1,8 @@
 package lib.controller;
 
+import lib.model.Group;
 import lib.model.Interaction;
+import lib.model.Meeting;
 import lib.model.User;
 
 import java.util.ArrayList;
@@ -105,10 +107,110 @@ public class SocialController {
      * Creates a new group. This group is owned by the creating user and has a name, type, and description.
      * @param user
      * @param name
-     * @param type
      * @param description
      */
-    public static void createNewGroup(User user, String name, String type, String description){
+    public static void createNewGroup(User user, String name, String description){
         return;
+    }
+
+    /**
+     * Returns a list of all groups.
+     * @return
+     */
+    public static List<Group> listAllGroups(){
+        return new ArrayList<Group>();
+    }
+
+    /**
+     * Retrieves a group by id, or null if it doesn't exist.
+     * @param id
+     * @return
+     */
+    public static Group getGroupByGroupId(int id){
+        return Group.create();
+    }
+
+    /**
+     * Retrieves a meeting by id, or null if it doesn't exist.
+     * @param id
+     * @return
+     */
+    public static Meeting getMeetingByMeetingId(int id){
+        return Meeting.create();
+    }
+
+    /**
+     * Updates the group with the targeted id by setting a new description, then re-saving the record.
+     * Does *not* update the field if the argument is null or empty.
+     * Reject the update if the user does not own the group (which means they dont have permissions to modify it).
+     * @param id
+     * @param description
+     */
+    public static void updateGroupWithGroupId(int id, User user, String description){
+
+    }
+
+    /**
+     * Adds the user to the group. No effect if they're already in the group.
+     * @param groupId
+     * @param user
+     */
+    public static void joinGroup(int groupId, User user){
+
+    }
+
+    /**
+     * Removes the user from the group. No effect if they weren't in the group already.
+     * @param groupId
+     * @param user
+     */
+    public static void leaveGroup(int groupId, User user){
+
+    }
+
+    /**
+     * Returns a list of all meetings, sorted chronologically.
+     * @return
+     */
+    public static List<Meeting> listAllMeetings(){
+        return new ArrayList<Meeting>();
+    }
+
+    /**
+     * Returns a list of all meetings for the provided user, i.e. all meetings for the groups this user is a member of.
+     * @return
+     */
+    public static List<Meeting> listAllMeetings(User user){
+        return new ArrayList<Meeting>();
+    }
+
+    /**
+     * Creates a meeting for the group with id groupId. Sets its location to location, and sets the Date to the
+     * Date corresponding to the day (provided in MM/DD/YYYY) and time (2400 format).
+     *
+     * Rejects creation if the user isn't a member of the group.
+     * @param groupId
+     * @param location
+     * @param day
+     * @param time
+     */
+    public static void createMeeting(int groupId, User user, String location, String day, String time){
+
+    }
+
+    /**
+     * Updates a meeting with id meetingId with the updated location and date. Does not update the fields if null,
+     * so if the user doesn't provide a day or time, don't update the date.
+     *
+     * Rejects the update if the user isn't a member of the group the meeting is for.
+     *
+     * @param meetingId
+     * @param user
+     * @param location
+     * @param day
+     * @param time
+     */
+    public static void updateMeetingWithMeetingId(int meetingId, User user, String location, String day, String time){
+
     }
 }

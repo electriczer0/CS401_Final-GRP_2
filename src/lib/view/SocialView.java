@@ -2,8 +2,11 @@ package lib.view;
 
 import lib.controller.SocialController;
 import lib.controller.UserController;
+import lib.model.Group;
 import lib.model.Interaction;
+import lib.model.Meeting;
 import lib.model.User;
+import lib.utilities.Utils;
 
 import java.util.*;
 
@@ -62,15 +65,20 @@ public class SocialView {
         while (!exiting){
             System.out.println("Please select one of the actions available, or 'exit' to exit.");
             System.out.println("You'll need an id number to reply to comments or interact with groups.");
+            System.out.println("Type 'library' to switch to the library view.");
             for (int i = 0; i < actions.size(); i++){
                 System.out.println((i + 1) + ". " + printAction(actions.get(i)));
             }
             String input = sc.next();
-            if (input != "exit") {
-                SocialAction action = actions.get(Integer.parseInt(input) - 1); //Sanitize
-                dispatchAction(action, sc);
+            if (input.equals("library")){
+                return 1;
             } else {
-                exiting = true;
+                if (!input.equals("exit")) {
+                    SocialAction action = actions.get(Integer.parseInt(input) - 1); //Sanitize
+                    dispatchAction(action, sc);
+                } else {
+                    exiting = true;
+                }
             }
         }
         return 0;
@@ -247,44 +255,106 @@ public class SocialView {
     }
 
     private static void listGroups(){
-
+        List<Group> groups = SocialController.listAllGroups();
+        System.out.println("------------------------------------------------------------------------------------------"); //90 dashes
+        System.out.println("| Group Id | Group Name                                                                  |");
+        System.out.println("------------------------------------------------------------------------------------------");
+        for (Group g : groups){
+            System.out.println("| " + Utils.fitString(g.getID() + "", 8) +
+                    " | " + Utils.fitString(g.getName(), 75) +" |");
+        }
+        System.out.println("------------------------------------------------------------------------------------------");
     }
 
     //Create a new group.
     private static void createGroup(Scanner sc){
         System.out.println("What's the name of your new group?");
         String name = sc.next();
-        System.out.println("What kind of group is this? This is entirely freeform, think of a descriptive adjective.");
-        String type = sc.nextLine();
         System.out.println("Add a description for this new group.");
         String desc = sc.nextLine();
-        SocialController.createNewGroup(UserController.getCurrentUser(), name, type, desc);
+        SocialController.createNewGroup(UserController.getCurrentUser(), name, desc);
     }
 
     private static void updateGroup(Scanner sc){
+        System.out.println("Enter the group id of the group you'd like to modify. You must own this group to modify it.");
+        String id = sc.next();
+        Group curGroup = SocialController.getGroupByGroupId(Integer.parseInt(id));
+        System.out.println("The current description of this group:");
+        System.out.println(curGroup.getDescription());
+        System.out.println("Enter what you'd like to change the group description to, or hit enter to leave it unchanged.");
+        String desc = sc.nextLine();
+        SocialController.updateGroupWithGroupId(Integer.parseInt(id), UserController.getCurrentUser(), desc);
+
 
     }
 
     private static void joinGroup(Scanner sc){
-
+        System.out.println("Enter the group id of the group you'd like to join.");
+        String id = sc.next();
+        SocialController.joinGroup(Integer.parseInt(id), UserController.getCurrentUser());
     }
 
     private static void leaveGroup(Scanner sc){
-
+        System.out.println("Enter the group id of the group you'd like to leave.");
+        String id = sc.next();
+        SocialController.leaveGroup(Integer.parseInt(id), UserController.getCurrentUser());
     }
 
     private static void listMeetings(){
-        
+        List<Meeting> meetings = SocialController.listAllMeetings();
+        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("| Meeting Id | Group of Meeting               | Meeting Location        | Meeting Time   |");
+        System.out.println("------------------------------------------------------------------------------------------");
+        for (Meeting m : meetings){
+            Group g = SocialController.getGroupByGroupId(m.getGroupId());
+            System.out.println("| " + Utils.fitString(m.getID() + "", 10) +
+                    " | " + Utils.fitString(g.getName(), 30) +
+                    " | " + Utils.fitString(m.getMeetingLocation(), 23) +
+                    " | " + Utils.fitString(m.getMeetingTime().toString(), 14) + " |");
+        }
+        System.out.println("------------------------------------------------------------------------------------------");
     }
 
     private static void createMeeting(Scanner sc){
-
+        System.out.println("All meetings are associated with a group. Enter the group id of the group you'd like to create a meeting for.");
+        System.out.println("You must be part of the group to create a meeting for the group.");
+        String id = sc.next();
+        System.out.println("Where is the meeting location?");
+        String location = sc.nextLine();
+        System.out.println("What day is the meeting? Use MM/DD/YYYY format.");
+        String day = sc.next();
+        System.out.println("What time? Use 2400 time notation.");
+        String time = sc.next();
+        SocialController.createMeeting(Integer.parseInt(id), UserController.getCurrentUser(), location, day, time);
     }
     private static void updateMeeting(Scanner sc){
+        System.out.println("Enter the meeting id of the meeting you'd like to modify. You must be part of this group to update its meeting.");
+        String id = sc.next();
+        Meeting curMeeting = SocialController.getMeetingByMeetingId(Integer.parseInt(id));
+        System.out.println("The current location of this group is '" + curMeeting.getMeetingLocation() + "'.");
+        System.out.println("Enter what you'd like to change the location to, or hit enter to leave it unchanged.");
+        String location = sc.nextLine();
+        System.out.println("The current date of this meeting is " + curMeeting.getMeetingTime() + ".");
+        System.out.println("Update the day of the meeting. Use MM/DD/YYYY format.");
+        String day = sc.next();
+        System.out.println("What time? Use 2400 time notation.");
+        String time = sc.next();
+        SocialController.updateMeetingWithMeetingId(Integer.parseInt(id), UserController.getCurrentUser(), location, day, time);
 
     }
     private static void checkUpcomingMeetings(Scanner sc){
-
+        List<Meeting> meetings = SocialController.listAllMeetings(UserController.getCurrentUser());
+        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("| Meeting Id | Group of Meeting               | Meeting Location        | Meeting Time   |");
+        System.out.println("------------------------------------------------------------------------------------------");
+        for (Meeting m : meetings){
+            Group g = SocialController.getGroupByGroupId(m.getGroupId());
+            System.out.println("| " + Utils.fitString(m.getID() + "", 10) +
+                    " | " + Utils.fitString(g.getName(), 30) +
+                    " | " + Utils.fitString(m.getMeetingLocation(), 23) +
+                    " | " + Utils.fitString(m.getMeetingTime().toString(), 14) + " |");
+        }
+        System.out.println("------------------------------------------------------------------------------------------");
     }
 
 }

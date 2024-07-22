@@ -8,6 +8,7 @@ import lib.db.*;
 import lib.model.User;
 import lib.utilities.*;
 import lib.view.LibraryView;
+import lib.view.SocialView;
 
 // Broadly the state diagram of this app switches between being in the library and interacting with books,
 // and interacting with the social media platform.
@@ -67,7 +68,7 @@ public class Example { //<--Refactor
 					rtn = LibraryView.basePrompt(sc);
 					break;
 				case SOCIAL_MEDIA_PLATFORM:
-					//rtn = SocialManager.basePrompt(sc);
+					rtn = SocialView.basePrompt(sc);
 					break;
 			}
 			if (rtn == 1){
@@ -92,10 +93,10 @@ public class Example { //<--Refactor
 		while (UserController.getCurrentUser() == null) {
 			System.out.println("Who is using this system? Enter an id, or type 'list' to list all users, or 'exit' to quit.");
 			String input = sc.next();
-			if (input == "exit") {
+			if (input.equals("exit")) {
 				return;
 			}
-			if (input == "list") {
+			if (input.equals("list")) {
 				LibraryController.listUsers();
 			} else {
 				//currentUser = Library.getUserById(input);

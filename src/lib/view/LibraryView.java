@@ -52,7 +52,7 @@ public class LibraryView {
         actions.add(LibraryAction.LIST_BOOKS);
         actions.add(LibraryAction.CHECK_BOOK_AVAILABLE);
         actions.add(LibraryAction.GENERATE_USER_CHECKOUT_REPORT);
-        if (UserController.getCurrentUser().getType() == "Librarian"){
+        if (UserController.getCurrentUser().getType().equals("Librarian")){
             actions.add(LibraryAction.ADD_USER);
             actions.add(LibraryAction.REMOVE_USER);
             actions.add(LibraryAction.LIST_USERS);
@@ -60,22 +60,27 @@ public class LibraryView {
             actions.add(LibraryAction.REMOVE_BOOK);
             actions.add(LibraryAction.GENERATE_LIBRARY_CHECKOUT_REPORT);
         }
-        if (UserController.getCurrentUser().getType() == "Patron"){
+        if (UserController.getCurrentUser().getType().equals("Patron")){
             actions.add(LibraryAction.CHECKOUT_BOOK);
             actions.add(LibraryAction.DEPOSIT_BOOK);
         }
         while (!exiting){
             System.out.println("Please select one of the actions available, or 'exit' to exit.");
             System.out.println("You'll need a book id to check out or deposit a book.");
+            System.out.println("Type 'social' to switch to the Social Media platform.");
             for (int i = 0; i < actions.size(); i++){
                 System.out.println((i + 1) + ". " + printAction(actions.get(i)));
             }
             String input = sc.next();
-            if (input != "exit") {
-                LibraryAction action = actions.get(Integer.parseInt(input) - 1); //Sanitize
-                dispatchAction(action, sc);
+            if (input.equals("social")){
+                return 1;
             } else {
-                exiting = true;
+                if (!input.equals("exit")) {
+                    LibraryAction action = actions.get(Integer.parseInt(input) - 1); //Sanitize
+                    dispatchAction(action, sc);
+                } else {
+                    exiting = true;
+                }
             }
         }
         return 0;
