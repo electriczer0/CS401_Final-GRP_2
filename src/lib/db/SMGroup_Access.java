@@ -1,6 +1,5 @@
 package lib.db;
 
-//TODO overload DB methods to add a Type filter on queries 
 
 import java.util.Arrays;
 import java.util.Date;

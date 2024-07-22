@@ -1,5 +1,4 @@
 package lib.db;
-//TODO overload DB methods to add a type filter on queries
 //check copy functionality
 
 
