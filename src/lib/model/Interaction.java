@@ -116,18 +116,15 @@ public class Interaction implements Has_ID, Has_Copy<Interaction> {
 
         Interaction inter = (Interaction) o;
 
-        if (id != inter.getID()) {
-			return false;  // Compare the ids
-		} else {
-			return true;
-		}
-		//We should enforce id uniqueness in the DB.
-		/*
-        if (!target_Id.equals(inter.getTargetId())) return false;  // Compare the ISBNs
-        if (!type.equals(inter.getType())) return false;  // Compare the titles
-        return Title.equals(inter.getTitle());  // Compare the authors
-		 */
+        if(id != inter.getID()) return false;
+        if(group_Id != inter.getGroupId()) return false;
+        if(target_Id != inter.getTargetId()) return false;
+        if(user_Id != inter.getUserId()) return false; 
+        if(!content.equals(inter.getContent())) return false; 
+        if(!type.equals(inter.getType())) return false;
+        if(!timestamp.equals(inter.getTimestamp())) return false;
 
+        return true;
     }
 
     // Overriding hashCode method

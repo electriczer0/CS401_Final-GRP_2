@@ -11,8 +11,8 @@ import lib.model.*;
 
 public class User_Profile_Access extends Table_Access<User_Profile> {
 
-    protected final String primary_key = "ProfileID"; // Set the primary key field for the Copy table
-    protected final String table_name = "SMUserProfiles"; // Set the table name for the Copy table
+    protected final String primary_key = "ProfileID"; // Set the primary key field for the SMUserProfiles table
+    protected final String table_name = "SMUserProfiles"; // Set the table name for the SMUserProfiles table
     protected Connection connection; 
     private final List<String> schema =
 			Arrays.asList(
@@ -22,7 +22,7 @@ public class User_Profile_Access extends Table_Access<User_Profile> {
 			                + "LitPrefs String,"
 							+ "ReadingHabits String,"
 			                + "FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE"
-			                //DB will delete related Copy records on deletion of related book
+			                //DB will delete related SMUserProfiles records on deletion of related book
 					);
  
     // Maps for getter and setter methods
@@ -34,15 +34,17 @@ public class User_Profile_Access extends Table_Access<User_Profile> {
         columnGetterMap = new HashMap<>();
         columnSetterMap = new HashMap<>();
         try {
-            columnGetterMap.put(primary_key, Copy.class.getMethod("getID"));
-            columnGetterMap.put("UserID", Copy.class.getMethod("getUserId"));
-            columnGetterMap.put("Username", Copy.class.getMethod("getUsername"));
+            columnGetterMap.put(primary_key, User_Profile.class.getMethod("getID"));
+            columnGetterMap.put("UserID", User_Profile.class.getMethod("getUserId"));
+            columnGetterMap.put("Username", User_Profile.class.getMethod("getUsername"));
+            columnGetterMap.put("ReadingHabits", User_Profile.class.getMethod("getReadingHabits"));
+            columnGetterMap.put("LitPrefs", User_Profile.class.getMethod("getLiteraryPreferences"));
 
-            columnSetterMap.put(primary_key, Copy.class.getMethod("setID", int.class));
-            columnSetterMap.put("UserID", Copy.class.getMethod("setUserID", int.class));
-            columnSetterMap.put("Username", Copy.class.getMethod("setUsername", String.class));
-            columnSetterMap.put("LitPrefs", Copy.class.getMethod("setLiteraryPreferences", int.class));
-            columnSetterMap.put("ReadingHabits", Copy.class.getMethod("setReadingHabits", int.class));
+            columnSetterMap.put(primary_key, User_Profile.class.getMethod("setID", int.class));
+            columnSetterMap.put("UserID", User_Profile.class.getMethod("setUserId", int.class));
+            columnSetterMap.put("Username", User_Profile.class.getMethod("setUsername", String.class));
+            columnSetterMap.put("LitPrefs", User_Profile.class.getMethod("setLiteraryPreferences", String.class));
+            columnSetterMap.put("ReadingHabits", User_Profile.class.getMethod("setReadingHabits", String.class));
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Failed to initialize column getter/setter maps", e);
         }
@@ -57,7 +59,7 @@ public class User_Profile_Access extends Table_Access<User_Profile> {
     protected void setConnection(Connection connection) {this.connection = connection; }
     protected String getTableName() {return this.table_name;}
     protected String getPrimaryKey() {return this.primary_key;}
-    public static Copy_Access getInstance() {
-    	return Table_Access.getInstance(Copy_Access.class);
+    public static User_Profile_Access getInstance() {
+    	return Table_Access.getInstance(User_Profile_Access.class);
     }
 }

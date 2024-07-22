@@ -24,8 +24,21 @@ import java.util.Map;
 
 import lib.db.*;
 import lib.model.*;
-
+/**
+ * This abstract class defines a data base controller object
+ * The basic CRUD functionality of a DB controller are defined in this class
+ * While the table-specific configuration is defined in the sub-class
+ * The sub-classes can also override common CRUD operations to define table-specific behavior
+ * Or add new methods for different DB operations such as join table reading and writing
+ * Each controller object should relate to one java class equivalent to the records represented 
+ * in the table. 
+ * Each controller object should be instantiated as a singleton. Table_Access
+ * provides methods for establishing the instances of subclasses, and providing them 
+ * through the getInstance() methods.  
+ * @param <T>
+ */
 public abstract class Table_Access<T extends Has_ID> {
+
 	/**
 	 * The Table_Access super class enforces a singleton pattern by maintaining this
 	 * Map between Class and Instance, wherein the class is a subclass of Table_Access
@@ -36,7 +49,6 @@ public abstract class Table_Access<T extends Has_ID> {
 	 */
 	private Class<T> type;
 	
-	
     protected abstract List<String> getTableSchema();
     protected abstract Map<String, Method> getColumnGetterMap();
     protected abstract Map<String, Method> getColumnSetterMap();
@@ -44,12 +56,9 @@ public abstract class Table_Access<T extends Has_ID> {
     protected abstract void setConnection(Connection connection);
     protected abstract String getTableName();
     protected abstract String getPrimaryKey();
-
-	
 	
 	@SuppressWarnings("unused")
-	private Table_Access() {
-	}
+	private Table_Access() {	}
 	
 	/**
 	 * Instantiates Table_Access controller
@@ -78,29 +87,28 @@ public abstract class Table_Access<T extends Has_ID> {
             throw new RuntimeException("The create method must be present in " + type.getName(), e);
         }
     }
-	
 
 	/**
 	 * Generic method to get or create a singleton instance for a given class with the requisite connection variable
 	 * This method acts is a helper function which acts as the primary constructor for all subclasses. 
 	 */
-	public static <T extends Table_Access<?>> T getInstance( Connection connection, Class<T> callerClass) throws SQLException {
+	public static <T extends Table_Access<?>> T getInstance( Connection connection, Class<T> clazz) throws SQLException {
 		
 		
 		T instance = null; 
 		synchronized (instances) {
-			if (!instances.containsKey(callerClass)) {
+			if (!instances.containsKey(clazz)) {
 				try {
 					// Use reflection to create new instance of the class through the subclass
-					instance = callerClass.getDeclaredConstructor().newInstance();
+					instance = clazz.getDeclaredConstructor().newInstance();
 					instance.setConnection(connection); 
-					instances.put(callerClass, instance);
+					instances.put(clazz, instance);
 					
 				} catch (Exception e) {
-					throw new RuntimeException("Failed to create singleton instance for: " + callerClass, e);
+					throw new RuntimeException("Failed to create singleton instance for: " + clazz, e);
 				} 
 			} else {
-				instance = callerClass.cast(instances.get(callerClass));
+				instance = clazz.cast(instances.get(clazz));
 			}
 		}
 	
@@ -113,7 +121,7 @@ public abstract class Table_Access<T extends Has_ID> {
 			throw new SQLException("Failed to check or create the table " + instance.getTableName() , e);
 		}
 		
-		assert instance != null: "Caught returning null instance of " + callerClass; 
+		assert instance != null: "Caught returning null instance of " + clazz; 
 		return instance;
 	}
 	
@@ -243,8 +251,6 @@ public abstract class Table_Access<T extends Has_ID> {
 		
 	}
 	
-	
-	
 	/**
 	 * Inserts specified record into DB
 	 * @param entity
@@ -355,7 +361,6 @@ public abstract class Table_Access<T extends Has_ID> {
        return recordsFound.values().stream().findFirst().orElse(null);
     }
 	
-	
 	/**
 	 * Parses objects returned from a sql query translating them into 
 	 * the desired java datatypes. Will process a variety of objects. 
@@ -392,13 +397,16 @@ public abstract class Table_Access<T extends Has_ID> {
             if (paramType.isEnum()) {
             	return Enum.valueOf((Class<Enum>) paramType, value.toString());
             }
+            if (paramType == int.class && value instanceof String) {
+            	if(((String) value).isEmpty()) return -1;
+            	return (int) Integer.parseInt((String) value);
+            };
             return paramType.cast(value);
         } catch (NumberFormatException e) {
             throw new SQLException("Failed to parse value: " + value, e);
         }
 		
 	}
-	
 	
 	public Map<Integer, T> readAll(int offset, int limit) throws SQLException {
 		/**
@@ -412,12 +420,10 @@ public abstract class Table_Access<T extends Has_ID> {
         return find(blankQuery, offset, limit);
 	}
 	
-	
 	/**
 	 * Convenience method. Returns the first 100 records from table
 	 */
 	public Map<Integer, T> readAll() throws SQLException { return readAll(0,100); }
-	
 	
 	/**
 	 * Updates the record specified by record.getId() using the attributes of record
@@ -439,7 +445,8 @@ public abstract class Table_Access<T extends Has_ID> {
             }
         }
         sql += setClause.toString() + " WHERE " + getPrimaryKey() + " = ?";
-
+        
+        Map<String, Object> debugValues = new HashMap<>();
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             int index = 1;
             for (String column : getters.keySet()) {
@@ -447,6 +454,7 @@ public abstract class Table_Access<T extends Has_ID> {
                     Method getter = getters.get(column);
                     try {
                         Object value = getter.invoke(record);
+                        debugValues.put(column, value);
                         //TODO fix this 
     	                //This is a hack to overwrite foreign keys which are set to -1 to "null" 
     	                //So that we can enforce foreign key relationships when the fk is not set
@@ -466,8 +474,12 @@ public abstract class Table_Access<T extends Has_ID> {
                 }
             }
             stmt.setInt(index, recordId);
-
-            int affectedRows = stmt.executeUpdate();
+            int affectedRows = 0;
+            try {
+            	affectedRows = stmt.executeUpdate();
+            } catch (SQLException e) {
+            	throw new SQLException("Update Action failed for " + getTableName() +"\nWith Query: \n" + debugValues, e);
+            }
             if (affectedRows == 0) {
                 throw new SQLException("Record not found for update: " + recordId);
             }
@@ -540,7 +552,6 @@ public abstract class Table_Access<T extends Has_ID> {
         }
         return resultMap;
     }
-
 	
 	/**
 	 * Convenience function returns up to the first 100 records of the specified query 
@@ -549,7 +560,6 @@ public abstract class Table_Access<T extends Has_ID> {
 	 * @return a Map<Integer, T> where key is the record ID, and value is the record 
 	 */
 	public Map<Integer, T> find(HashMap<String, String> parameters) throws SQLException {return find(parameters, 0, 100);}
-	
 	
 	/**
 	 * Deprecated replaced by praseValue
@@ -569,13 +579,9 @@ public abstract class Table_Access<T extends Has_ID> {
 		return date; 
 	}
 	
-	
-	
 	@Override
 	public String toString() {
 		return this.getClass().toString();
 	}
-		
-	
 
 }

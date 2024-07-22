@@ -56,6 +56,7 @@ class TableAccessTest {
 	private static SMInteraction_Access interactionTable = null;
 	private static SMMeeting_Access meetingTable = null;
 	private static SMGroup_Access groupTable = null; 
+	private static User_Profile_Access userProfileTable = null;
 	
 	
 	private static User_Address_Access userAddressTable = null;
@@ -117,6 +118,7 @@ class TableAccessTest {
 			interactionTable = Table_Access.getInstance(libraryConnection, SMInteraction_Access.class);
 			groupTable = Table_Access.getInstance(libraryConnection, SMGroup_Access.class);
 			meetingTable = Table_Access.getInstance(libraryConnection, SMMeeting_Access.class);
+			userProfileTable = Table_Access.getInstance(libraryConnection, User_Profile_Access.class);
 		} catch (SQLException e) {
             e.printStackTrace();
         }
@@ -124,7 +126,8 @@ class TableAccessTest {
 		assert bookTable != null && copyTable != null &&
 				loanTable != null && userTable != null &&
 				userAddressTable != null && interactionTable != null &&
-				groupTable != null && meetingTable != null : "Caught null tables"; 
+				groupTable != null && meetingTable != null &&
+				userProfileTable != null : "Caught null tables"; 
 	}
 
 	@AfterEach
@@ -142,6 +145,7 @@ class TableAccessTest {
 		Table_Access.removeInstance(SMInteraction_Access.class);
 		Table_Access.removeInstance(SMGroup_Access.class);
 		Table_Access.removeInstance(SMMeeting_Access.class);
+		Table_Access.removeInstance(User_Profile_Access.class);
 		
 		bookTable=null;
 		copyTable=null;
@@ -151,6 +155,7 @@ class TableAccessTest {
 		interactionTable = null; 
 		groupTable = null;
 		meetingTable = null;
+		userProfileTable = null;
 		
 		//Delete test db file if it exists
 		File dbFile = new File(activeDBLocation);
@@ -219,14 +224,22 @@ class TableAccessTest {
 				new Object[] {Copy_Access.class, -1},
 				new Object[] {Loan_Access.class, -1},
 				new Object[] {User_Access.class, -1},
+				new Object[] {User_Profile_Access.class, -1},
 				new Object[] {User_Address_Access.class, -1},
+				new Object[] {SMInteraction_Access.class, -1},
+				new Object[] {SMMeeting_Access.class, -1},
+				new Object[] {SMGroup_Access.class, -1},
 				// test actual record deletions
 				//these records must exist in the Test.DB
 				new Object[] {Book_Access.class, 750},
 				new Object[] {Copy_Access.class, 2},
 				new Object[] {Loan_Access.class, 2033519},
 				new Object[] {User_Access.class, 8},
-				new Object[] {User_Address_Access.class, 10}
+				new Object[] {User_Address_Access.class, 10},
+				new Object[] {User_Profile_Access.class, 1},
+				new Object[] {SMInteraction_Access.class, 1},
+				new Object[] {SMMeeting_Access.class, 2},
+				new Object[] {SMGroup_Access.class, 1}
 		);
 		
 	}
@@ -255,7 +268,8 @@ class TableAccessTest {
 				new Object[] {SMGroup_Access.class, Group.create(-1, 10, "newgroup1", "Dan's new group", new Date()) },
 				new Object[] {SMMeeting_Access.class, Meeting.create(-1, 3, 6, "my study session", "crushing cs401", "123 main st", new Date(), new Date())},
 				new Object[] {SMMeeting_Access.class, Meeting.create(-1, 3, -1, "my study session2", "crushing cs401 again", "123443 2nd street", new Date(), new Date())},
-				new Object[] {SMInteraction_Access.class, Interaction.create(-1, 1, 1, 1, Interaction_Type.COMMENT_ON_CONTENT, "My comment here" , new Date())} 
+				new Object[] {SMInteraction_Access.class, Interaction.create(-1, 1, 1, 1, Interaction_Type.COMMENT_ON_CONTENT, "My comment here" , new Date())}, 
+				new Object[] {User_Profile_Access.class, User_Profile.create(-1, 4, "crashTestDummy", "abstract", "picture books plz")} 
 		);
 	}
 	
@@ -359,7 +373,11 @@ class TableAccessTest {
 				new Object[] {User_Address_Access.class,User_Address.create(1, 1, "123 Main St", "Appt 2", "Labanon", "KY", "12345")},
 				new Object[] {User_Address_Access.class, User_Address.create(2, 2, "888 Main St", "", "Labanon", "KY", "12345")},
 				new Object[] {User_Address_Access.class, User_Address.create(3, 3, "999 Main St", "Unit z", "San Francisco", "CA", "12345")},
-				new Object[] {User_Address_Access.class, User_Address.create(4, 4, "1001 Main St", "", "New York", "NY", "12345")}
+				new Object[] {User_Address_Access.class, User_Address.create(4, 4, "1001 Main St", "", "New York", "NY", "12345")},
+				new Object[] {User_Profile_Access.class, User_Profile.create(1, 1, "Kripsy", "Fiction", "alskdjf")},
+				new Object[] {SMInteraction_Access.class, Interaction.create(1, 20, 1, 3, Interaction_Type.SHARE_ON_CONTENT, "EDIT: I LOVEXXX THIS!", new Date())},
+				new Object[] {SMMeeting_Access.class, Meeting.create(2, 19, 1, "Updated Group Meeting", "To celebrate!", "MY HOUSE!*$", new Date(), new Date())},
+				new Object[] {SMGroup_Access.class, Group.create(1, 18, "a book club!" , "drinking and books! Duh!", new Date())}
 		);
 	}
 	
@@ -438,5 +456,62 @@ class TableAccessTest {
 		);
 	}
 
-
+	@Test
+	public static void testUserBookLists() {
+		Map<Integer, Book> faveExpected = new HashMap<>();
+		Map<Integer, Book> faveActual = null;
+		Map<Integer, Book> recentExpected = new HashMap<>();
+		Map<Integer, Book> recentActual = null; 
+		try {
+			faveExpected.put(754, bookTable.read(754));
+			faveExpected.put(760, bookTable.read(760));
+			recentExpected.put(749, bookTable.read(749));
+			recentExpected.put(750, bookTable.read(750));
+			faveActual = userTable.getFavorites(1);
+			recentActual = userTable.getRecentBooks(1);
+		}catch (SQLException e) {
+			SQLException e2 = new SQLException("Caught exception testUserBookLists test", e);
+            e2.printStackTrace();
+		}
+		
+		assertEquals(faveExpected, faveActual);
+		assertEquals(recentExpected, recentActual);
+		
+	}
+	
+	/**
+	 * Tests the accessor methods for the several join queries
+	 * including getGroupMembers, getGroups, and getMeetings
+	 */
+	@Test
+	public static void testGroupMemberLists() {
+		Map<Integer, User> usersExpected = new HashMap<>();
+		Map<Integer, User> usersActual = null;
+		Map<Integer, Group> groupsExpected = new HashMap<>();
+		Map<Integer, Group> groupsActual = null; 
+		Map<Integer, Meeting> meetingsExpected = new HashMap<>();
+		Map<Integer, Meeting> meetingsActual = null; 
+		try {
+			usersExpected.put(1, userTable.read(1));
+			usersExpected.put(4, userTable.read(4));
+			groupsExpected.put(1, groupTable.read(1));
+			meetingsExpected.put(2, meetingTable.read(2));
+			meetingsExpected.put(3, meetingTable.read(3));
+			
+			
+			
+			usersActual = groupTable.getGroupMembers(1);
+			groupsActual = userTable.getGroups(1);
+			meetingsActual = userTable.getMeetings(1);
+			
+		}catch (SQLException e) {
+			SQLException e2 = new SQLException("Caught exception testGroupMemberLists test", e);
+            e2.printStackTrace();
+		}
+		
+		assertEquals(usersExpected, usersActual);
+		assertEquals(groupsExpected, groupsActual);
+		assertEquals(meetingsExpected, meetingsActual);
+		
+	}
 }

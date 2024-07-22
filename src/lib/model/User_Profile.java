@@ -38,9 +38,6 @@ public class User_Profile implements Has_ID, Has_Copy<User_Profile> {
 
     public void setLiteraryPreferences(String literaryPreferences) {this.literaryPreferences = literaryPreferences; }
 
-//TODO implement favorite book IDs
-//TODO implement recent book IDs
- // Overriding equals method
 
     @Override
     public boolean equals(Object o) {
@@ -50,8 +47,9 @@ public class User_Profile implements Has_ID, Has_Copy<User_Profile> {
         User_Profile profile = (User_Profile) o;
 
         if (Profile_Id != profile.getID()) return false;  // Compare the ids
-        if (username != profile.getUsername()) return false;
-        if (!readingHabits.equals(getReadingHabits())) return false;
+        if (!username.equals(profile.getUsername())) return false;
+        if (User_Id != profile.getUserId()) return false; 
+        if (!readingHabits.equals(profile.getReadingHabits())) return false;
         if (!literaryPreferences.equals(profile.getLiteraryPreferences())) return false;
 
         return true;
@@ -64,6 +62,23 @@ public class User_Profile implements Has_ID, Has_Copy<User_Profile> {
         result = 31 * result + username.hashCode();
 
         return result;
+    }
+    
+    @Override
+    public String toString() {
+    	StringBuilder output = new StringBuilder();
+		output.append("Profile ID:\t")
+			.append(this.Profile_Id)
+			.append("\nUser ID:\t")
+			.append(this.User_Id)
+			.append("\nUsername:\t")
+			.append(this.username)
+			.append("\nLiterary Prefs:\t")
+			.append(this.literaryPreferences)
+			.append("\nReading Habits:\t")
+			.append(this.readingHabits)
+			.append("\n");
+		return output.toString();
     }
 
     public static User_Profile create(int id, int user_Id, String username, String litPrefs, String readingHabits) {

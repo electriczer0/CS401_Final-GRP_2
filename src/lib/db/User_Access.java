@@ -1,5 +1,4 @@
 package lib.db;
-//TODO Add methods to access Group / User joints from Meeting type
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -7,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,8 +54,7 @@ public class User_Access extends Table_Access<User> {
         super(User.class);
     }
 
-   
-
+    //Getter / Setters
     protected  List<String> getTableSchema(){
 		return this.schema;
 	}
@@ -107,9 +106,10 @@ public class User_Access extends Table_Access<User> {
      * @throws SQLException
      */
     public Map<Integer, Group> getGroups(int userID) throws SQLException {
-        String sql = "SELECT g.GroupID, g.Type, g.Description, g.Name, g.MeetingLocation, g.MeetingGroupID, g.MeetingTimestamp, g.Timestamp "
+        String sql = "SELECT g.GroupID, g.OwnerID, g.Type, g.Description, g.Name, g.Timestamp "
                    + "FROM SMGroups g "
                    + "INNER JOIN SMGroupMembers gm ON g.GroupID = gm.GroupID "
+                   + "INNER JOIN SMGroups grp ON gm.GroupID = grp.GroupID AND grp.Type='Group' "
                    + "WHERE gm.UserID = ?";
 
         Map<Integer, Group> groups = new HashMap<>();
@@ -136,6 +136,47 @@ public class User_Access extends Table_Access<User> {
 
         return groups;
     }
+    
+    /**
+     * Return meetings associated with a user
+     * @param userID
+     * @return a Map<Integer, Group> where Integer is the GroupID
+     * @throws SQLException
+     */
+    public Map<Integer, Meeting> getMeetings(int userID) throws SQLException {
+        String sql = "SELECT g.GroupID, g.OwnerID, g.Type, g.Description, g.Name, g.MeetingLocation, g.MeetingGroupID, g.MeetingTimestamp, g.Timestamp "
+                   + "FROM SMGroups g "
+                   + "INNER JOIN SMGroupMembers gm ON g.GroupID = gm.GroupID "
+                   + "INNER JOIN SMGroups grp ON gm.GroupID = grp.GroupID AND grp.Type='Meeting' "
+                   + "WHERE gm.UserID = ?";
+
+        Map<Integer, Meeting> meetings = new HashMap<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int groupID = rs.getInt("GroupID");
+                    int ownerID = rs.getInt("OwnerID");
+                    String type = rs.getString("Type");
+                    String description = rs.getString("Description");
+                    String name = rs.getString("Name");
+                    String meetingLocation = rs.getString("MeetingLocation");
+                    int meetingGroupID = rs.getInt("MeetingGroupID");
+                    java.sql.Date meetingTimestamp = rs.getDate("MeetingTimestamp");
+                    java.sql.Date timestamp = rs.getDate("Timestamp");
+
+                    Meeting meeting = Meeting.create(groupID, ownerID, meetingGroupID, name, description, meetingLocation, meetingTimestamp, timestamp);
+                    meeting.setType(type);
+                    meetings.put(groupID, meeting);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Failed to retrieve groups for user ID: " + userID, e);
+        }
+
+        return meetings;
+    }
 
     /**
      * Removes a user's group affiliation be deleting from SMGroupMembers
@@ -155,30 +196,168 @@ public class User_Access extends Table_Access<User> {
         }
     }
 
-    public Map<Integer, User> getGroupMembers(int groupID) throws SQLException {
-        String sql = "SELECT u.UserID, u.Username, u.OtherFields " // Replace u.OtherFields with actual fields
-                   + "FROM Users u "
-                   + "INNER JOIN SMGroupMembers gm ON u.UserID = gm.UserID "
-                   + "WHERE gm.GroupID = ?";
+    /**
+     * Returns a user's favorite books by querying a join table 
+     * @param userID The user in question
+     * @return Map<Integer, Book> where Integer is the BookID. 
+     * @throws SQLException
+     */
+    public Map<Integer, Book> getFavorites(int userID) throws SQLException{
+    	String sql = "SELECT b.BookID, b.Title, b.Author, b.ISBN "
+                + "FROM Books b "
+                + "INNER JOIN FavBooks fb ON b.BookID = fb.BookID "
+                + "WHERE fb.UserID = ?";
 
-        Map<Integer, User> groupMembers = new HashMap<>();
+     Map<Integer, Book> favoriteBooks = new HashMap<>();
+
+     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+         stmt.setInt(1, userID);
+         try (ResultSet rs = stmt.executeQuery()) {
+             while (rs.next()) {
+                 int bookID = rs.getInt("BookID");
+                 String title = rs.getString("Title");
+                 String author = rs.getString("Author");
+                 String ISBN = rs.getString("ISBN");
+                 Book book = Book.create(bookID, author, ISBN, title);
+                 favoriteBooks.put(bookID, book);
+             }
+         }
+     } catch (SQLException e) {
+         throw new SQLException("Failed to retrieve favorite books for user ID: " + userID, e);
+     }
+
+     return favoriteBooks;
+ }
+    	
+    /**
+     * Insert favorite books record into FavBooks join table
+     * NOTE: This does NOT user the Books table. 
+     * @param userID
+     * @param bookID
+     * @throws SQLException
+     */
+    public void addFavorite(int userID, int bookID) throws SQLException {
+        String sql = "INSERT INTO FavBooks (UserID, BookID) VALUES (?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, groupID);
+            stmt.setInt(1, userID);
+            stmt.setInt(2, bookID);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Failed to add favorite book for user ID: " + userID + " and book ID: " + bookID, e);
+        }
+    }
+    
+    /**
+     * Remove a favorite from the FavBooks join table based on userID and bookID
+     * Will do nothing and report no errors if there are no records matching userID and bookID
+     * @param userID
+     * @param bookID
+     * @throws SQLException
+     */
+    public void removeFavorite(int userID, int bookID) throws SQLException {
+        String sql = "DELETE FROM FavBooks WHERE UserID = ? AND BookID = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            stmt.setInt(2, bookID);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Failed to remove favorite book for user ID: " + userID + " and book ID: " + bookID, e);
+        }
+    }
+    
+    /**
+     * Returns a Map of recent books from the RecentBooks table
+     * @param userID the User in question
+     * @param days how days in the past to look
+     * @return
+     * @throws SQLException
+     */
+    public Map<Integer, Book> getRecentBooks(int userID, int days) throws SQLException {
+        String sql = "SELECT b.BookID, b.Title, b.Author, b.ISBN"
+        		   + "FROM Books b"
+        		   + "INNER JOIN RecentBooks rb ON b.BookID = rb.BookID"
+                   + "WHERE rb.UserID = ? AND rb.ActivityDate >= DATE('now', '-? days')";
+        
+        Map<Integer, Book> recentBooks = new HashMap<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            stmt.setInt(2, days);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    int userID = rs.getInt("UserID");
-                    String firstName = rs.getString("NameFirst");
-                    String lastName = rs.getString("NameLast");
-                    String type = rs.getString("Type");
-                    User user = User.create(userID, firstName, lastName, type);
-                    groupMembers.put(userID, user);
+                    int bookID = rs.getInt("BookID");
+                    String title = rs.getString("Title");
+                    String author = rs.getString("Author");
+                    String isbn = rs.getString("ISBN");
+                    Book book = Book.create(bookID, author, isbn, title);
+                    recentBooks.put(bookID, book);
                 }
             }
         } catch (SQLException e) {
-            throw new SQLException("Failed to retrieve group members for group ID: " + groupID, e);
+            throw new SQLException("Failed to retrieve recent books for user ID: " + userID, e);
         }
 
-        return groupMembers;
+        return recentBooks;
     }
+
+    /**
+     * Add a book to the recent books list
+     * @param userID the user to whom it should be added
+     * @param bookID the book to add
+     * @param date the date on which the book was accessed
+     * @throws SQLException
+     */
+    public void addRecentBook(int userID, int bookID, Date date) throws SQLException {
+        String sql = "INSERT INTO RecentBooks (UserID, BookID, ActivityDate) VALUES (?, ?, ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            stmt.setInt(2, bookID);
+            stmt.setDate(3, (java.sql.Date) date);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Failed to add recent book for user ID: " + userID + " and book ID: " + bookID, e);
+        }
+    }
+
+    /**
+     * Deletes the recent books records from RecentBooks table specified by params
+     * @param userID the user in question
+     * @param bookID the book in question
+     * @param date the recency date
+     * @return true if 1 or more records deleted else false
+     * @throws SQLException
+     */
+    public boolean removeRecentBook(int userID, int bookID, Date date) throws SQLException {
+        String sql = "DELETE FROM RecentBooks WHERE UserID = ? AND BookID = ? AND ActivityDate = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            stmt.setInt(2, bookID);
+            stmt.setDate(3, (java.sql.Date) date);
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected == 0) {
+                // No rows were affected, meaning no matching record was found
+                return false;
+            }
+            return true;
+        } catch (SQLException e) {
+            throw new SQLException("Failed to remove recent book for user ID: " + userID + " and book ID: " + bookID, e);
+        }
+    }
+
+    /**
+     * Convenience function returns books from the last 30 days 
+     * @param userID user in question
+     * @return books accessed w/in the last 30 days
+     * @throws SQLException
+     */
+    public Map<Integer, Book> getRecentBooks(int userID) throws SQLException{
+    	return getRecentBooks(userID, 30);
+    }
+
+
 }

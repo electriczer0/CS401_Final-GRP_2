@@ -63,7 +63,11 @@ public class Meeting extends Grouping implements Has_Copy<Meeting> {
 
         Meeting meeting = (Meeting) o;
 
-        if(!super.equals(meeting)) return false; 
+        if(this.id != meeting.getID()) return false;
+        if(this.description != null && !this.description.equals(meeting.getDescription())) return false;
+        if(this.name != null && !this.name.equals(meeting.getName())) return false;
+        if(this.owner_Id != meeting.getOwnerId()) return false; 
+        if(this.timestamp != null && !this.timestamp.equals( meeting.getTimestamp())) return false; 
         if(this.meetingLocation != null && !this.meetingLocation.equals(meeting.getMeetingLocation())) return false;
         if(this.meetingTimestamp != null && !this.meetingTimestamp.equals(meeting.getMeetingTime())) return false;
         if(this.group_Id != meeting.getGroupId()) return false;

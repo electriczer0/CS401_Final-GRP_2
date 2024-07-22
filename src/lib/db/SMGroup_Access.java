@@ -12,6 +12,8 @@ import lib.model.*;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SMGroup_Access extends Table_Access<Group> {
@@ -29,8 +31,7 @@ public class SMGroup_Access extends Table_Access<Group> {
 					"MeetingGroupID INTEGER",
 					"MeetingTimestamp DATETIME",
 					"Timestamp DATETIME NOT NULL",
-					"FOREIGN KEY (OwnerID) REFERENCES Users(UserID)",
-					"FOREIGN KEY (MeetingGroupID) REFERENCES SMGroups(GroupID) ON DELETE CASCADE"
+					"FOREIGN KEY (OwnerID) REFERENCES Users(UserID)"
 					);
 
 	private final Map<String, Method> columnGetterMap = new HashMap<>();
@@ -108,7 +109,73 @@ public class SMGroup_Access extends Table_Access<Group> {
     	
     }
     
-   
+    public Map<Integer, User> getGroupMembers(int groupID) throws SQLException {
+        String sql = "SELECT u.UserID, u.NameFirst, u.NameLast, u.Type "
+                   + "FROM Users u "
+                   + "INNER JOIN SMGroupMembers gm ON u.UserID = gm.UserID "
+                   + "INNER JOIN SMGroups grp ON gm.GroupID = grp.GroupID AND grp.Type='Group' "
+                   + "WHERE gm.GroupID = ?";
+
+        Map<Integer, User> groupMembers = new HashMap<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, groupID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int userID = rs.getInt("UserID");
+                    String firstName = rs.getString("NameFirst");
+                    String lastName = rs.getString("NameLast");
+                    String type = rs.getString("Type");
+                    User user = User.create(userID, firstName, lastName, type);
+                    groupMembers.put(userID, user);
+                }
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Failed to retrieve group members for group ID: " + groupID, e);
+        }
+
+        return groupMembers;
+    }
+
+    /**
+     * Add a user to a group by creating a record in SMGroupMembers
+     * @param userID
+     * @param groupID
+     * @throws SQLException
+     */
+    public void addUser(int userID, int groupID) throws SQLException {
+        String sql = "INSERT INTO SMGroupMembers (UserID, GroupID) VALUES (?, ?)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            stmt.setInt(2, groupID);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Failed to add group for user ID: " + userID + " and group ID: " + groupID, e);
+        }
+    }
+    
+    /**
+     * Removes a user's group affiliation be deleting from SMGroupMembers
+     * @param userID
+     * @param groupID
+     * @throws SQLException
+     */
+    public void remUser(int userID, int groupID) throws SQLException {
+        String sql = "DELETE FROM SMGroupMembers WHERE UserID = ? AND GroupID = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            stmt.setInt(2, groupID);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new SQLException("Failed to remove group for user ID: " + userID + " and group ID: " + groupID, e);
+        }
+    }
+
+    
+
+
     
     
 }
