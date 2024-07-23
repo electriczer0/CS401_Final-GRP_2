@@ -109,7 +109,7 @@ public class LibraryView {
         switch (action){
             case ADD_USER -> {addNewUser(sc); break;}
             case REMOVE_USER -> {removeUser(sc); break;}
-            case LIST_USERS -> {listUsers(sc); break;}
+            case LIST_USERS -> {listUsers(); break;}
             case ADD_BOOK -> {addNewBook(sc); break;}
             case REMOVE_BOOK -> {removeBook(sc); break;}
             case LIST_BOOKS -> {listBooks(); break;}
@@ -137,7 +137,8 @@ public class LibraryView {
         String id = sc.next();
         LibraryController.deleteUserById(id);
     }
-    private static void listUsers(Scanner sc){
+    //Public to permit the top level call from the init
+    public static void listUsers(){
         List<User> userList = LibraryController.listUsers();
         /*
         User k = new User();

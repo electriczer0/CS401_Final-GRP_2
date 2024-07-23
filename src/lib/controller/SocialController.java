@@ -40,8 +40,9 @@ public class SocialController {
             }
             //sort the list by timestamp
             Collections.sort(totalInteractions, Comparator.comparing(Interaction::getTimestamp));
+            Collections.reverse(totalInteractions);
             //reverse order for descending
-            return totalInteractions.reversed();
+            return totalInteractions;
 
         } catch (SQLException e){
             e.printStackTrace();
@@ -63,7 +64,8 @@ public class SocialController {
             List<Interaction> interactions = new ArrayList<Interaction>();
             interactions.addAll(thisGroupsInteractions.values());
             Collections.sort(interactions, Comparator.comparing(Interaction::getTimestamp));
-            return interactions.reversed();
+            Collections.reverse(interactions);
+            return interactions;
 
         } catch (SQLException e){
             e.printStackTrace();
@@ -477,6 +479,29 @@ public class SocialController {
      * @param time
      */
     public static void updateMeetingWithMeetingId(int meetingId, User user, String location, String day, String time){
-
+        try {
+            SMMeeting_Access meetingAccessor = SMMeeting_Access.getInstance();
+            Meeting thisMeeting = getMeetingByMeetingId(meetingId);
+            if (thisMeeting != null && user.getID() == thisMeeting.getOwnerId()){
+                if (location.length() > 0){
+                    thisMeeting.setMeetingLocation(location);
+                }
+                if (day.length() > 0 && time.length() > 0){
+                    Date thisDate = new Date();
+                    String theMonth = day.substring(0, 2);
+                    String theDay = day.substring(3, 5);
+                    String theYear = day.substring(6, 10);
+                    thisDate.setMonth(Integer.parseInt(theMonth) - 1);
+                    thisDate.setYear(Integer.parseInt(theYear));
+                    thisDate.setDate(Integer.parseInt(theDay));
+                    thisDate.setHours(Integer.parseInt(time.substring(0, 1)));
+                    thisDate.setMinutes(Integer.parseInt(time.substring(2, 3)));
+                    thisMeeting.setMeetingTimestamp(thisDate);
+                }
+            }
+            meetingAccessor.update(thisMeeting);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 }
