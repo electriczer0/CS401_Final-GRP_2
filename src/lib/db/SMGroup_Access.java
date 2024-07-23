@@ -31,7 +31,7 @@ public class SMGroup_Access extends Table_Access<Group> {
 					"MeetingGroupID INTEGER",
 					"MeetingTimestamp DATETIME",
 					"Timestamp DATETIME NOT NULL",
-					"FOREIGN KEY (OwnerID) REFERENCES Users(UserID)"
+					"FOREIGN KEY (OwnerID) REFERENCES Users(UserID) ON DELETE SET NULL"
 					);
 
 	private final Map<String, Method> columnGetterMap = new HashMap<>();

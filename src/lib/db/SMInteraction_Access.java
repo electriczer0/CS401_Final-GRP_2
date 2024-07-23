@@ -25,7 +25,7 @@ public class SMInteraction_Access extends Table_Access<Interaction> {
 					"Content TEXT",
 					"Type TEXT NOT NULL",
 					"Timestamp DATETIME NOT NULL",
-					"FOREIGN KEY (UserID) REFERENCES Users(UserID)",
+					"FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE SET NULL",
 					"FOREIGN KEY (GroupID) REFERENCES SMGroups(GroupID) ON DELETE CASCADE"
 					);
 
