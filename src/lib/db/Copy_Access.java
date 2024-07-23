@@ -2,7 +2,11 @@ package lib.db;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,4 +73,32 @@ public class Copy_Access extends Table_Access<Copy> {
     public static Copy_Access getInstance() {
     	return Table_Access.getInstance(Copy_Access.class);
     }
+    
+    public Loan getActiveLoan(int copyID) throws SQLException{
+    	String sql = "SELECT LoanID, CopyID, UserID, DateOut, DateDue, IsActive "
+                + "FROM Loans "
+                + "WHERE CopyID = ? AND IsActive = TRUE";
+
+     Loan activeLoan = null;
+
+     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+         stmt.setInt(1, copyID);
+         try (ResultSet rs = stmt.executeQuery()) {
+             if (rs.next()) {
+                 int loanID = rs.getInt("LoanID");
+                 int id = rs.getInt("CopyID");
+                 int userID = rs.getInt("UserID");
+                 Date dateOut = rs.getDate("DateOut");
+                 Date dateDue = rs.getDate("DateDue");
+                 boolean isActive = rs.getBoolean("IsActive");
+                 activeLoan = Loan.create(loanID, id, userID, dateOut, dateDue, isActive);
+             }
+         }
+     } catch (SQLException e) {
+         throw new SQLException("Failed to retrieve active loans for Copy: " + copyID, e);
+     }
+
+     return activeLoan;
+ }
+    
 }

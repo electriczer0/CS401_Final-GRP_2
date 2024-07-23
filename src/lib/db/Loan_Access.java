@@ -2,6 +2,8 @@ package lib.db;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
@@ -100,6 +102,33 @@ public class Loan_Access extends Table_Access<Loan> {
     public static Loan_Access getInstance() {
     	return Table_Access.getInstance(Loan_Access.class);
     }
+    
+    public Map<Integer, Loan> readAllActive() throws SQLException{
+    	String sql = "SELECT LoanID, CopyID, UserID, DateOut, DateDue, IsActive "
+                + "FROM Loans "
+                + "WHERE IsActive = TRUE";
+
+     Map<Integer, Loan> activeLoans = new HashMap<>();
+
+     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+         try (ResultSet rs = stmt.executeQuery()) {
+             while (rs.next()) {
+                 int loanID = rs.getInt("LoanID");
+                 int copyID = rs.getInt("CopyID");
+                 int id = rs.getInt("UserID");
+                 Date dateOut = rs.getDate("DateOut");
+                 Date dateDue = rs.getDate("DateDue");
+                 boolean isActive = rs.getBoolean("IsActive");
+                 Loan loan = Loan.create(loanID, copyID, id, dateOut, dateDue, isActive);
+                 activeLoans.put(loanID, loan);
+             }
+         }
+     } catch (SQLException e) {
+         throw new SQLException("Failed to retrieve all active loans ", e);
+     }
+
+     return activeLoans;
+ }
 
 }
 
