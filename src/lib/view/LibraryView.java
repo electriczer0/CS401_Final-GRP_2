@@ -171,24 +171,22 @@ public class LibraryView {
         LibraryController.deleteBookById(id);
     }
     private static void listBooks(){
+    	//TODO reconsider logic. This will print X copies of each book where X is the number of copies we have. 
+    	// Instead, perhaps we should call to Book.readAll() directly. or if we want to ensure that there is >0 copies of the book
+    	// we could load the copy table, and then run a filter for unique BookIDs
         List<Copy> bookList = LibraryController.listCopies();
-        /*
-        Book k = new Book();
-        k.setID(93);
-        k.setAuthor("John Doo");
-        k.setTitle("Paradise Found");
-        k.setISBN("238732895");
-        bookList.add(k);*/
         System.out.println("------------------------------------------------------------------------------------------"); //90 dashes
         System.out.println("| Id   | Title                          | Author                         | ISBN          |");
         System.out.println("------------------------------------------------------------------------------------------");
         for (Copy copy: bookList){
             //For every copy of the book, we look up the original book.
             Book thisbook = LibraryController.getBookById(copy.getID());
-            System.out.println("| " + Utils.fitString(copy.getID() + "", 4) +
-                    " | " + Utils.fitString(thisbook.getTitle(), 30) +
-                    " | " + Utils.fitString(thisbook.getAuthor(), 30) +
-                    " | " + Utils.fitString(thisbook.getISBN(), 13) + " |");
+            if(thisbook != null) {
+	            System.out.println("| " + Utils.fitString(copy.getID() + "", 4) +
+	                    " | " + Utils.fitString(thisbook.getTitle(), 30) +
+	                    " | " + Utils.fitString(thisbook.getAuthor(), 30) +
+	                    " | " + Utils.fitString(thisbook.getISBN(), 13) + " |");
+            }
         }
         System.out.println("------------------------------------------------------------------------------------------");
     }
@@ -209,10 +207,17 @@ public class LibraryView {
         System.out.println("------------------------------------------------------------------------------------------");
     }
     private static void checkAvailability(Scanner sc){
-        System.out.println("Enter the id of the book you'd like to check.");
+    	//TODO need to work on logic here. what if entered book id doesn't exist? 
+        System.out.println("Enter the id of the book copy you'd like to check.");
         String id = sc.next();
-        Loan loan = LibraryController.checkIfBookHasLoan(id);
-        if (loan == null){
+        
+        Copy copy = LibraryController.getCopyById(Integer.parseInt(id));
+        Loan loan = LibraryController.checkIfCopyHasLoan(id);
+        Book book = LibraryController.getBookById(copy.getBookID());
+        
+        if (book == null) {
+        	System.out.println("Book does not exist.");
+        } else if (loan == null){
             System.out.println("Book is available.");
         } else {
             System.out.println("This book was checked out on " + loan.getDateOut().toString());
@@ -234,13 +239,15 @@ public class LibraryView {
         System.out.println("------------------------------------------------------------------------------------------"); //90 dashes
         System.out.println("| Book Id | Title                           | Author                       | Due back by |");
         System.out.println("------------------------------------------------------------------------------------------");
-        for (Loan loan: loanList){
-            Copy c = LibraryController.getCopyById(loan.getCopyID());
-            Book thisBook = LibraryController.getBookById(c.getBookID());
-            System.out.println("| " + Utils.fitString(loan.getCopyID() + "", 7) +
-                    " | " + Utils.fitString(thisBook.getTitle(), 31) +
-                    " | " + Utils.fitString( thisBook.getAuthor(), 28) +
-                    " | " + Utils.fitString(loan.getDateDue().toString(), 11) + " |");
+        if( loanList != null && !loanList.isEmpty()) {
+	        for (Loan loan: loanList){
+	            Copy c = LibraryController.getCopyById(loan.getCopyID());
+	            Book thisBook = LibraryController.getBookById(c.getBookID());
+	            System.out.println("| " + Utils.fitString(loan.getCopyID() + "", 7) +
+	                    " | " + Utils.fitString(thisBook.getTitle(), 31) +
+	                    " | " + Utils.fitString( thisBook.getAuthor(), 28) +
+	                    " | " + Utils.fitString(loan.getDateDue().toString(), 11) + " |");
+	        }
         }
         System.out.println("------------------------------------------------------------------------------------------");
     }

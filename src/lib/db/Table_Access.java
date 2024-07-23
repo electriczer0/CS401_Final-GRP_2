@@ -579,6 +579,19 @@ public abstract class Table_Access<T extends Has_ID> {
 		return date; 
 	}
 	
+	/**
+	 * convenience function which checks if the specified record exists. 
+	 * @param recordID
+	 * @return
+	 * @throws SQLException
+	 */
+	public boolean exists(int recordID) throws SQLException {
+		T r = null;
+		r = read(recordID);
+		return r != null; 
+		
+	}
+	
 	@Override
 	public String toString() {
 		return this.getClass().toString();

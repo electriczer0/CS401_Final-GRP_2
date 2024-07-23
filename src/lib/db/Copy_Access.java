@@ -88,8 +88,8 @@ public class Copy_Access extends Table_Access<Copy> {
                  int loanID = rs.getInt("LoanID");
                  int id = rs.getInt("CopyID");
                  int userID = rs.getInt("UserID");
-                 Date dateOut = rs.getDate("DateOut");
-                 Date dateDue = rs.getDate("DateDue");
+                 Date dateOut = Date.class.cast(parseValue(Date.class,rs.getObject("DateOut")));
+                 Date dateDue = Date.class.cast(parseValue(Date.class, rs.getObject("DateDue")));
                  boolean isActive = rs.getBoolean("IsActive");
                  activeLoan = Loan.create(loanID, id, userID, dateOut, dateDue, isActive);
              }

@@ -177,12 +177,17 @@ public class LibraryController {
      * @param copyId
      * @return
      */
-    public static Loan checkIfBookHasLoan(String copyId){
+    public static Loan checkIfCopyHasLoan(String copyId){
         Loan loan = null;
-        
     	try {
     		int idNum = Integer.parseInt(copyId);
-    		loan = Copy_Access.getInstance().getActiveLoan(idNum);
+    		Copy copy = Copy_Access.getInstance().read(idNum);
+    		if(Book_Access.getInstance().exists(copy.getBookID())) {
+    			
+    			loan = Copy_Access.getInstance().getActiveLoan(idNum);
+    		} else {
+    			System.out.println("Book does not exist!");
+    		}
     	} catch (SQLException e) {
     		e.printStackTrace();
     	}
@@ -200,7 +205,7 @@ public class LibraryController {
     	calendar.add(Calendar.DAY_OF_YEAR, 14);
     	Date dueDate = calendar.getTime();
     	
-    	if(checkIfBookHasLoan(copyId) != null) {
+    	if(checkIfCopyHasLoan(copyId) != null) {
     		System.out.println("Error: The book is already checked out!");
     		return; 
     	}

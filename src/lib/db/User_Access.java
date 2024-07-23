@@ -123,7 +123,7 @@ public class User_Access extends Table_Access<User> {
                     String type = rs.getString("Type");
                     String description = rs.getString("Description");
                     String name = rs.getString("Name");
-                    java.sql.Date timestamp = rs.getDate("Timestamp");
+                    Date timestamp = Date.class.cast(parseValue(Date.class, rs.getObject("Timestamp")));
 
                     Group group = Group.create(groupID, ownerID, name, description, timestamp);
                     group.setType(type);
@@ -248,15 +248,15 @@ public class User_Access extends Table_Access<User> {
                  int loanID = rs.getInt("LoanID");
                  int copyID = rs.getInt("CopyID");
                  int id = rs.getInt("UserID");
-                 Date dateOut = rs.getDate("DateOut");
-                 Date dateDue = rs.getDate("DateDue");
+                 Date dateOut = Date.class.cast(parseValue(Date.class, rs.getObject("DateOut")));
+                 Date dateDue = Date.class.cast(parseValue(Date.class, rs.getObject("DateDue")));
                  boolean isActive = rs.getBoolean("IsActive");
                  Loan loan = Loan.create(loanID, copyID, id, dateOut, dateDue, isActive);
                  activeLoans.put(loanID, loan);
              }
          }
      } catch (SQLException e) {
-         throw new SQLException("Failed to retrieve favorite loans for user ID: " + userID, e);
+         throw new SQLException("Failed to retrieve active loans for user ID: " + userID, e);
      }
 
      return activeLoans;
