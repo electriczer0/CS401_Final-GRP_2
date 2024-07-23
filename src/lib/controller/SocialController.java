@@ -2,6 +2,7 @@ package lib.controller;
 
 import lib.db.SMGroup_Access;
 import lib.db.SMInteraction_Access;
+import lib.db.SMMeeting_Access;
 import lib.db.User_Access;
 import lib.model.Group;
 import lib.model.Interaction;
@@ -45,6 +46,7 @@ public class SocialController {
         } catch (SQLException e){
             e.printStackTrace();
         }
+        return null;
     }
 
     /**
@@ -66,6 +68,7 @@ public class SocialController {
         } catch (SQLException e){
             e.printStackTrace();
         }
+        return null;
     }
 
     /**
@@ -121,6 +124,7 @@ public class SocialController {
         } catch (SQLException e){
             e.printStackTrace();
         }
+        return null;
     }
 
     /**
@@ -280,35 +284,73 @@ public class SocialController {
         } catch (SQLException e){
             e.printStackTrace();
         }
+        return null;
     }
 
     /**
      * Retrieves a group by id, or null if it doesn't exist.
-     * @param id
+     * @param groupId
      * @return
      */
-    public static Group getGroupByGroupId(int id){
-        return Group.create();
+    public static Group getGroupByGroupId(int groupId){
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            HashMap<String, String> accessor = new HashMap<>();
+            accessor.put("id", Integer.toString(groupId));
+            Map<Integer, Group> group = groupAccessor.find(accessor);
+            if (group.values().size() == 1){
+                ArrayList<Group> tbr = new ArrayList<>(group.values());
+                return tbr.get(0); //We enforce id uniqueness so the values should only have one element
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
      * Retrieves a meeting by id, or null if it doesn't exist.
-     * @param id
+     * @param meetingId
      * @return
      */
-    public static Meeting getMeetingByMeetingId(int id){
-        return Meeting.create();
+    public static Meeting getMeetingByMeetingId(int meetingId){
+        try {
+            SMMeeting_Access meetingAccessor = SMMeeting_Access.getInstance();
+            HashMap<String, String> accessor = new HashMap<>();
+            accessor.put("id", Integer.toString(meetingId));
+            Map<Integer, Meeting> meeting = meetingAccessor.find(accessor);
+            if (meeting.values().size() == 1){
+                ArrayList<Meeting> tbr = new ArrayList<>(meeting.values());
+                return tbr.get(0); //We enforce id uniqueness so the values should only have one element
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
      * Updates the group with the targeted id by setting a new description, then re-saving the record.
      * Does *not* update the field if the argument is null or empty.
      * Reject the update if the user does not own the group (which means they dont have permissions to modify it).
-     * @param id
+     * @param groupId
      * @param description
      */
-    public static void updateGroupWithGroupId(int id, User user, String description){
-
+    public static void updateGroupWithGroupId(int groupId, User user, String description){
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Group thisGroup = getGroupByGroupId(groupId);
+            if (thisGroup != null && thisGroup.getOwnerId() == user.getID()){
+                if (description.length() > 0){
+                    thisGroup.setDescription(description);
+                    groupAccessor.update(thisGroup);
+                }
+            } else {
+                System.out.println("User does not own this group.");
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -317,7 +359,18 @@ public class SocialController {
      * @param user
      */
     public static void joinGroup(int groupId, User user){
-
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Group thisGroup = getGroupByGroupId(groupId);
+            Map<Integer, User> groupUsers = groupAccessor.getGroupMembers(groupId);
+            if (thisGroup != null && !groupUsers.isEmpty() && !groupUsers.values().contains(user)){
+                groupAccessor.addUser(user.getID(), groupId);
+            } else {
+                System.out.println("Group does not exist, or group already contains this user.");
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -326,7 +379,18 @@ public class SocialController {
      * @param user
      */
     public static void leaveGroup(int groupId, User user){
-
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Group thisGroup = getGroupByGroupId(groupId);
+            Map<Integer, User> groupUsers = groupAccessor.getGroupMembers(groupId);
+            if (thisGroup != null && !groupUsers.isEmpty() && groupUsers.values().contains(user)){
+                groupAccessor.remUser(user.getID(), groupId);
+            } else {
+                System.out.println("Group does not exist, or group didn't contain this user.");
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -334,7 +398,14 @@ public class SocialController {
      * @return
      */
     public static List<Meeting> listAllMeetings(){
-        return new ArrayList<Meeting>();
+        try {
+            SMMeeting_Access meetingAccessor = SMMeeting_Access.getInstance();
+            Map<Integer, Meeting> meetings = meetingAccessor.readAll();
+            return new ArrayList(meetings.values());
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -342,7 +413,14 @@ public class SocialController {
      * @return
      */
     public static List<Meeting> listAllMeetings(User user){
-        return new ArrayList<Meeting>();
+        try {
+            User_Access userAccessor = User_Access.getInstance();
+            Map<Integer, Meeting> meetings = userAccessor.getMeetings(UserController.getCurrentUser().getID());
+            return new ArrayList(meetings.values());
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -356,7 +434,34 @@ public class SocialController {
      * @param time
      */
     public static void createMeeting(int groupId, User user, String location, String day, String time){
+        try {
+            Group group = getGroupByGroupId(groupId);
+            SMMeeting_Access meetingAccessor = SMMeeting_Access.getInstance();
+            Date thisDate = new Date();
+            String theMonth = day.substring(0, 2);
+            String theDay = day.substring(3, 5);
+            String theYear = day.substring(6, 10);
+            thisDate.setMonth(Integer.parseInt(theMonth) - 1);
+            thisDate.setYear(Integer.parseInt(theYear));
+            thisDate.setDate(Integer.parseInt(theDay));
+            thisDate.setHours(Integer.parseInt(time.substring(0, 1)));
+            thisDate.setMinutes(Integer.parseInt(time.substring(2, 3)));
 
+            if (group != null) {
+                Meeting toBeInserted = Meeting.create(
+                        -1,
+                        user.getID(),
+                        groupId,
+                        group.getName(),
+                        group.getDescription(),
+                        location,
+                        thisDate,
+                        new Date());
+                meetingAccessor.insert(toBeInserted);
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
