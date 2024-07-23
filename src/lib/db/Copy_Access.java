@@ -80,7 +80,6 @@ public class Copy_Access extends Table_Access<Copy> {
                 + "WHERE CopyID = ? AND IsActive = TRUE";
 
      Loan activeLoan = null;
-
      try (PreparedStatement stmt = connection.prepareStatement(sql)) {
          stmt.setInt(1, copyID);
          try (ResultSet rs = stmt.executeQuery()) {

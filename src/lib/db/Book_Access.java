@@ -80,5 +80,35 @@ public class Book_Access extends Table_Access<Book> {
     public static Book_Access getInstance() {
     	return Table_Access.getInstance(Book_Access.class);
     }
+    
+    /**
+     * Queries the Copy table for a map of copies related to bookID
+     * @param bookID
+     * @return
+     * @throws SQLException
+     */
+    public Map<Integer, Copy> getBookCopies(int bookID) throws SQLException{
+    	String sql = "SELECT CopyID, BookID "
+                + "FROM Copy "
+                + "WHERE BookID = ?";
+
+     Map<Integer, Copy> bookCopies = new HashMap<>();
+
+     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+         stmt.setInt(1, bookID);
+         try (ResultSet rs = stmt.executeQuery()) {
+             while (rs.next()) {
+                 int copyID = rs.getInt("CopyID");
+                 int bID = rs.getInt("BookID");
+                 Copy copy = Copy.create(copyID, bID);
+                 bookCopies.put(copyID, copy);
+             }
+         }
+     } catch (SQLException e) {
+         throw new SQLException("Failed to retrieve Book copies for BookID: " + bookID, e);
+     }
+
+     return bookCopies;
+ }
 
 }

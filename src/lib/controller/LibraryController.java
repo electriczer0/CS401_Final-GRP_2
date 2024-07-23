@@ -177,10 +177,9 @@ public class LibraryController {
      * @param copyId
      * @return
      */
-    public static Loan checkIfCopyHasLoan(String copyId){
+    public static Loan checkIfCopyHasLoan(int idNum){
         Loan loan = null;
     	try {
-    		int idNum = Integer.parseInt(copyId);
     		Copy copy = Copy_Access.getInstance().read(idNum);
     		if(Book_Access.getInstance().exists(copy.getBookID())) {
     			
@@ -193,31 +192,42 @@ public class LibraryController {
     	}
     	return loan;
     }
+    
+    public static Loan checkIfCopyHasLoan(String copyID) {
+    	int idNum = Integer.parseInt(copyID);
+    	return checkIfCopyHasLoan(idNum);
+    	
+    }
 
     /**
      * Checks a copy of a book out to the specified user. Creates a loan for that copy and marks the date.
      * Let's say that all book loans are for two weeks.
      * @param copyId
      */
-    public static void checkoutBook(String copyId, User user){
+    public static void checkoutBook(int cId, User user){
     	
     	Calendar calendar = Calendar.getInstance();
     	calendar.add(Calendar.DAY_OF_YEAR, 14);
     	Date dueDate = calendar.getTime();
     	
-    	if(checkIfCopyHasLoan(copyId) != null) {
+    	if(checkIfCopyHasLoan(cId) != null) {
     		System.out.println("Error: The book is already checked out!");
     		return; 
     	}
     	
     	try {
-    		int cId = Integer.parseInt(copyId);
     		Loan_Access.getInstance().insert(Loan.create(-1, cId, user.getID(), new Date(), dueDate, true));
     	} catch(SQLException e) {
     		e.printStackTrace();
     	}
     	System.out.println("Book Checked Out. Due date: " + dueDate);
 
+    }
+    public static void checkoutBook(String copyId, User user){
+    	Integer cId = null; 
+  		cId = Integer.parseInt(copyId);
+  		checkoutBook(cId.intValue(), user);  
+    
     }
 
     /**
@@ -226,17 +236,58 @@ public class LibraryController {
      * for this user.
      * @param copyId
      */
-    public static void depositBook(String copyId, User user){
+    public static void depositBook(int cId, User user){
     	Loan loan = null; 
     	try {
-    		int cId = Integer.parseInt(copyId);
     		loan = Copy_Access.getInstance().getActiveLoan(cId);
     		if(loan != null) {
-    			loan.setActive(false);
-    			Loan_Access.getInstance().update(loan);
+    			if(loan.getUserID() != user.getID()) {
+    				System.out.println("Book is checked out by a different user!");
+    			}else {
+    				loan.setActive(false);
+    				Loan_Access.getInstance().update(loan);
+    			}
     		}
     	} catch (SQLException e) {
     		e.printStackTrace();
     	}
+    }
+    
+    public static void depositBook(String copyId, User user) {
+    	depositBook(Integer.parseInt(copyId), user);
+    }
+    
+    /**
+     * Return a list of Copies related to bookID
+     * Returns null and prints user message if BookID not found 
+     * @param bookID
+     * @return
+     */
+    public static List<Copy> getBookCopies(int bookID){
+    	List<Copy> copies = null;
+    	try {
+	    	if(Book_Access.getInstance().exists(bookID)) {
+		    		copies = new ArrayList<>(Book_Access.getInstance().getBookCopies(bookID).values());
+	    	} else {
+	    		System.out.println("Book ID Not Found");
+	    	}
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    	}
+    	return copies; 
+    }
+    
+    /**
+     * returns a list containing all books
+     * @return
+     */
+    public static List<Book> listBooks(){
+    	List<Book> books = null;
+    	try {
+    		books = new ArrayList<>(Book_Access.getInstance().readAll().values());
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    	}
+    	return books;
     }
 }

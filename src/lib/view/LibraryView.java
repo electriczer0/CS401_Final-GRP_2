@@ -2,12 +2,15 @@ package lib.view;
 
 import lib.controller.LibraryController;
 import lib.controller.UserController;
+import lib.db.Copy_Access;
+import lib.db.Loan_Access;
 import lib.model.Book;
 import lib.model.Copy;
 import lib.model.Loan;
 import lib.model.User;
 import lib.utilities.Utils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -27,7 +30,8 @@ enum LibraryAction {
     REMOVE_BOOK,
     LIST_BOOKS,
     GENERATE_LIBRARY_CHECKOUT_REPORT,
-    CHECK_BOOK_AVAILABLE,
+    CHECK_BOOK_COPY_AVAILABLE,
+    GENERATE_BOOK_COPIES,
     CHECKOUT_BOOK,
     DEPOSIT_BOOK,
     GENERATE_USER_CHECKOUT_REPORT
@@ -50,7 +54,8 @@ public class LibraryView {
         // between calls.
         ArrayList<LibraryAction> actions = new ArrayList<LibraryAction>();
         actions.add(LibraryAction.LIST_BOOKS);
-        actions.add(LibraryAction.CHECK_BOOK_AVAILABLE);
+        actions.add(LibraryAction.GENERATE_BOOK_COPIES);
+        actions.add(LibraryAction.CHECK_BOOK_COPY_AVAILABLE);
         actions.add(LibraryAction.GENERATE_USER_CHECKOUT_REPORT);
         if (UserController.getCurrentUser().getType().equals("Librarian")){
             actions.add(LibraryAction.ADD_USER);
@@ -66,7 +71,7 @@ public class LibraryView {
         }
         while (!exiting){
             System.out.println("Please select one of the actions available, or 'exit' to exit.");
-            System.out.println("You'll need a book id to check out or deposit a book.");
+            System.out.println("You'll need a book copy id to check out or deposit a book.");
             System.out.println("Type 'social' to switch to the Social Media platform.");
             for (int i = 0; i < actions.size(); i++){
                 System.out.println((i + 1) + ". " + printAction(actions.get(i)));
@@ -74,17 +79,24 @@ public class LibraryView {
             String input = sc.next();
             if (input.equals("social")){
                 return 1;
+            } else if (input.equals("exit")) {
+            	exiting = true;
             } else {
-                if (!input.equals("exit")) {
-                    LibraryAction action = actions.get(Integer.parseInt(input) - 1); //Sanitize
-                    dispatchAction(action, sc);
-                } else {
-                    exiting = true;
+            	try {
+            		int actionIndex = Integer.parseInt(input) - 1;
+                    if (actionIndex >= 0 && actionIndex < actions.size()) {
+                        LibraryAction action = actions.get(actionIndex);
+                        dispatchAction(action, sc);
+                    } else {
+                        System.out.println("Invalid action number. Please select a valid menu action.");
+                    }
+            		
+            	} catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a number corresponding to a menu action or a valid command.");
                 }
-            }
+              } 
         }
         return 0;
-
     }
 
     private static String printAction(LibraryAction action){
@@ -96,7 +108,8 @@ public class LibraryView {
             case REMOVE_BOOK -> {return "Remove a copy of a book from the collection.";}
             case LIST_BOOKS -> {return "List all books in the collection.";}
             case GENERATE_LIBRARY_CHECKOUT_REPORT -> {return "Print a list of all book loans.";}
-            case CHECK_BOOK_AVAILABLE -> {return "Check a book for availability.";}
+            case CHECK_BOOK_COPY_AVAILABLE -> {return "Check a book copy for availability.";}
+            case GENERATE_BOOK_COPIES -> { return "List all copies of a Book.";}
             case CHECKOUT_BOOK -> {return "Checkout an available book.";}
             case DEPOSIT_BOOK -> {return "Return a loaned book.";}
             case GENERATE_USER_CHECKOUT_REPORT -> {return "Print a list of your borrowed books.";}
@@ -114,7 +127,8 @@ public class LibraryView {
             case REMOVE_BOOK -> {removeBook(sc); break;}
             case LIST_BOOKS -> {listBooks(); break;}
             case GENERATE_LIBRARY_CHECKOUT_REPORT -> {genLibReport(); break;}
-            case CHECK_BOOK_AVAILABLE -> {checkAvailability(sc); break;}
+            case CHECK_BOOK_COPY_AVAILABLE -> {checkAvailability(sc); break;}
+            case GENERATE_BOOK_COPIES -> {listBookCopies(sc); break;}
             case CHECKOUT_BOOK -> {checkoutBook(sc); break;}
             case DEPOSIT_BOOK -> {depositBook(sc); break;}
             case GENERATE_USER_CHECKOUT_REPORT -> {genUserReport(sc); break;}
@@ -122,13 +136,112 @@ public class LibraryView {
         }
     }
 
+    private static void listBookCopies(Scanner sc) {
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    	List<Copy> copies = null;
+    	String dueBack = null;
+    	String input = null; 
+    	Integer bookID = null; 
+    	
+    	boolean validEntry = false;
+    	while(!validEntry) {
+    		System.out.println("Enter the Book ID:");
+        	input = sc.next();
+        	try {
+        		bookID = Integer.parseInt(input);
+        		if(bookID == null || bookID <0) {
+        			System.out.println("Invalid Entry!");
+        			continue;
+        		} else {
+        			validEntry = true; 
+        		}
+        	} catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number >0.");
+            }
+        	
+    	}
+    	Book book = LibraryController.getBookById(bookID);
+    	copies = LibraryController.getBookCopies(bookID);
+    	if(copies != null) {
+    		
+    		
+	    	System.out.println("------------------------------------------------------------"); //60 dashes
+	    	System.out.println("| Book: " + Utils.fitString(book.getTitle(), 51)+"|");
+	    	System.out.println("------------------------------------------------------------"); //60 dashes
+	        System.out.println("| Copy | Available?                    | Due Back          |");
+	        System.out.println("------------------------------------------------------------");
+	        
+	        for (Copy copy: copies){
+	        	Loan relatedLoan = LibraryController.checkIfCopyHasLoan(copy.getID());
+	        	boolean avail =  relatedLoan == null;
+	        	dueBack = ""; 
+	        	if(!avail) {
+	        		dueBack = dateFormat.format(relatedLoan.getDateDue());
+	        	}
+	            System.out.println("| " + Utils.fitString(copy.getID() + "", 4) +
+	                    " | " + Utils.fitString(String.valueOf(avail), 29) +
+	                    " | " + Utils.fitString( dueBack, 17) + " |");
+	        }
+	        System.out.println("------------------------------------------------------------");
+    	} else {
+    		System.out.println("No Copies Found.");
+    	}
+    	return;
+    }
     private static void addNewUser(Scanner sc){
-        System.out.println("What is the new user's first name?");
-        String fn = sc.next();
-        System.out.println("What is the new user's last name?");
-        String ln = sc.next();
-        System.out.println("Type out this user's role. Ex. 'Patron' or 'Librarian'.");
-        String type = sc.next();
+    	boolean validEntry = false; 
+    	boolean allValid = false; 
+    	String fn = null;
+    	String ln = null;
+    	String input = null; 
+    	Integer selection = null;
+    	while(!allValid) {
+    		fn = null;
+    		ln = null; 
+    		input = null;
+    		selection = null;
+    		validEntry = false; 
+	    	 while(!validEntry) {
+	    		 System.out.println("What is the new user's first name?");
+	    	     fn = sc.next();
+	    	     System.out.println("What is the new user's last name?");
+	    	     ln = sc.next();
+	    	     if(fn.isBlank() || fn.isEmpty() || ln.isBlank() || ln.isEmpty()) {
+	         		System.out.println("First name and last name must be set");
+	         		continue;
+	    	     } else {
+	         		validEntry = true; 
+	    	     }
+	     	}
+	        validEntry = false; 
+	        try {
+		        while(!validEntry) {
+		    		System.out.println("Select a User Role (1) Patron (2) Librarian");
+		        	input = sc.next();
+	        		selection = Integer.parseInt(input);
+	        		if(selection != 1 && selection != 2) {
+	        			System.out.println("Invalid Entry!");
+	        			continue;
+	        		} else {
+	        			validEntry = true; 
+	        		}
+		    	}
+	        } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid selection 1 or 2");
+                continue; 
+            }
+	        allValid = true; 
+    	}
+    	String type = null; 
+    	switch(selection){
+    		case 1:
+    			type = "Patron";
+    			break;
+    		case 2:
+    			type = "Librarian";
+    			break;
+			default:
+    	}
         LibraryController.createNewUser(fn, ln, type);
     }
 
@@ -175,15 +288,14 @@ public class LibraryView {
     	//TODO reconsider logic. This will print X copies of each book where X is the number of copies we have. 
     	// Instead, perhaps we should call to Book.readAll() directly. or if we want to ensure that there is >0 copies of the book
     	// we could load the copy table, and then run a filter for unique BookIDs
-        List<Copy> bookList = LibraryController.listCopies();
+    	
+        List<Book> bookList = LibraryController.listBooks(); 
         System.out.println("------------------------------------------------------------------------------------------"); //90 dashes
         System.out.println("| Id   | Title                          | Author                         | ISBN          |");
         System.out.println("------------------------------------------------------------------------------------------");
-        for (Copy copy: bookList){
-            //For every copy of the book, we look up the original book.
-            Book thisbook = LibraryController.getBookById(copy.getID());
+        for (Book thisbook: bookList){
             if(thisbook != null) {
-	            System.out.println("| " + Utils.fitString(copy.getID() + "", 4) +
+	            System.out.println("| " + Utils.fitString(thisbook.getID() + "", 4) +
 	                    " | " + Utils.fitString(thisbook.getTitle(), 30) +
 	                    " | " + Utils.fitString(thisbook.getAuthor(), 30) +
 	                    " | " + Utils.fitString(thisbook.getISBN(), 13) + " |");
@@ -208,17 +320,34 @@ public class LibraryView {
         System.out.println("------------------------------------------------------------------------------------------");
     }
     private static void checkAvailability(Scanner sc){
-    	//TODO need to work on logic here. what if entered book id doesn't exist? 
-        System.out.println("Enter the id of the book copy you'd like to check.");
-        String id = sc.next();
+    	boolean validEntry = false;
+    	Integer id = null;
+    	String input = null;
+    	
+    	while(!validEntry) {
+    		System.out.println("Enter the id of the book copy you'd like to check.");
+        	input = sc.next();
+        	try {
+        		id = Integer.parseInt(input);
+        		if(id == null || id <0) {
+        			System.out.println("Invalid Entry!");
+        			continue;
+        		} else {
+        			validEntry = true; 
+        		}
+        	} catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number >0.");
+            }
+        	
+    	}
         
-        Copy copy = LibraryController.getCopyById(Integer.parseInt(id));
-        Loan loan = LibraryController.checkIfCopyHasLoan(id);
+        Copy copy = LibraryController.getCopyById(id.intValue());
+        Loan loan = LibraryController.checkIfCopyHasLoan(id.intValue());
         Book book = LibraryController.getBookById(copy.getBookID());
         
         if (book == null) {
         	System.out.println("Book does not exist.");
-        } else if (loan == null){
+        } else if (loan== null){
             System.out.println("Book is available.");
         } else {
             System.out.println("This book was checked out on " + loan.getDateOut().toString());
@@ -226,14 +355,58 @@ public class LibraryView {
         }
     }
     private static void checkoutBook(Scanner sc){
-        System.out.println("Enter the id of the book you'd like to borrow.");
-        String id = sc.next();
-        LibraryController.checkoutBook(id, UserController.getCurrentUser());
+    	boolean validEntry = false; 
+    	String input = null; 
+    	Integer id = null; 
+    	
+    	while(!validEntry) {
+    		System.out.println("Enter the id of the book you'd like to borrow.");
+        	input = sc.next();
+        	try {
+        		id = Integer.parseInt(input);
+        		if(id == null || id <0) {
+        			System.out.println("Invalid Entry!");
+        			continue;
+        		} else {
+        			validEntry = true; 
+        		}
+        	} catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number >0.");
+            }
+        	
+    	}
+    	if(LibraryController.getCopyById(id) != null) {  	
+    		LibraryController.checkoutBook(id, UserController.getCurrentUser());
+    	} else {
+    		System.out.println("Book Copy not Found!");
+    	}
     }
     private static void depositBook(Scanner sc){
-        System.out.println("Enter the id of the book you'd like to deposit.");
-        String id = sc.next();
-        LibraryController.depositBook(id, UserController.getCurrentUser());
+    	
+    	boolean validEntry = false; 
+    	String input = null; 
+    	Integer id = null; 
+    	while(!validEntry) {
+    		System.out.println("Enter the book copy ID to deposit:");
+        	input = sc.next();
+        	try {
+        		id = Integer.parseInt(input);
+        		if(id == null || id <0) {
+        			System.out.println("Invalid Entry!");
+        			continue;
+        		} else {
+        			validEntry = true; 
+        		}
+        	} catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number >0.");
+            }
+        	
+    	}
+    	if(LibraryController.getCopyById(id) == null) {
+    		System.out.println("Copy not found!"); 
+    	} else {
+    		LibraryController.depositBook(id, UserController.getCurrentUser());
+    	}
     }
     private static void genUserReport(Scanner sc){
         List<Loan> loanList = LibraryController.generateCheckoutBookList(UserController.getCurrentUser().getID());
@@ -254,104 +427,3 @@ public class LibraryView {
     }
 
 }
-/*
------------------------------------------------------------------------------------------------------------------------------------------------------------
-Here is my code. -- Jian Xiong Lu
-
-public class LibraryView {
-
-	
-	private static void removeUser(Scanner sc){
-		System.out.println("Enter member's first name: ");
-		String firstName = sc.next();
-		System.out.println("Enter member's Last name: ");
-		String lastName = sc.next();
-		System.out.println("Enter your Library member ID");
-		String id = sc.next();
-		String type = "Deprecated";
-		UserController.removeMemeber(firstName,lastName,id,type);
-    }
-	private static void listUsers(){
-        UserController.listAllusers();
-    }
-    //....
-    private static void removeBook(Scanner sc){
-    	System.out.println("Enter deprecated book's title: ");
-		String title = sc.next();
-		System.out.println("Enter deprecated book's author");
-		String author = sc.next();
-		System.out.println("Enter deprecated book's ISBN");
-		String ISBN = sc.next();
-        LibraryController.removeBook(title, author, ISBN);
-    }
-    
-    private static void listBooks(){
-    	LibraryController.listAllAvaliableBook();
-    }
-    
-    private static void genLibReport(Scanner sc){
-    	LibraryController.Report();
-    }
-    private static void checkAvailability(Scanner sc){
-    	System.out.println("Enter your book's title: ");
-		String title = sc.next();
-		System.out.println("Enter your new book's author");
-		String author = sc.next();
-		System.out.println("Enter your book's ISBN");
-		String ISBN = sc.next();
-		LibraryController.searchBook(title, author, ISBN);
-    }
-    private static void checkoutBook(Scanner sc){
-    	System.out.println("Enter your Library member ID");
-		String id = sc.next();
-		System.out.println("Enter borrowing book's ISBN");
-		String ISBN = sc.next();
-		System.out.println("Enter borrowing book's due date(yyyy-mm-dd)");
-		String dueDate = sc.next();
-		LibraryController.borrowBook(id, ISBN, dueDate);
-		
-    }
-    public void depositBook(Scanner sc){
-        System.out.println("Enter returning book's ISBN");
-		String ISBN = sc.next();
-		System.out.println("Enter your Library member ID");
-		String id = sc.next();
-		System.out.println("Enter your book's actual returned date(yyyy-mm-dd)");
-		String actualReturnedDate = sc.next();
-		LibraryController.returnBook(id, ISBN, actualReturnedDate);
-    }
-    
-    public void trackBooks(Scanner sc) {
-		System.out.println("Enter tracking book's ISBN");
-		String ISBN = sc.next();
-		LibraryController.trackBooks(ISBN);
-		}
-    
-    
-    public static void genUserReport(){
-        return;
-    }
-    
-    public static void createNewUser(Scanner input){
-		System.out.println("Enter member's first name: ");
-		String firstName = input.next();
-		System.out.println("Enter member's Last name: ");
-		String lastName = input.next();
-		System.out.println("Enter your Library member ID");
-		String id = input.next();
-		String type = "Registered";
-		System.out.println("Congulation, You're the new member of our Library!");
-		UserController.createNewUser(firstName,lastName, id,type);
-    }
-    
-    public void updateMemberInfo(Scanner input) {
-		System.out.println("Enter member's current first name: ");
-		String firstName = input.next();
-		System.out.println("Enter member's current Last name: ");
-		String lastName = input.next();
-		System.out.println("Enter your Library member ID");
-		String id = input.next();
-		String type = "Registered";
-		UserController.updateMemberInfo(firstName,lastName, id,type);}
-}
-*/

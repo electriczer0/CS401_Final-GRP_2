@@ -352,12 +352,9 @@ public abstract class Table_Access<T extends Has_ID> {
 	 * @return Object of type <T> found by primary key or NULL if not found
 	 */
 	public T read(int recordId) throws SQLException {
-		
        HashMap<String,String> recordQuery = new HashMap<String, String>();
        recordQuery.put(getPrimaryKey(), String.valueOf(recordId));
-       
        Map<Integer, T> recordsFound = find(recordQuery);
-       
        return recordsFound.values().stream().findFirst().orElse(null);
     }
 	
