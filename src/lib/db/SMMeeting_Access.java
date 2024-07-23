@@ -98,8 +98,8 @@ public class SMMeeting_Access extends Table_Access<Meeting> {
     	return this.primary_key;
     }
     
-    public static SMGroup_Access getInstance() {
-    	return Table_Access.getInstance(SMGroup_Access.class);
+    public static SMMeeting_Access getInstance() {
+    	return Table_Access.getInstance(SMMeeting_Access.class);
     }
     
     @Override

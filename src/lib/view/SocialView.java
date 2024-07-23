@@ -269,7 +269,7 @@ public class SocialView {
     //Create a new group.
     private static void createGroup(Scanner sc){
         System.out.println("What's the name of your new group?");
-        String name = sc.next();
+        String name = sc.nextLine();
         System.out.println("Add a description for this new group.");
         String desc = sc.nextLine();
         SocialController.createNewGroup(UserController.getCurrentUser(), name, desc);

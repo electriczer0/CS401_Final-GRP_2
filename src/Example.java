@@ -97,7 +97,7 @@ public class Example { //<--Refactor
 				return;
 			}
 			if (input.equals("list")) {
-				LibraryController.listUsers();
+				LibraryView.listUsers();
 			} else {
 				//currentUser = Library.getUserById(input);
 				UserController.setCurrentUserById(input);

@@ -1,12 +1,16 @@
 package lib.controller;
 
+import lib.db.SMGroup_Access;
+import lib.db.SMInteraction_Access;
+import lib.db.SMMeeting_Access;
+import lib.db.User_Access;
 import lib.model.Group;
 import lib.model.Interaction;
 import lib.model.Meeting;
 import lib.model.User;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Controller for all social media interactions.
@@ -21,7 +25,29 @@ public class SocialController {
      * @return
      */
     public static List<Interaction> getInteractionsByUserId(int userId){
-        return new ArrayList<Interaction>();
+        try {
+            User_Access userAccessor = User_Access.getInstance();
+            SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
+            //Get the groups this user is in
+            Map<Integer, Group> groups = userAccessor.getGroups(UserController.getCurrentUser().getID());
+            List<Interaction> totalInteractions = new ArrayList<Interaction>();
+            //Loop through those groups and add their interactions to the total list
+            for (Group g : groups.values()){
+                HashMap<String, String> accessor = new HashMap<>();
+                accessor.put("group_id", Integer.toString(g.getID()));
+                Map<Integer, Interaction> thisGroupsInteractions = smiAccessor.find(accessor);
+                totalInteractions.addAll(thisGroupsInteractions.values());
+            }
+            //sort the list by timestamp
+            Collections.sort(totalInteractions, Comparator.comparing(Interaction::getTimestamp));
+            Collections.reverse(totalInteractions);
+            //reverse order for descending
+            return totalInteractions;
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -30,7 +56,21 @@ public class SocialController {
      * @return
      */
     public static List<Interaction> getInteractionsByGroupId(int groupId){
-        return new ArrayList<Interaction>();
+        try {
+            SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
+            HashMap<String, String> accessor = new HashMap<>();
+            accessor.put("group_id", Integer.toString(groupId));
+            Map<Integer, Interaction> thisGroupsInteractions = smiAccessor.find(accessor);
+            List<Interaction> interactions = new ArrayList<Interaction>();
+            interactions.addAll(thisGroupsInteractions.values());
+            Collections.sort(interactions, Comparator.comparing(Interaction::getTimestamp));
+            Collections.reverse(interactions);
+            return interactions;
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -42,7 +82,29 @@ public class SocialController {
      * @param comment
      */
     public static void postRootComment(User user, int groupId, String comment){
-        return;
+        try {
+            SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            //Check if user is in the marked group
+            Map<Integer, User> users = groupAccessor.getGroupMembers(groupId);
+            if (users.values().contains(user)){
+                Interaction toBeInserted = Interaction.create(
+                        -1,
+                        user.getID(),
+                        groupId,
+                        0,
+                        Interaction.Interaction_Type.ORIGINAL_CONTENT,
+                        comment,
+                        new Date());
+                smiAccessor.insert(toBeInserted);
+            } else {
+                //User isnt part of a group, reject the post
+                System.out.println("This user is not part of group " + groupId);
+            }
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -51,7 +113,20 @@ public class SocialController {
      * @return
      */
     public static Interaction getInteractionById(int interactionId){
-        return Interaction.create();
+        try {
+            SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
+            HashMap<String, String> accessor = new HashMap<>();
+            accessor.put("id", Integer.toString(interactionId));
+            Map<Integer, Interaction> interaction = smiAccessor.find(accessor);
+            if (interaction.values().size() == 1){
+                ArrayList<Interaction> tbr = new ArrayList<>();
+                tbr.addAll(interaction.values());
+                return tbr.get(0); //We enforce id uniqueness so the values should only have one element
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -62,7 +137,22 @@ public class SocialController {
      * @param newComment
      */
     public static void editComment(User user, int interactionId, String newComment){
-        return;
+        try {
+            SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
+            Interaction thisInteraction = getInteractionById(interactionId);
+            if (thisInteraction.getUserId() == user.getID() &&
+                    (thisInteraction.getType() == Interaction.Interaction_Type.ORIGINAL_CONTENT ||
+                            thisInteraction.getType() == Interaction.Interaction_Type.COMMENT_ON_CONTENT)){
+                if (newComment.length() > 0){
+                    thisInteraction.setContent(newComment);
+                    smiAccessor.update(thisInteraction);
+                }
+            } else {
+                System.out.println("User does not own this comment, or interaction is of wrong type.");
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -74,7 +164,30 @@ public class SocialController {
      * @param comment
      */
     public static void postReplyComment(User user, int interactionId, String comment){
-        return;
+        try {
+            SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Interaction parentInteraction = getInteractionById(interactionId);
+            //Check if user is in the marked group
+            Map<Integer, User> users = groupAccessor.getGroupMembers(parentInteraction.getGroupId());
+            if (users.values().contains(user)){
+                Interaction toBeInserted = Interaction.create(
+                        -1,
+                        user.getID(),
+                        parentInteraction.getGroupId(),
+                        parentInteraction.getID(),
+                        Interaction.Interaction_Type.COMMENT_ON_CONTENT,
+                        comment,
+                        new Date());
+                smiAccessor.insert(toBeInserted);
+            } else {
+                //User isn't part of a group, reject the post
+                System.out.println("This user is not part of group " + parentInteraction.getGroupId());
+            }
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -85,7 +198,22 @@ public class SocialController {
      * @param interactionId
      */
     public static void likeComment(User user, int interactionId){
-        return;
+        try {
+            SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
+            Interaction parentInteraction = getInteractionById(interactionId);
+            //Check if user is in the marked group
+            Interaction toBeInserted = Interaction.create(
+                    -1,
+                    user.getID(),
+                    parentInteraction.getGroupId(),
+                    parentInteraction.getID(),
+                    Interaction.Interaction_Type.LIKE_CONTENT,
+                    null,
+                    new Date());
+            smiAccessor.insert(toBeInserted);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -100,7 +228,29 @@ public class SocialController {
      * @param interactionId
      */
     public static void shareComment(User user, int interactionId){
-        return;
+        try {
+            SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Interaction parentInteraction = getInteractionById(interactionId);
+            //Check if user is in the marked group
+            Interaction toBeInserted = Interaction.create(
+                    -1,
+                    user.getID(),
+                    parentInteraction.getGroupId(),
+                    parentInteraction.getID(),
+                    Interaction.Interaction_Type.SHARE_ON_CONTENT,
+                    null,
+                    new Date());
+            smiAccessor.insert(toBeInserted);
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(user.getFirstName() + " shared this comment " + parentInteraction.getID() + ":");
+            sb.append(parentInteraction.getContent());
+
+            postRootComment(user, 0, sb.toString());
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -110,7 +260,18 @@ public class SocialController {
      * @param description
      */
     public static void createNewGroup(User user, String name, String description){
-        return;
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Group toBeInserted = Group.create(
+                    -1,
+                    user.getID(),
+                    name,
+                    description,
+                    new Date());
+            groupAccessor.insert(toBeInserted);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -118,36 +279,80 @@ public class SocialController {
      * @return
      */
     public static List<Group> listAllGroups(){
-        return new ArrayList<Group>();
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Map<Integer, Group> groups = groupAccessor.readAll();
+            return new ArrayList(groups.values());
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
      * Retrieves a group by id, or null if it doesn't exist.
-     * @param id
+     * @param groupId
      * @return
      */
-    public static Group getGroupByGroupId(int id){
-        return Group.create();
+    public static Group getGroupByGroupId(int groupId){
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            HashMap<String, String> accessor = new HashMap<>();
+            accessor.put("id", Integer.toString(groupId));
+            Map<Integer, Group> group = groupAccessor.find(accessor);
+            if (group.values().size() == 1){
+                ArrayList<Group> tbr = new ArrayList<>(group.values());
+                return tbr.get(0); //We enforce id uniqueness so the values should only have one element
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
      * Retrieves a meeting by id, or null if it doesn't exist.
-     * @param id
+     * @param meetingId
      * @return
      */
-    public static Meeting getMeetingByMeetingId(int id){
-        return Meeting.create();
+    public static Meeting getMeetingByMeetingId(int meetingId){
+        try {
+            SMMeeting_Access meetingAccessor = SMMeeting_Access.getInstance();
+            HashMap<String, String> accessor = new HashMap<>();
+            accessor.put("id", Integer.toString(meetingId));
+            Map<Integer, Meeting> meeting = meetingAccessor.find(accessor);
+            if (meeting.values().size() == 1){
+                ArrayList<Meeting> tbr = new ArrayList<>(meeting.values());
+                return tbr.get(0); //We enforce id uniqueness so the values should only have one element
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
      * Updates the group with the targeted id by setting a new description, then re-saving the record.
      * Does *not* update the field if the argument is null or empty.
      * Reject the update if the user does not own the group (which means they dont have permissions to modify it).
-     * @param id
+     * @param groupId
      * @param description
      */
-    public static void updateGroupWithGroupId(int id, User user, String description){
-
+    public static void updateGroupWithGroupId(int groupId, User user, String description){
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Group thisGroup = getGroupByGroupId(groupId);
+            if (thisGroup != null && thisGroup.getOwnerId() == user.getID()){
+                if (description.length() > 0){
+                    thisGroup.setDescription(description);
+                    groupAccessor.update(thisGroup);
+                }
+            } else {
+                System.out.println("User does not own this group.");
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -156,7 +361,18 @@ public class SocialController {
      * @param user
      */
     public static void joinGroup(int groupId, User user){
-
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Group thisGroup = getGroupByGroupId(groupId);
+            Map<Integer, User> groupUsers = groupAccessor.getGroupMembers(groupId);
+            if (thisGroup != null && !groupUsers.isEmpty() && !groupUsers.values().contains(user)){
+                groupAccessor.addUser(user.getID(), groupId);
+            } else {
+                System.out.println("Group does not exist, or group already contains this user.");
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -165,7 +381,18 @@ public class SocialController {
      * @param user
      */
     public static void leaveGroup(int groupId, User user){
-
+        try {
+            SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
+            Group thisGroup = getGroupByGroupId(groupId);
+            Map<Integer, User> groupUsers = groupAccessor.getGroupMembers(groupId);
+            if (thisGroup != null && !groupUsers.isEmpty() && groupUsers.values().contains(user)){
+                groupAccessor.remUser(user.getID(), groupId);
+            } else {
+                System.out.println("Group does not exist, or group didn't contain this user.");
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -173,7 +400,14 @@ public class SocialController {
      * @return
      */
     public static List<Meeting> listAllMeetings(){
-        return new ArrayList<Meeting>();
+        try {
+            SMMeeting_Access meetingAccessor = SMMeeting_Access.getInstance();
+            Map<Integer, Meeting> meetings = meetingAccessor.readAll();
+            return new ArrayList(meetings.values());
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -181,7 +415,14 @@ public class SocialController {
      * @return
      */
     public static List<Meeting> listAllMeetings(User user){
-        return new ArrayList<Meeting>();
+        try {
+            User_Access userAccessor = User_Access.getInstance();
+            Map<Integer, Meeting> meetings = userAccessor.getMeetings(UserController.getCurrentUser().getID());
+            return new ArrayList(meetings.values());
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -195,7 +436,34 @@ public class SocialController {
      * @param time
      */
     public static void createMeeting(int groupId, User user, String location, String day, String time){
+        try {
+            Group group = getGroupByGroupId(groupId);
+            SMMeeting_Access meetingAccessor = SMMeeting_Access.getInstance();
+            Date thisDate = new Date();
+            String theMonth = day.substring(0, 2);
+            String theDay = day.substring(3, 5);
+            String theYear = day.substring(6, 10);
+            thisDate.setMonth(Integer.parseInt(theMonth) - 1);
+            thisDate.setYear(Integer.parseInt(theYear));
+            thisDate.setDate(Integer.parseInt(theDay));
+            thisDate.setHours(Integer.parseInt(time.substring(0, 1)));
+            thisDate.setMinutes(Integer.parseInt(time.substring(2, 3)));
 
+            if (group != null) {
+                Meeting toBeInserted = Meeting.create(
+                        -1,
+                        user.getID(),
+                        groupId,
+                        group.getName(),
+                        group.getDescription(),
+                        location,
+                        thisDate,
+                        new Date());
+                meetingAccessor.insert(toBeInserted);
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -211,6 +479,29 @@ public class SocialController {
      * @param time
      */
     public static void updateMeetingWithMeetingId(int meetingId, User user, String location, String day, String time){
-
+        try {
+            SMMeeting_Access meetingAccessor = SMMeeting_Access.getInstance();
+            Meeting thisMeeting = getMeetingByMeetingId(meetingId);
+            if (thisMeeting != null && user.getID() == thisMeeting.getOwnerId()){
+                if (location.length() > 0){
+                    thisMeeting.setMeetingLocation(location);
+                }
+                if (day.length() > 0 && time.length() > 0){
+                    Date thisDate = new Date();
+                    String theMonth = day.substring(0, 2);
+                    String theDay = day.substring(3, 5);
+                    String theYear = day.substring(6, 10);
+                    thisDate.setMonth(Integer.parseInt(theMonth) - 1);
+                    thisDate.setYear(Integer.parseInt(theYear));
+                    thisDate.setDate(Integer.parseInt(theDay));
+                    thisDate.setHours(Integer.parseInt(time.substring(0, 1)));
+                    thisDate.setMinutes(Integer.parseInt(time.substring(2, 3)));
+                    thisMeeting.setMeetingTimestamp(thisDate);
+                }
+            }
+            meetingAccessor.update(thisMeeting);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 }
