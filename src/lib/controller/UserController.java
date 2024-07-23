@@ -1,7 +1,9 @@
 package lib.controller;
 
+import lib.db.User_Access;
 import lib.model.User;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class UserController {
@@ -17,10 +19,13 @@ public class UserController {
 
 	public static void setCurrentUserById(String id){
 		//Lookup the user by their id, then set currentUser to that User.
-
-		currentUser = User.create();
-		currentUser.setType("Librarian");
-		//^^ Replace this
+		try {
+			int uId = Integer.parseInt(id);
+			currentUser = User_Access.getInstance().read(uId);
+			currentUser.setType(currentUser.getType());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
     /**
@@ -28,7 +33,14 @@ public class UserController {
      * @param id
      */
     public static User getUserById(int id){
-        return User.create();
+    	
+    	User user = null;
+    	try {
+    		user = User_Access.getInstance().read(id);
+    	} catch(SQLException e) {
+    		e.printStackTrace();
+    	}
+    	return user;
     }
 }
 
