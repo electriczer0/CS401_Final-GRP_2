@@ -34,7 +34,7 @@ public class SocialController {
             //Loop through those groups and add their interactions to the total list
             for (Group g : groups.values()){
                 HashMap<String, String> accessor = new HashMap<>();
-                accessor.put("InteractionID", Integer.toString(g.getID()));
+                accessor.put("UserID", Integer.toString(g.getID()));
                 Map<Integer, Interaction> thisGroupsInteractions = smiAccessor.find(accessor);
                 totalInteractions.addAll(thisGroupsInteractions.values());
             }
@@ -59,7 +59,7 @@ public class SocialController {
         try {
             SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
             HashMap<String, String> accessor = new HashMap<>();
-            accessor.put("InteractionID", Integer.toString(groupId));
+            accessor.put("GroupID", Integer.toString(groupId));
             Map<Integer, Interaction> thisGroupsInteractions = smiAccessor.find(accessor);
             List<Interaction> interactions = new ArrayList<Interaction>();
             interactions.addAll(thisGroupsInteractions.values());
@@ -87,7 +87,6 @@ public class SocialController {
             SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
             //Check if user is in the marked group
             Map<Integer, User> users = groupAccessor.getGroupMembers(groupId);
-            System.out.println(users);
             if (users.values().contains(user)){
                 Interaction toBeInserted = Interaction.create(
                         -1,
@@ -366,7 +365,7 @@ public class SocialController {
             SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
             Group thisGroup = getGroupByGroupId(groupId);
             Map<Integer, User> groupUsers = groupAccessor.getGroupMembers(groupId);
-            if (thisGroup != null && !groupUsers.isEmpty() && !groupUsers.values().contains(user)){
+            if (thisGroup != null && !groupUsers.values().contains(user)){
                 groupAccessor.addUser(user.getID(), groupId);
             } else {
                 System.out.println("Group does not exist, or group already contains this user.");
