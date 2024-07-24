@@ -87,7 +87,7 @@ public class SocialController {
             SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
             //Check if user is in the marked group
             Map<Integer, User> users = groupAccessor.getGroupMembers(groupId);
-            if (users.values().contains(user)){
+            if (users.values().contains(user) || groupId == 0){
                 Interaction toBeInserted = Interaction.create(
                         -1,
                         user.getID(),

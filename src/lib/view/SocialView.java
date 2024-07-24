@@ -170,26 +170,26 @@ public class SocialView {
         switch (inter.getType()){
             case ORIGINAL_CONTENT -> {
                 System.out.println("-----");
-                System.out.println(postingUser.getFirstName() + " " + postingUser.getLastName() + " posted :");
+                System.out.println(inter.getID() + "::" + postingUser.getFirstName() + " " + postingUser.getLastName() + " posted :");
                 System.out.println(inter.getContent());
                 System.out.println("Posted on " + inter.getTimestamp().toString());
                 break;
             }
             case COMMENT_ON_CONTENT -> {
                 System.out.println("---");
-                System.out.println(postingUser.getFirstName() + " " + postingUser.getLastName() + " replied :");
+                System.out.println(inter.getID() + "::" + postingUser.getFirstName() + " " + postingUser.getLastName() + " replied :");
                 System.out.println(inter.getContent());
                 System.out.println("Posted on " + inter.getTimestamp().toString());
                 break;
             }
             case LIKE_CONTENT -> {
                 System.out.println("---");
-                System.out.println(postingUser.getFirstName() + " " + postingUser.getLastName() + " liked this post.");
+                System.out.println(inter.getID() + "::" + postingUser.getFirstName() + " " + postingUser.getLastName() + " liked this post.");
                 System.out.println("Posted on " + inter.getTimestamp().toString());
             }
             case SHARE_ON_CONTENT -> {
                 System.out.println("---");
-                System.out.println(postingUser.getFirstName() + " " + postingUser.getLastName() + " shared this post.");
+                System.out.println(inter.getID() + "::" + postingUser.getFirstName() + " " + postingUser.getLastName() + " shared this post.");
                 System.out.println("Posted on " + inter.getTimestamp().toString());
             }
         }
