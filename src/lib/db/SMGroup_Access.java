@@ -93,20 +93,19 @@ public class SMGroup_Access extends Table_Access<Group> {
     	return Table_Access.getInstance(SMGroup_Access.class);
     }
 
+    /**
+	 * Find operation. Queries table and returns records found. Null parameters
+	 * will return all records. 
+	 * @param searchParams a HashMap<String, String> of key, value pairs representing
+	 * the query column and search value. This method automatically adds Type=Group
+	 * @param limit the maximum records to return
+	 * @param offset the first record to return 
+	 * @return a Map<Integer, T> where key is the record ID, and value is the record 
+	 */
     @Override
     public Map<Integer, Group> find(HashMap<String, String> searchParams, int offset, int limit) throws SQLException{
-    	/**
-		 * Find operation. Queries table and returns records found. Null parameters
-		 * will return all records. 
-		 * @param searchParams a HashMap<String, String> of key, value pairs representing
-		 * the query column and search value. This method automatically adds Type=Group
-		 * @param limit the maximum records to return
-		 * @param offset the first record to return 
-		 * @return a Map<Integer, T> where key is the record ID, and value is the record 
-    	 */
     	searchParams.put("Type", "Group");
     	return super.find(searchParams, offset, limit);
-    	
     }
     
     public Map<Integer, User> getGroupMembers(int groupID) throws SQLException {
