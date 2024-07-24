@@ -18,7 +18,7 @@ enum cli_state {
 	SOCIAL_MEDIA_PLATFORM
 };
 
-public class Example { //<--Refactor
+public class LibraryProgram { //<--Refactor
 
 	private static cli_state state = cli_state.LIBRARY_MANAGEMENT;
 	private static boolean exiting = false;
