@@ -198,6 +198,9 @@ public class LibraryView {
     	return;
     }
     private static void addNewUser(Scanner sc){
+    	if(sc.hasNextLine()) {
+    		sc.nextLine();
+    	}
     	boolean validEntry = false; 
     	boolean allValid = false; 
     	String fn = null;
