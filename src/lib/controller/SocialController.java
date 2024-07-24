@@ -34,7 +34,7 @@ public class SocialController {
             //Loop through those groups and add their interactions to the total list
             for (Group g : groups.values()){
                 HashMap<String, String> accessor = new HashMap<>();
-                accessor.put("group_id", Integer.toString(g.getID()));
+                accessor.put("InteractionID", Integer.toString(g.getID()));
                 Map<Integer, Interaction> thisGroupsInteractions = smiAccessor.find(accessor);
                 totalInteractions.addAll(thisGroupsInteractions.values());
             }
@@ -59,7 +59,7 @@ public class SocialController {
         try {
             SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
             HashMap<String, String> accessor = new HashMap<>();
-            accessor.put("group_id", Integer.toString(groupId));
+            accessor.put("InteractionID", Integer.toString(groupId));
             Map<Integer, Interaction> thisGroupsInteractions = smiAccessor.find(accessor);
             List<Interaction> interactions = new ArrayList<Interaction>();
             interactions.addAll(thisGroupsInteractions.values());
@@ -87,6 +87,7 @@ public class SocialController {
             SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
             //Check if user is in the marked group
             Map<Integer, User> users = groupAccessor.getGroupMembers(groupId);
+            System.out.println(users);
             if (users.values().contains(user)){
                 Interaction toBeInserted = Interaction.create(
                         -1,
@@ -116,7 +117,7 @@ public class SocialController {
         try {
             SMInteraction_Access smiAccessor = SMInteraction_Access.getInstance();
             HashMap<String, String> accessor = new HashMap<>();
-            accessor.put("id", Integer.toString(interactionId));
+            accessor.put("InteractionID", Integer.toString(interactionId));
             Map<Integer, Interaction> interaction = smiAccessor.find(accessor);
             if (interaction.values().size() == 1){
                 ArrayList<Interaction> tbr = new ArrayList<>();
@@ -298,7 +299,7 @@ public class SocialController {
         try {
             SMGroup_Access groupAccessor = SMGroup_Access.getInstance();
             HashMap<String, String> accessor = new HashMap<>();
-            accessor.put("id", Integer.toString(groupId));
+            accessor.put("GroupID", Integer.toString(groupId));
             Map<Integer, Group> group = groupAccessor.find(accessor);
             if (group.values().size() == 1){
                 ArrayList<Group> tbr = new ArrayList<>(group.values());
@@ -319,7 +320,7 @@ public class SocialController {
         try {
             SMMeeting_Access meetingAccessor = SMMeeting_Access.getInstance();
             HashMap<String, String> accessor = new HashMap<>();
-            accessor.put("id", Integer.toString(meetingId));
+            accessor.put("MeetingID", Integer.toString(meetingId));
             Map<Integer, Meeting> meeting = meetingAccessor.find(accessor);
             if (meeting.values().size() == 1){
                 ArrayList<Meeting> tbr = new ArrayList<>(meeting.values());
