@@ -144,7 +144,6 @@ public abstract class Table_Access<T extends Has_ID> {
 	 * @param callerClass the class whose instance should be returned
 	 * @return a singleton instance of the class in question
 	 */
-	//Generic method to get the existing singleton instance for a given class
 	public static <T extends Table_Access<?>> T getInstance(Class<T> callerClass) {
 		
 		synchronized(instances) {
@@ -159,6 +158,7 @@ public abstract class Table_Access<T extends Has_ID> {
  * Deprecated
  * @return
  */
+	@Deprecated
 	private static Class<?> getCallerClass() {
         try {
             String callerClassName = Thread.currentThread().getStackTrace()[3].getClassName();
@@ -405,14 +405,13 @@ public abstract class Table_Access<T extends Has_ID> {
 		
 	}
 	
+	/**
+	 * Reads all records from the table limiting return to limit number and starting at offset'th record
+	 * @param limit the maximum number of records to return
+	 * @param offset the first record to return 
+	 * @return Map<Integer, T> of records where key is the primarykey and value is the record 
+	 */
 	public Map<Integer, T> readAll(int offset, int limit) throws SQLException {
-		/**
-		 * Reads all records from the table limiting return to limit number and starting at offset'th record
-		 * @param limit the maximum number of records to return
-		 * @param offset the first record to return 
-		 * @return Map<Integer, T> of records where key is the primarykey and value is the record 
-		 */
-		
         HashMap<String, String> blankQuery = new HashMap<>();
         return find(blankQuery, offset, limit);
 	}

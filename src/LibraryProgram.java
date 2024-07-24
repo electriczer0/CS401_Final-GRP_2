@@ -18,7 +18,7 @@ enum cli_state {
 	SOCIAL_MEDIA_PLATFORM
 };
 
-public class Example { //<--Refactor
+public class LibraryProgram { //<--Refactor
 
 	private static cli_state state = cli_state.LIBRARY_MANAGEMENT;
 	private static boolean exiting = false;
@@ -91,17 +91,36 @@ public class Example { //<--Refactor
 
 	public static void initUser(Scanner sc){
 		while (UserController.getCurrentUser() == null) {
-			System.out.println("Who is using this system? Enter an id, or type 'list' to list all users, or 'exit' to quit.");
-			String input = sc.next();
-			if (input.equals("exit")) {
-				return;
-			}
-			if (input.equals("list")) {
-				LibraryView.listUsers();
-			} else {
-				//currentUser = Library.getUserById(input);
-				UserController.setCurrentUserById(input);
-			}
+			String input = null;
+			Integer userID = null;
+			boolean validEntry = false;
+			User user = null; 
+	    	while(!validEntry) {
+	    		System.out.println("Who is using this system? Enter an id, or type 'list' to list all users, or 'exit' to quit.");
+	        	input = sc.next();
+	        	try {
+	        		if (input.equals("exit")) {
+	    				return;
+	    			}
+	    			if (input.equals("list")) {
+	    				LibraryView.listUsers();
+	    				continue;
+	    			} else {
+		        		userID = Integer.parseInt(input);
+		        		if(userID == null || userID <0 ) {
+		        			System.out.println("Invalid Entry!");
+		        			continue;
+		        		}
+		        		user = UserController.getUserById(userID);
+		        		if (user == null) { continue; }
+		        		validEntry = true; 
+		        		}
+	        		} catch (NumberFormatException e) {
+	                System.out.println("Invalid input. Please enter a valid number >0.");
+	            }
+	        	
+	    	}
+				UserController.setCurrentUserById(user.getID());
 		}
 	}
 

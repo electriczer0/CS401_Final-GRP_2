@@ -2,6 +2,7 @@ package lib.view;
 
 import lib.controller.LibraryController;
 import lib.controller.UserController;
+import lib.db.Book_Access;
 import lib.db.Copy_Access;
 import lib.db.Loan_Access;
 import lib.model.Book;
@@ -34,7 +35,9 @@ enum LibraryAction {
     GENERATE_BOOK_COPIES,
     CHECKOUT_BOOK,
     DEPOSIT_BOOK,
-    GENERATE_USER_CHECKOUT_REPORT
+    GENERATE_USER_CHECKOUT_REPORT,
+    ADD_COPY,
+    REMOVE_COPY
 }
 public class LibraryView {
 
@@ -56,16 +59,18 @@ public class LibraryView {
         actions.add(LibraryAction.LIST_BOOKS);
         actions.add(LibraryAction.GENERATE_BOOK_COPIES);
         actions.add(LibraryAction.CHECK_BOOK_COPY_AVAILABLE);
-        actions.add(LibraryAction.GENERATE_USER_CHECKOUT_REPORT);
         if (UserController.getCurrentUser().getType().equals("Librarian")){
             actions.add(LibraryAction.ADD_USER);
             actions.add(LibraryAction.REMOVE_USER);
             actions.add(LibraryAction.LIST_USERS);
             actions.add(LibraryAction.ADD_BOOK);
             actions.add(LibraryAction.REMOVE_BOOK);
+            actions.add(LibraryAction.ADD_COPY);
+            actions.add(LibraryAction.REMOVE_COPY);
             actions.add(LibraryAction.GENERATE_LIBRARY_CHECKOUT_REPORT);
         }
         if (UserController.getCurrentUser().getType().equals("Patron")){
+        	actions.add(LibraryAction.GENERATE_USER_CHECKOUT_REPORT);
             actions.add(LibraryAction.CHECKOUT_BOOK);
             actions.add(LibraryAction.DEPOSIT_BOOK);
         }
@@ -104,8 +109,10 @@ public class LibraryView {
             case ADD_USER -> {return "Add a new user to the list of library patrons.";}
             case REMOVE_USER -> {return "Remove a user from the list of library patrons.";}
             case LIST_USERS -> {return "List all users.";}
-            case ADD_BOOK -> {return "Add a copy of a book to the collection.";}
-            case REMOVE_BOOK -> {return "Remove a copy of a book from the collection.";}
+            case ADD_BOOK -> {return "Add a book entry to the collection.";}
+            case REMOVE_BOOK -> {return "Remove a book entry from the collection.";}
+            case ADD_COPY -> {return "Add a copy of a book to the collection.";}
+            case REMOVE_COPY -> {return "Remove a copy of a book from the collection.";}
             case LIST_BOOKS -> {return "List all books in the collection.";}
             case GENERATE_LIBRARY_CHECKOUT_REPORT -> {return "Print a list of all book loans.";}
             case CHECK_BOOK_COPY_AVAILABLE -> {return "Check a book copy for availability.";}
@@ -126,6 +133,8 @@ public class LibraryView {
             case ADD_BOOK -> {addNewBook(sc); break;}
             case REMOVE_BOOK -> {removeBook(sc); break;}
             case LIST_BOOKS -> {listBooks(); break;}
+            case ADD_COPY -> {addCopy(sc); break;}
+            case REMOVE_COPY -> {removeCopy(sc); break;}
             case GENERATE_LIBRARY_CHECKOUT_REPORT -> {genLibReport(); break;}
             case CHECK_BOOK_COPY_AVAILABLE -> {checkAvailability(sc); break;}
             case GENERATE_BOOK_COPIES -> {listBookCopies(sc); break;}
@@ -203,9 +212,9 @@ public class LibraryView {
     		validEntry = false; 
 	    	 while(!validEntry) {
 	    		 System.out.println("What is the new user's first name?");
-	    	     fn = sc.next();
+	    	     fn = sc.nextLine();
 	    	     System.out.println("What is the new user's last name?");
-	    	     ln = sc.next();
+	    	     ln = sc.nextLine();
 	    	     if(fn.isBlank() || fn.isEmpty() || ln.isBlank() || ln.isEmpty()) {
 	         		System.out.println("First name and last name must be set");
 	         		continue;
@@ -271,23 +280,52 @@ public class LibraryView {
         System.out.println("------------------------------------------------------------");
     }
     private static void addNewBook(Scanner sc){
+    	if (sc.hasNextLine()) {
+    		sc.nextLine();
+    	}
         System.out.println("What is the new book's title?");
-        String title = sc.next();
+        String title = sc.nextLine();
         System.out.println("Who is the author?");
-        String author = sc.next();
-        System.out.println("What's the ISBN?");
-        String isbn = sc.next();
+        String author = sc.nextLine();
+        boolean validEntry = false; 
+        String isbn = null; 
+    	 while(!validEntry) {
+    		 System.out.println("What's the ISBN?");
+    	     isbn = sc.nextLine();
+    	     int length = isbn.length();
+    	     if(!isbn.matches("[a-zA-Z0-9]+") || ( length != 10 && length != 13)) {
+         		System.out.println("Invalid ISBN must be 10 or 13 digit alphanumeric");
+    	     } else {
+         		validEntry = true; 
+    	     }
+    	 }
         LibraryController.addNewBook(title, author, isbn);
     }
     private static void removeBook(Scanner sc){
-        System.out.println("What is the book's id?");
-        String id = sc.next();
+    	
+    	boolean validEntry = false; 
+    	String input = null; 
+    	Integer id = null; 
+    	
+    	while(!validEntry) {
+    		System.out.println("Enter the id of the book record you'd like to delete.");
+        	input = sc.next();
+        	try {
+        		id = Integer.parseInt(input);
+        		if(id == null || id <0) {
+        			System.out.println("Invalid Entry!");
+        			continue;
+        		} else {
+        			validEntry = true; 
+        		}
+        	} catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number >0.");
+            }
+        	
+    	}
         LibraryController.deleteBookById(id);
     }
     private static void listBooks(){
-    	//TODO reconsider logic. This will print X copies of each book where X is the number of copies we have. 
-    	// Instead, perhaps we should call to Book.readAll() directly. or if we want to ensure that there is >0 copies of the book
-    	// we could load the copy table, and then run a filter for unique BookIDs
     	
         List<Book> bookList = LibraryController.listBooks(); 
         System.out.println("------------------------------------------------------------------------------------------"); //90 dashes
@@ -426,4 +464,55 @@ public class LibraryView {
         System.out.println("------------------------------------------------------------------------------------------");
     }
 
+    private static void addCopy(Scanner sc) {
+    	boolean validEntry = false; 
+    	String input = null; 
+    	Integer id = null; 
+    	while(!validEntry) {
+    		System.out.println("Enter the BookID which is is a copy of: ");
+        	input = sc.next();
+        	try {
+        		id = Integer.parseInt(input);
+        		if(id == null || id <0) {
+        			System.out.println("Invalid Entry!");
+        			continue;
+        		} else {
+        			validEntry = true; 
+        		}
+        	} catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number >0.");
+            }
+        	validEntry = true; 
+    	}
+    	if(!LibraryController.bookExists(id)) {
+    		System.out.println("Book Record Not Found!");
+    	} else {
+    		LibraryController.createBookCopy(id);
+    	}
+    	
+    }
+    private static void removeCopy(Scanner sc) {
+    	
+    	boolean validEntry = false; 
+    	String input = null; 
+    	Integer id = null; 
+    	while(!validEntry) {
+    		System.out.println("Enter the Copy ID to delete: ");
+        	input = sc.next();
+        	try {
+        		id = Integer.parseInt(input);
+        		if(id == null || id <0) {
+        			System.out.println("Invalid Entry!");
+        			continue;
+        		} else {
+        			validEntry = true; 
+        		}
+        	} catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number >0.");
+            }
+        	validEntry = true; 
+    	}
+    	
+   		LibraryController.deleteBookCopyById(id.intValue());
+    }
 }

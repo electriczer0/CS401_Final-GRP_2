@@ -86,18 +86,21 @@ public class LibraryController {
      * Deletes a copy of a book from the library. Should also delete any outstanding loan for that book.
      * @param id
      */
-    public static void deleteBookById(String id){
-    	
+    public static void deleteBookCopyById(int idNum){
     	
     	try {
-            int idNum = Integer.parseInt(id);
             Copy_Access.getInstance().delete(idNum);
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid string format: " + id);
-        } catch (SQLException e) {
+        }  catch (SQLException e) {
    		e.printStackTrace();
         }
+    }
     
+    public static void deleteBookCopyById(String id) {
+    	try {
+    		deleteBookCopyById(Integer.parseInt(id));
+    	}catch (NumberFormatException e) {
+            System.out.println("Invalid string format: " + id);
+        }
     }
 
     /**
@@ -289,5 +292,40 @@ public class LibraryController {
     		e.printStackTrace();
     	}
     	return books;
+    }
+    /**
+     * Create a copy record. Assumes that the existance of bookID was handled elsewhere
+     * @param bookID
+     */
+    public static void createBookCopy(int bookID) {
+    	try {
+    		Copy_Access.getInstance().insert(Copy.create(-1, bookID));
+    	
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    /**
+     * Deletes the a copy from the copy table as specified by param 
+     * copyID need not exist in table, but nothing will happen if it does not
+     * @param copyID
+     */
+    public static void deleteBookById (int bookID) {
+    	try {
+    		Book_Access.getInstance().delete(bookID);
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    public static boolean bookExists (int bookID) {
+    	boolean exists = false; 
+    	try {
+    		exists = Book_Access.getInstance().read(bookID) != null;
+    	} catch (SQLException e) {
+    		e.printStackTrace();
+    	}
+    	return exists; 
     }
 }
