@@ -1,5 +1,5 @@
 Library Catalog Program
-By Dan Grace, Seng Heng, and Jian Ziong Lu
+By Dan Grace, Seng Heng, and Jian Xiong Lu
 
 The library program represents a traditional lending library system, in which users can brows a library catalog, view their outstanding loans, check books for availability and check out and return books. 
 Librarians can view all loans outstanding, add and remove new books, add and remove copies of those books, add and remove users, and other typical Librarian functions. 
