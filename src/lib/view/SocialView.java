@@ -206,15 +206,17 @@ public class SocialView {
         System.out.println("Please indicate in which group you'd like to post your comment.");
         System.out.println("Enter a group ID, or '0' for a global post. Note that you must be a member of a group to post in that group.");
         String id = sc.next();
+        sc.nextLine();
         System.out.println("What would you like to post?");
         String comment = sc.nextLine();
+        System.out.println(comment);
         SocialController.postRootComment(UserController.getCurrentUser(), Integer.parseInt(id), comment);
     }
 
     //Edit a comment by changing it's content. Cannot edit anything else about the comment, ex. no replacing target ID
     private static void editComment(Scanner sc){
         System.out.println("Enter the id of the comment you'd like to edit. You may only edit your own comments.");
-        String id = sc.next();
+        String id = sc.nextLine();
         Interaction existingComment = SocialController.getInteractionById(Integer.parseInt(id));
         if (existingComment == null){
             System.out.println("No comment found with that Id.");
@@ -235,6 +237,7 @@ public class SocialView {
     private static void replyComment(Scanner sc){
         System.out.println("Enter the id of the comment you're replying to.");
         String id = sc.next();
+        sc.nextLine();
         System.out.println("What would you like to post?");
         String comment = sc.nextLine();
         SocialController.postReplyComment(UserController.getCurrentUser(), Integer.parseInt(id), comment);
@@ -278,6 +281,7 @@ public class SocialView {
     private static void updateGroup(Scanner sc){
         System.out.println("Enter the group id of the group you'd like to modify. You must own this group to modify it.");
         String id = sc.next();
+        sc.nextLine();
         Group curGroup = SocialController.getGroupByGroupId(Integer.parseInt(id));
         System.out.println("The current description of this group:");
         System.out.println(curGroup.getDescription());
@@ -319,6 +323,7 @@ public class SocialView {
         System.out.println("All meetings are associated with a group. Enter the group id of the group you'd like to create a meeting for.");
         System.out.println("You must be part of the group to create a meeting for the group.");
         String id = sc.next();
+        sc.nextLine();
         System.out.println("Where is the meeting location?");
         String location = sc.nextLine();
         System.out.println("What day is the meeting? Use MM/DD/YYYY format.");
@@ -330,6 +335,7 @@ public class SocialView {
     private static void updateMeeting(Scanner sc){
         System.out.println("Enter the meeting id of the meeting you'd like to modify. You must be part of this group to update its meeting.");
         String id = sc.next();
+        sc.nextLine();
         Meeting curMeeting = SocialController.getMeetingByMeetingId(Integer.parseInt(id));
         System.out.println("The current location of this group is '" + curMeeting.getMeetingLocation() + "'.");
         System.out.println("Enter what you'd like to change the location to, or hit enter to leave it unchanged.");
