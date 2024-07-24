@@ -116,8 +116,8 @@ public class Loan_Access extends Table_Access<Loan> {
                  int loanID = rs.getInt("LoanID");
                  int copyID = rs.getInt("CopyID");
                  int id = rs.getInt("UserID");
-                 Date dateOut = rs.getDate("DateOut");
-                 Date dateDue = rs.getDate("DateDue");
+                 Date dateOut =  Date.class.cast(parseValue(Date.class, rs.getObject("DateOut")));
+                 Date dateDue = Date.class.cast(parseValue(Date.class, rs.getObject("DateDue")));
                  boolean isActive = rs.getBoolean("IsActive");
                  Loan loan = Loan.create(loanID, copyID, id, dateOut, dateDue, isActive);
                  activeLoans.put(loanID, loan);
