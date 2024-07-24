@@ -16,6 +16,9 @@ The system can be run by compiling and executing the LibraryProgram.java file.
 
 The system comes with a pre-loaded database in the root file at Library.db. In the event of corruption or if the user would like to restore the environment, a backed up database can be found in Data\Library.db.restore. 
 
+Social media functionality is also fully implemented and can be run by typing "social" at the appropriate prompt. 
+
+
 Additional documentation can be found here in the Docs folder including UML diagrams, testing overview, and in-depth testing scripts. 
 Annotated javadocs describing class interfaces and usage can be found in javadocs\
 
